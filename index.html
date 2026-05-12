@@ -243,6 +243,48 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
 .m-save{width:100%;height:42px;border:none;border-radius:10px;background:var(--navy);color:var(--amber);font-size:14px;font-weight:700;font-family:'Noto Sans KR',sans-serif;cursor:pointer}
 .m-cancel{width:100%;height:36px;border:none;border-radius:10px;background:var(--bg);color:var(--muted);font-size:13px;font-weight:700;font-family:'Noto Sans KR',sans-serif;cursor:pointer;margin-top:6px}
 
+
+/* ── MANAGEMENT TAB ── */
+.mgmt-sec{padding:10px 11px 100px}
+.mgmt-card{background:var(--card);border-radius:var(--r);padding:14px;margin-bottom:10px;box-shadow:var(--sh)}
+.mgmt-title{font-size:13px;font-weight:700;color:var(--navy);margin-bottom:12px;display:flex;align-items:center;gap:6px}
+.mgmt-row{display:flex;gap:7px;margin-bottom:8px;align-items:center}
+.mgmt-inp{flex:1;border:1.5px solid var(--border);border-radius:9px;padding:8px 11px;font-size:13px;font-family:'Noto Sans KR',sans-serif;outline:none;color:var(--text);background:var(--bg)}
+.mgmt-inp:focus{border-color:var(--navy);background:#fff}
+.mgmt-sel{flex:1;border:1.5px solid var(--border);border-radius:9px;padding:8px 11px;font-size:13px;font-family:'Noto Sans KR',sans-serif;outline:none;color:var(--text);background:var(--bg);appearance:none}
+.mgmt-btn{padding:8px 14px;border:none;border-radius:9px;font-size:12px;font-weight:700;font-family:'Noto Sans KR',sans-serif;cursor:pointer;white-space:nowrap}
+.mgmt-btn.navy{background:var(--navy);color:var(--amber)}
+.mgmt-btn.green{background:var(--green);color:#fff}
+.mgmt-btn.red{background:var(--red);color:#fff}
+.mgmt-btn.amber{background:var(--amber);color:var(--navy)}
+.mgmt-lbl{font-size:11px;font-weight:700;color:var(--muted);margin-bottom:4px}
+.member-search-result{margin-top:8px}
+.member-item{background:var(--bg);border-radius:9px;padding:10px 12px;margin-bottom:5px;display:flex;align-items:center;gap:9px}
+.member-item-info{flex:1;min-width:0}
+.member-item-name{font-size:13px;font-weight:700}
+.member-item-sub{font-size:11px;color:var(--muted);margin-top:1px}
+.badge{display:inline-flex;align-items:center;padding:2px 7px;border-radius:99px;font-size:10px;font-weight:700}
+.badge.active{background:#dcfce7;color:#166534}
+.badge.left{background:#fee2e2;color:#991b1b}
+.badge.guest{background:#fef3c7;color:#92400e}
+.badge.paid{background:#dbeafe;color:#1e40af}
+.badge.unpaid{background:#fee2e2;color:#991b1b}
+.fin-item{background:var(--bg);border-radius:9px;padding:9px 12px;margin-bottom:5px;display:flex;align-items:center;gap:8px}
+.fin-item-info{flex:1;min-width:0}
+.fin-item-desc{font-size:13px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.fin-item-sub{font-size:10px;color:var(--muted);margin-top:1px}
+.fin-item-amt{font-size:14px;font-weight:900;flex-shrink:0}
+.fin-item-amt.plus{color:var(--green)}
+.fin-item-amt.minus{color:var(--red)}
+.fin-del{background:none;border:none;color:var(--muted);cursor:pointer;font-size:16px;padding:2px 4px;flex-shrink:0}
+.balance-card{background:linear-gradient(135deg,var(--navy),#1e3a8a);border-radius:var(--r);padding:20px;margin-bottom:10px;color:#fff}
+.balance-lbl{font-size:11px;font-weight:700;opacity:.7;margin-bottom:4px}
+.balance-val{font-size:32px;font-weight:900;line-height:1}
+.balance-sub{display:flex;gap:16px;margin-top:10px;font-size:11px;opacity:.8}
+.tab-row{display:flex;gap:5px;margin-bottom:12px}
+.tab-pill{flex:1;padding:7px 4px;border:1.5px solid var(--border);border-radius:9px;background:#fff;color:var(--muted);font-size:11px;font-weight:700;font-family:'Noto Sans KR',sans-serif;cursor:pointer;text-align:center}
+.tab-pill.active{background:var(--navy);border-color:var(--navy);color:var(--amber)}
+
 /* ── MISC ── */
 .empty{text-align:center;padding:28px 20px;color:var(--muted);font-size:14px}
 .loading{text-align:center;padding:48px 20px;color:var(--muted)}
@@ -310,6 +352,7 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
   <button class="tBtn active" id="tab-att"  onclick="switchTab('att')">☑️ 참석여부</button>
   <button class="tBtn"        id="tab-lane" onclick="switchTab('lane')">🎳 레인배정</button>
   <button class="tBtn"        id="tab-dash" onclick="switchTab('dash')">📊 대시보드</button>
+  <button class="tBtn"        id="tab-mgmt" onclick="switchTab('mgmt')">⚙️ 관리</button>
 </div>
 
 <div class="scr" id="scr">
@@ -420,6 +463,124 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
       <div class="chart-title">🎳 참석 TOP 10</div>
       <div id="rank-att"></div>
     </div>
+  </div>
+</div>
+
+
+<!-- ══ 관리 ══ -->
+<div class="sec" id="sec-mgmt">
+  <div class="mgmt-sec">
+
+    <!-- 서브탭 -->
+    <div class="tab-row">
+      <button class="tab-pill active" id="mtab-member" onclick="setMgmtTab('member',this)">👤 회원</button>
+      <button class="tab-pill" id="mtab-finance" onclick="setMgmtTab('finance',this)">💰 가계부</button>
+      <button class="tab-pill" id="mtab-score" onclick="setMgmtTab('score',this)">🎳 점수</button>
+    </div>
+
+    <!-- 회원 관리 -->
+    <div id="msec-member">
+      <!-- 회원 검색 -->
+      <div class="mgmt-card">
+        <div class="mgmt-title">🔍 회원 검색 / 수정</div>
+        <div class="mgmt-row">
+          <input class="mgmt-inp" id="m-search" type="search" placeholder="이름 검색..." oninput="searchMember()">
+        </div>
+        <div id="m-search-result"></div>
+      </div>
+
+      <!-- 신규 회원 추가 -->
+      <div class="mgmt-card">
+        <div class="mgmt-title">➕ 신규 회원 추가</div>
+        <div class="mgmt-lbl">이름</div>
+        <div class="mgmt-row"><input class="mgmt-inp" id="new-name" type="text" placeholder="홍길동"></div>
+        <div class="mgmt-lbl">학과</div>
+        <div class="mgmt-row"><input class="mgmt-inp" id="new-dept" type="text" placeholder="컴퓨터공학과"></div>
+        <div class="mgmt-lbl">학번 (앞 2자리)</div>
+        <div class="mgmt-row"><input class="mgmt-inp" id="new-grade" type="text" placeholder="24"></div>
+        <div class="mgmt-lbl">에버리지 (없으면 0)</div>
+        <div class="mgmt-row"><input class="mgmt-inp" id="new-avg" type="number" placeholder="0" value="0"></div>
+        <div class="mgmt-lbl">상태</div>
+        <div class="mgmt-row">
+          <select class="mgmt-sel" id="new-status">
+            <option value="active">일반 회원</option>
+            <option value="guest">게스트</option>
+          </select>
+        </div>
+        <button class="mgmt-btn navy" style="width:100%;height:40px" onclick="addNewMember()">✅ 추가</button>
+      </div>
+    </div>
+
+    <!-- 가계부 -->
+    <div id="msec-finance" style="display:none">
+      <!-- 잔액 카드 -->
+      <div class="balance-card">
+        <div class="balance-lbl">💰 현재 잔액</div>
+        <div class="balance-val" id="balance-val">-</div>
+        <div class="balance-sub">
+          <span>수입 <strong id="balance-income">-</strong></span>
+          <span>지출 <strong id="balance-expense">-</strong></span>
+        </div>
+      </div>
+
+      <!-- 수입/지출 입력 -->
+      <div class="mgmt-card">
+        <div class="mgmt-title">➕ 내역 추가</div>
+        <div class="mgmt-lbl">날짜</div>
+        <div class="mgmt-row"><input class="mgmt-inp" id="fin-date" type="date"></div>
+        <div class="mgmt-lbl">내용</div>
+        <div class="mgmt-row"><input class="mgmt-inp" id="fin-desc" type="text" placeholder="팀퍼펙트 경품 지급"></div>
+        <div class="mgmt-lbl">금액 (지출은 - 붙이기)</div>
+        <div class="mgmt-row">
+          <input class="mgmt-inp" id="fin-amount" type="number" placeholder="-50000">
+          <select class="mgmt-sel" id="fin-cat" style="max-width:100px">
+            <option value="수입">수입</option>
+            <option value="지출">지출</option>
+            <option value="경품">경품</option>
+            <option value="이자">이자</option>
+            <option value="캐시백">캐시백</option>
+            <option value="이월">이월</option>
+            <option value="기타">기타</option>
+          </select>
+        </div>
+        <div class="mgmt-lbl">메모 (선택)</div>
+        <div class="mgmt-row"><input class="mgmt-inp" id="fin-note" type="text" placeholder=""></div>
+        <button class="mgmt-btn navy" style="width:100%;height:40px" onclick="addFinanceEntry()">✅ 추가</button>
+      </div>
+
+      <!-- 내역 목록 -->
+      <div class="mgmt-card">
+        <div class="mgmt-title">📋 내역 목록</div>
+        <div id="fin-list"><div class="loading"><div class="spinner"></div>불러오는 중...</div></div>
+      </div>
+    </div>
+
+    <!-- 점수 입력 -->
+    <div id="msec-score" style="display:none">
+      <div class="mgmt-card">
+        <div class="mgmt-title">🎳 점수 입력</div>
+        <div class="mgmt-lbl">이름</div>
+        <div class="mgmt-row">
+          <input class="mgmt-inp" id="sc-name" type="text" placeholder="이름 검색 후 선택" oninput="filterScoreMembers()">
+        </div>
+        <div id="sc-name-list" style="margin-bottom:8px"></div>
+        <div class="mgmt-lbl">날짜</div>
+        <div class="mgmt-row"><input class="mgmt-inp" id="sc-date" type="date"></div>
+        <div class="mgmt-lbl">총합 점수</div>
+        <div class="mgmt-row"><input class="mgmt-inp" id="sc-total" type="number" placeholder="390"></div>
+        <div class="mgmt-lbl">게임 수</div>
+        <div class="mgmt-row"><input class="mgmt-inp" id="sc-games" type="number" placeholder="3" value="3"></div>
+        <div id="sc-avg-preview" style="font-size:12px;color:var(--muted);margin-bottom:10px"></div>
+        <button class="mgmt-btn navy" style="width:100%;height:40px" onclick="submitScore()">✅ 점수 저장</button>
+      </div>
+
+      <!-- 최근 점수 -->
+      <div class="mgmt-card">
+        <div class="mgmt-title">📊 최근 점수 기록</div>
+        <div id="recent-scores"></div>
+      </div>
+    </div>
+
   </div>
 </div>
 
@@ -739,7 +900,7 @@ function setEvtBadge(title){
 //  탭
 // ══════════════════════════════════════════════════════
 function switchTab(tab){
-  ['att','lane','dash'].forEach(t=>{
+  ['att','lane','dash','mgmt'].forEach(t=>{
     document.getElementById(`sec-${t}`).classList.toggle('active',t===tab);
     document.getElementById(`tab-${t}`).classList.toggle('active',t===tab);
   });
@@ -1289,6 +1450,259 @@ function toast(msg){
   t.textContent=msg;t.style.opacity='1';t.style.transform='translateX(-50%) translateY(0)';
   clearTimeout(_tt);_tt=setTimeout(()=>{t.style.opacity='0';},2400);
 }
+
+
+// ══════════════════════════════════════════════════════
+//  관리 탭
+// ══════════════════════════════════════════════════════
+let currentMgmtTab = 'member';
+let finances = [];
+
+function setMgmtTab(tab, el) {
+  currentMgmtTab = tab;
+  document.querySelectorAll('.tab-pill').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  ['member','finance','score'].forEach(t => {
+    document.getElementById('msec-' + t).style.display = t === tab ? 'block' : 'none';
+  });
+  if (tab === 'finance') loadFinances();
+  if (tab === 'score') {
+    const today = new Date().toISOString().slice(0,10);
+    document.getElementById('sc-date').value = today;
+    loadRecentScores();
+  }
+}
+
+// ── 회원 검색 ──
+function searchMember() {
+  const q = document.getElementById('m-search').value.trim();
+  const el = document.getElementById('m-search-result');
+  if (!q) { el.innerHTML = ''; return; }
+  const filtered = members.filter(m => m.name.includes(q));
+  if (!filtered.length) { el.innerHTML = '<div class="empty">없음</div>'; return; }
+  el.innerHTML = filtered.map(m => `
+    <div class="member-item">
+      <div class="member-item-info">
+        <div class="member-item-name">${m.name}
+          <span class="badge ${m.status}">${m.status==='active'?'활성':m.status==='guest'?'게스트':'탈퇴'}</span>
+          <span class="badge ${m.feePaid==='O'?'paid':'unpaid'}">${m.feePaid==='O'?'납부':'미납'}</span>
+        </div>
+        <div class="member-item-sub">${m.dept} · ${m.grade}학번 · 에버 ${m.avg||'-'}</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:4px">
+        <button class="mgmt-btn amber" style="font-size:10px;padding:4px 8px" onclick="toggleFee('${m.name.replace(/'/g,"\'")}','${m.feePaid}')">
+          ${m.feePaid==='O'?'납부→미납':'미납→납부'}
+        </button>
+        ${m.status==='active'
+          ? `<button class="mgmt-btn red" style="font-size:10px;padding:4px 8px" onclick="setLeft('${m.name.replace(/'/g,"\'")}')">탈퇴처리</button>`
+          : `<button class="mgmt-btn green" style="font-size:10px;padding:4px 8px" onclick="setActive('${m.name.replace(/'/g,"\'")}')">복귀처리</button>`
+        }
+      </div>
+    </div>`).join('');
+}
+
+async function toggleFee(name, current) {
+  const newFee = current === 'O' ? 'X' : 'O';
+  const res = await callGAS({ action:'updateMember', name, feePaid: newFee });
+  if (res.ok) {
+    const m = members.find(m => m.name === name);
+    if (m) m.feePaid = newFee;
+    toast(`✅ ${name} 회비 ${newFee==='O'?'납부':'미납'} 처리`);
+    searchMember(); renderList();
+  }
+}
+
+async function setLeft(name) {
+  if (!confirm(`"${name}"을 탈퇴 처리하시겠어요?`)) return;
+  const res = await callGAS({ action:'updateMember', name, status:'left' });
+  if (res.ok) {
+    const m = members.find(m => m.name === name);
+    if (m) m.status = 'left';
+    toast(`✅ ${name} 탈퇴 처리됨`);
+    searchMember(); renderList();
+  }
+}
+
+async function setActive(name) {
+  const res = await callGAS({ action:'updateMember', name, status:'active' });
+  if (res.ok) {
+    const m = members.find(m => m.name === name);
+    if (m) m.status = 'active';
+    toast(`✅ ${name} 복귀 처리됨`);
+    searchMember(); renderList();
+  }
+}
+
+async function addNewMember() {
+  const name    = document.getElementById('new-name').value.trim();
+  const dept    = document.getElementById('new-dept').value.trim();
+  const grade   = document.getElementById('new-grade').value.trim();
+  const avg     = document.getElementById('new-avg').value || 0;
+  const status  = document.getElementById('new-status').value;
+
+  if (!name) { toast('이름을 입력하세요'); return; }
+
+  const res = await callGAS({ action:'addMember', name, dept, grade, avg, feePaid:'X', status });
+  if (res.ok) {
+    members.push({ name, dept, grade, avg: parseFloat(avg)||0, feePaid:'X', status });
+    toast(`✅ ${name} 추가됨`);
+    document.getElementById('new-name').value = '';
+    document.getElementById('new-dept').value = '';
+    document.getElementById('new-grade').value = '';
+    document.getElementById('new-avg').value = '0';
+    renderList();
+  } else {
+    toast('❌ ' + (res.message || res.error));
+  }
+}
+
+// ── 가계부 ──
+async function loadFinances() {
+  document.getElementById('fin-list').innerHTML = '<div class="loading"><div class="spinner"></div>불러오는 중...</div>';
+  try {
+    const res = await gasGet('getFinances');
+    if (res.error) throw new Error(res.error);
+    finances = res;
+    renderFinances();
+    // 잔액 업데이트
+    const dash = await gasGet('getDashboard');
+    if (!dash.error) {
+      document.getElementById('balance-val').textContent = fmt(dash.balance) + '원';
+      document.getElementById('balance-income').textContent = fmt(dash.income) + '원';
+      document.getElementById('balance-expense').textContent = fmt(Math.abs(dash.expense)) + '원';
+    }
+  } catch(e) { toast('가계부 로드 실패: ' + e.message); }
+}
+
+function renderFinances() {
+  const el = document.getElementById('fin-list');
+  if (!finances.length) { el.innerHTML = '<div class="empty">내역 없음</div>'; return; }
+  const sorted = [...finances].sort((a,b) => b.date.localeCompare(a.date));
+  el.innerHTML = sorted.map(f => `
+    <div class="fin-item">
+      <div class="fin-item-info">
+        <div class="fin-item-desc">${f.desc}</div>
+        <div class="fin-item-sub">${f.date} · ${f.category}</div>
+      </div>
+      <div class="fin-item-amt ${f.amount>=0?'plus':'minus'}">${f.amount>=0?'+':''}${fmt(f.amount)}</div>
+      <button class="fin-del" onclick="deleteFinEntry(${f.rowNum})">🗑</button>
+    </div>`).join('');
+}
+
+async function addFinanceEntry() {
+  const date   = document.getElementById('fin-date').value;
+  const desc   = document.getElementById('fin-desc').value.trim();
+  const amount = parseFloat(document.getElementById('fin-amount').value);
+  const cat    = document.getElementById('fin-cat').value;
+  const note   = document.getElementById('fin-note').value.trim();
+
+  if (!desc) { toast('내용을 입력하세요'); return; }
+  if (isNaN(amount)) { toast('금액을 입력하세요'); return; }
+
+  const res = await callGAS({ action:'addFinance', date, desc, amount, category:cat, note });
+  if (res.ok) {
+    toast('✅ 추가됨');
+    document.getElementById('fin-desc').value = '';
+    document.getElementById('fin-amount').value = '';
+    document.getElementById('fin-note').value = '';
+    loadFinances();
+  } else toast('❌ ' + res.error);
+}
+
+async function deleteFinEntry(rowNum) {
+  if (!confirm('이 내역을 삭제할까요?')) return;
+  const res = await callGAS({ action:'deleteFinance', rowNum });
+  if (res.ok) { toast('🗑 삭제됨'); loadFinances(); }
+}
+
+// ── 점수 입력 ──
+function filterScoreMembers() {
+  const q = document.getElementById('sc-name').value.trim();
+  const el = document.getElementById('sc-name-list');
+  updateScoreAvgPreview();
+  if (!q || q.length < 1) { el.innerHTML = ''; return; }
+  const filtered = members.filter(m => m.name.includes(q) && m.status !== 'left').slice(0, 5);
+  el.innerHTML = filtered.map(m =>
+    `<div style="padding:6px 10px;background:var(--bg);border-radius:7px;margin-bottom:3px;cursor:pointer;font-size:13px;font-weight:700"
+      onclick="selectScoreName('${m.name.replace(/'/g,"\'")}')">${m.name} <span style="font-size:10px;color:var(--muted)">${m.dept}</span></div>`
+  ).join('');
+}
+
+function selectScoreName(name) {
+  document.getElementById('sc-name').value = name;
+  document.getElementById('sc-name-list').innerHTML = '';
+  updateScoreAvgPreview();
+}
+
+function updateScoreAvgPreview() {
+  const total = parseFloat(document.getElementById('sc-total').value) || 0;
+  const games = parseInt(document.getElementById('sc-games').value) || 1;
+  const el = document.getElementById('sc-avg-preview');
+  if (total && games) {
+    el.textContent = `→ 1게임 평균: ${Math.round(total/games*10)/10}점`;
+  } else {
+    el.textContent = '';
+  }
+}
+
+async function submitScore() {
+  const name  = document.getElementById('sc-name').value.trim();
+  const date  = document.getElementById('sc-date').value;
+  const total = parseFloat(document.getElementById('sc-total').value);
+  const games = parseInt(document.getElementById('sc-games').value) || 1;
+
+  if (!name) { toast('이름을 입력하세요'); return; }
+  if (!total || isNaN(total)) { toast('점수를 입력하세요'); return; }
+
+  const res = await callGAS({ action:'addScore', name, date, totalScore:total, games });
+  if (res.ok) {
+    toast(`✅ ${name} 점수 저장됨 (평균 ${res.avg}점)`);
+    // 로컬 에버리지 업데이트
+    const m = members.find(m => m.name === name);
+    if (m) m.avg = res.avg;
+    document.getElementById('sc-total').value = '';
+    loadRecentScores(); renderList();
+  } else toast('❌ ' + res.error);
+}
+
+async function loadRecentScores() {
+  const el = document.getElementById('recent-scores');
+  try {
+    const res = await gasGet('getScores');
+    if (res.error) throw new Error(res.error);
+    const recent = [...res].sort((a,b) => b.date.localeCompare(a.date)).slice(0, 15);
+    el.innerHTML = recent.map(s =>
+      `<div class="fin-item">
+        <div class="fin-item-info">
+          <div class="fin-item-desc">${s.name}</div>
+          <div class="fin-item-sub">${s.date} · ${s.games}게임</div>
+        </div>
+        <div class="fin-item-amt plus">avg ${s.avg}</div>
+      </div>`).join('') || '<div class="empty">없음</div>';
+  } catch(e) { el.innerHTML = '<div class="empty">로드 실패</div>'; }
+}
+
+// ── 공통 유틸 ──
+function fmt(n) {
+  return Math.round(n).toLocaleString('ko-KR');
+}
+
+async function callGAS(body) {
+  try {
+    return await gasPost(body);
+  } catch(e) {
+    // POST 실패시 GET fallback
+    try { return await gasGet(body.action, body); }
+    catch(e2) { return { error: e2.message }; }
+  }
+}
+
+// 오늘 날짜 기본값
+window.addEventListener('DOMContentLoaded', () => {
+  const today = new Date().toISOString().slice(0,10);
+  const finDate = document.getElementById('fin-date');
+  if (finDate) finDate.value = today;
+});
 
 // init
 updateLaneLbl();
