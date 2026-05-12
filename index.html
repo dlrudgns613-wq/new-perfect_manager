@@ -465,19 +465,23 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
     <!-- 가계부 요약 -->
     <div class="chart-card">
       <div class="chart-title">💰 가계부 현황</div>
-      <div style="display:flex;gap:10px;margin-bottom:10px">
+      <div style="display:flex;gap:8px;margin-bottom:8px">
         <div style="flex:1;background:var(--bg);border-radius:9px;padding:10px;text-align:center">
           <div style="font-size:10px;color:var(--muted);margin-bottom:3px">회계상 잔액</div>
-          <div style="font-size:16px;font-weight:900;color:var(--navy)" id="d-balance">-</div>
+          <div style="font-size:15px;font-weight:900;color:var(--navy)" id="d-balance">-</div>
         </div>
         <div style="flex:1;background:var(--bg);border-radius:9px;padding:10px;text-align:center">
           <div style="font-size:10px;color:var(--muted);margin-bottom:3px">총 수입</div>
-          <div style="font-size:16px;font-weight:900;color:var(--green)" id="d-income">-</div>
+          <div style="font-size:14px;font-weight:900;color:var(--green)" id="d-income">-</div>
         </div>
         <div style="flex:1;background:var(--bg);border-radius:9px;padding:10px;text-align:center">
           <div style="font-size:10px;color:var(--muted);margin-bottom:3px">총 지출</div>
-          <div style="font-size:16px;font-weight:900;color:var(--red)" id="d-expense">-</div>
+          <div style="font-size:14px;font-weight:900;color:var(--red)" id="d-expense">-</div>
         </div>
+      </div>
+      <div style="background:#fef3c7;border-radius:9px;padding:9px 12px;display:flex;justify-content:space-between;align-items:center">
+        <span style="font-size:12px;font-weight:700;color:#92400e">🔢 반올림 오차 누계</span>
+        <span style="font-size:15px;font-weight:900;color:var(--navy)" id="d-rounding">-</span>
       </div>
     </div>
 
@@ -563,6 +567,45 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
           <span>수입 <strong id="balance-income">-</strong></span>
           <span>지출 <strong id="balance-expense">-</strong></span>
         </div>
+      </div>
+
+      <!-- 뒷풀이 반올림 계산기 -->
+      <div class="mgmt-card">
+        <div class="mgmt-title">🔢 뒷풀이 반올림 계산기</div>
+        <div style="font-size:11px;color:var(--muted);margin-bottom:10px;line-height:1.6">
+          총액 ÷ 인원수 = 1인당 금액(올림) → 잔돈 자동 계산 후 가계부 기록
+        </div>
+        <div class="mgmt-lbl">모임 (ex: [정기] 5/14)</div>
+        <div class="mgmt-row"><input class="mgmt-inp" id="rd-event" type="text" placeholder="[정기] 5/14" list="event-list-rd">
+          <datalist id="event-list-rd"></datalist>
+        </div>
+        <div style="display:flex;gap:8px">
+          <div style="flex:1">
+            <div class="mgmt-lbl">뒷풀이 총액</div>
+            <input class="mgmt-inp" id="rd-total" type="number" placeholder="150000" oninput="calcRounding()">
+          </div>
+          <div style="flex:1">
+            <div class="mgmt-lbl">참석 인원수</div>
+            <input class="mgmt-inp" id="rd-cnt" type="number" placeholder="12" oninput="calcRounding()">
+          </div>
+        </div>
+        <div id="rd-result" style="background:var(--bg);border-radius:9px;padding:10px;margin:8px 0;display:none">
+          <div style="display:flex;justify-content:space-between;margin-bottom:4px">
+            <span style="font-size:12px;color:var(--muted)">1인당 금액</span>
+            <span style="font-size:15px;font-weight:900;color:var(--navy)" id="rd-per">-</span>
+          </div>
+          <div style="display:flex;justify-content:space-between">
+            <span style="font-size:12px;color:var(--muted)">잔돈 (가계부 반영)</span>
+            <span style="font-size:15px;font-weight:900" id="rd-remain">-</span>
+          </div>
+        </div>
+        <button class="mgmt-btn navy" style="width:100%;height:38px" onclick="submitRounding()">💾 가계부에 기록</button>
+      </div>
+
+      <!-- 반올림 이력 -->
+      <div class="mgmt-card">
+        <div class="mgmt-title">📋 반올림 이력 <span id="rounding-total" style="font-size:11px;color:var(--muted);font-weight:400"></span></div>
+        <div id="rounding-list"></div>
       </div>
 
       <!-- 수입/지출 입력 -->
@@ -1672,6 +1715,7 @@ function updateBalanceDisplay() {
 function renderFinances() {
   const el = document.getElementById('fin-list');
   if (!el) return;
+  renderRoundingHistory();
   if (!finances.length) { el.innerHTML = '<div class="empty">내역 없음</div>'; return; }
   const sorted = [...finances].sort((a,b) => b.date.localeCompare(a.date));
   el.innerHTML = sorted.map(f => `
@@ -1683,6 +1727,81 @@ function renderFinances() {
       <div class="fin-item-amt ${f.amount>=0?'plus':'minus'}">${f.amount>=0?'+':''}${fmt(f.amount)}</div>
       <button class="fin-del" onclick="deleteFinEntry(${f.rowNum})">🗑</button>
     </div>`).join('');
+}
+
+
+// ── 반올림 계산기 ──
+function calcRounding() {
+  const total = parseFloat(document.getElementById('rd-total').value) || 0;
+  const cnt   = parseInt(document.getElementById('rd-cnt').value) || 0;
+  const el    = document.getElementById('rd-result');
+  if (!total || !cnt) { el.style.display='none'; return; }
+
+  const perPerson = Math.ceil(total / cnt);
+  const rounding  = (perPerson * cnt) - total; // 양수 = 동아리 이득
+
+  el.style.display = 'block';
+  document.getElementById('rd-per').textContent = fmt(perPerson) + '원';
+  const remEl = document.getElementById('rd-remain');
+  remEl.textContent = (rounding >= 0 ? '+' : '') + fmt(rounding) + '원';
+  remEl.style.color = rounding >= 0 ? 'var(--green)' : 'var(--red)';
+}
+
+async function submitRounding() {
+  const eventTitle    = document.getElementById('rd-event').value.trim();
+  const totalExpense  = parseFloat(document.getElementById('rd-total').value);
+  const attendees     = parseInt(document.getElementById('rd-cnt').value);
+
+  if (!eventTitle) { toast('모임명을 입력하세요'); return; }
+  if (!totalExpense || isNaN(totalExpense)) { toast('총액을 입력하세요'); return; }
+  if (!attendees || isNaN(attendees)) { toast('인원수를 입력하세요'); return; }
+
+  const res = await callGAS({ action:'addRounding', eventTitle, totalExpense, attendees });
+  if (res.ok) {
+    toast(`✅ 1인당 ${fmt(res.perPerson)}원 · 잔돈 ${res.rounding >= 0 ? '+' : ''}${res.rounding}원 기록됨`);
+    document.getElementById('rd-event').value = '';
+    document.getElementById('rd-total').value = '';
+    document.getElementById('rd-cnt').value = '';
+    document.getElementById('rd-result').style.display = 'none';
+    loadFinances();
+  } else toast('❌ ' + (res.error || '실패'));
+}
+
+function renderRoundingHistory() {
+  const el    = document.getElementById('rounding-list');
+  const total = document.getElementById('rounding-total');
+  if (!el) return;
+
+  const items = finances.filter(f => f.category === '반올림');
+  if (!items.length) {
+    el.innerHTML = '<div class="empty">반올림 기록 없음</div>';
+    if (total) total.textContent = '';
+    return;
+  }
+
+  const sum = items.reduce((s, f) => s + f.amount, 0);
+  if (total) total.textContent = `합계: ${sum >= 0 ? '+' : ''}${fmt(sum)}원`;
+
+  // 대시보드 반올림 합계도 갱신
+  const dr = document.getElementById('d-rounding');
+  if (dr) dr.textContent = (sum >= 0 ? '+' : '') + fmt(sum) + '원';
+
+  el.innerHTML = items.sort((a,b) => b.date.localeCompare(a.date)).map(f => `
+    <div class="fin-item">
+      <div class="fin-item-info">
+        <div class="fin-item-desc">${f.desc}</div>
+        <div class="fin-item-sub">${f.date} · ${f.note || ''}</div>
+      </div>
+      <div class="fin-item-amt ${f.amount>=0?'plus':'minus'}">${f.amount>=0?'+':''}${fmt(f.amount)}원</div>
+      <button class="fin-del" onclick="deleteFinEntry(${f.rowNum})">🗑</button>
+    </div>`).join('');
+}
+
+// ── 이벤트 datalist 갱신 (반올림 계산기용) ──
+function updateEventDatalist() {
+  const dl = document.getElementById('event-list-rd');
+  if (!dl) return;
+  dl.innerHTML = events.map(e => `<option value="${e.title}">`).join('');
 }
 
 async function addFinanceEntry() {
@@ -1765,23 +1884,27 @@ async function submitBulkScore() {
   const btn = document.querySelector('[onclick="submitBulkScore()"]');
   if (btn) { btn.textContent = '⏳ 저장 중...'; btn.disabled = true; }
 
-  let ok = 0, fail = [];
-  for (const r of parsed) {
-    const res = await callGAS({ action:'addScore', name:r.name, date, totalScore:r.total, games:r.games });
-    if (res.ok) {
-      ok++;
-      const m = members.find(m => m.name === r.name);
-      if (m && res.avg) m.avg = res.avg;
-    } else {
-      fail.push(r.name);
-    }
-  }
+  // ★ 핵심: 개별 저장 대신 한 번에 전송
+  const scores = parsed.map(r => ({ name:r.name, date, totalScore:r.total, games:r.games }));
+  const res = await callGAS({ action:'bulkAddScores', scores });
 
   if (btn) { btn.textContent = '✅ 일괄 저장'; btn.disabled = false; }
-  toast(`✅ ${ok}명 저장 완료${fail.length?' · ❌'+fail.join(','):''}`);
-  document.getElementById('sc-paste').value = '';
-  document.getElementById('sc-preview').innerHTML = '';
-  loadRecentScores(); renderList();
+
+  if (res.ok) {
+    // 로컬 에버리지 업데이트
+    if (res.avgs) {
+      Object.entries(res.avgs).forEach(([name, avg]) => {
+        const m = members.find(m => m.name === name);
+        if (m) m.avg = avg;
+      });
+    }
+    toast(`✅ ${res.count}명 저장 완료!`);
+    document.getElementById('sc-paste').value = '';
+    document.getElementById('sc-preview').innerHTML = '';
+    loadRecentScores(); renderList();
+  } else {
+    toast('❌ 저장 실패: ' + (res.error || ''));
+  }
 }
 
 async function loadRecentScores() {
