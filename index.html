@@ -447,6 +447,41 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
       <div class="stat-card"><div class="stat-lbl">회비 납부율</div><div class="stat-val" id="d-fee-rate">-</div><div class="stat-sub" id="d-fee-sub">명 납부</div></div>
       <div class="stat-card"><div class="stat-lbl">미납자</div><div class="stat-val" id="d-unpaid" style="color:var(--red)">-</div><div class="stat-sub">명</div></div>
     </div>
+    <!-- 상세 통계 -->
+    <div class="stat-grid" style="margin-bottom:10px">
+      <div class="stat-card"><div class="stat-lbl">💰 회비 납부율</div><div class="stat-val" id="d-fee-rate2">-</div><div class="stat-sub" id="d-fee-sub2">-</div></div>
+      <div class="stat-card"><div class="stat-lbl">⚠️ 게스트</div><div class="stat-val" id="d-guest">-</div><div class="stat-sub">명</div></div>
+    </div>
+
+    <!-- 미납자 명단 -->
+    <div class="chart-card">
+      <div class="chart-title" style="display:flex;justify-content:space-between;align-items:center">
+        <span>⚠️ 회비 미납자 명단</span>
+        <span id="unpaid-cnt" style="font-size:11px;color:var(--red);font-weight:700"></span>
+      </div>
+      <div id="unpaid-list"></div>
+    </div>
+
+    <!-- 가계부 요약 -->
+    <div class="chart-card">
+      <div class="chart-title">💰 가계부 현황</div>
+      <div style="display:flex;gap:10px;margin-bottom:10px">
+        <div style="flex:1;background:var(--bg);border-radius:9px;padding:10px;text-align:center">
+          <div style="font-size:10px;color:var(--muted);margin-bottom:3px">회계상 잔액</div>
+          <div style="font-size:16px;font-weight:900;color:var(--navy)" id="d-balance">-</div>
+        </div>
+        <div style="flex:1;background:var(--bg);border-radius:9px;padding:10px;text-align:center">
+          <div style="font-size:10px;color:var(--muted);margin-bottom:3px">총 수입</div>
+          <div style="font-size:16px;font-weight:900;color:var(--green)" id="d-income">-</div>
+        </div>
+        <div style="flex:1;background:var(--bg);border-radius:9px;padding:10px;text-align:center">
+          <div style="font-size:10px;color:var(--muted);margin-bottom:3px">총 지출</div>
+          <div style="font-size:16px;font-weight:900;color:var(--red)" id="d-expense">-</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 모임별 참석자 -->
     <div class="chart-card">
       <div class="chart-title">📅 모임별 참석자 수</div>
       <div class="evt-trend" id="evt-trend"></div>
@@ -480,13 +515,19 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
 
     <!-- 회원 관리 -->
     <div id="msec-member">
-      <!-- 회원 검색 -->
+      <!-- 필터 + 검색 -->
       <div class="mgmt-card">
-        <div class="mgmt-title">🔍 회원 검색 / 수정</div>
-        <div class="mgmt-row">
-          <input class="mgmt-inp" id="m-search" type="search" placeholder="이름 검색..." oninput="searchMember()">
+        <div class="mgmt-title">👥 회원 목록</div>
+        <div class="mgmt-row" style="margin-bottom:8px">
+          <input class="mgmt-inp" id="m-search" type="search" placeholder="이름 검색..." oninput="renderMemberList()">
         </div>
-        <div id="m-search-result"></div>
+        <div style="display:flex;gap:5px;margin-bottom:10px;flex-wrap:wrap">
+          <button class="tab-pill active" id="mf-all"    onclick="setMemFilter('all',this)">전체</button>
+          <button class="tab-pill" id="mf-active"  onclick="setMemFilter('active',this)">활성</button>
+          <button class="tab-pill" id="mf-unpaid"  onclick="setMemFilter('unpaid',this)">미납</button>
+          <button class="tab-pill" id="mf-left"    onclick="setMemFilter('left',this)">탈퇴</button>
+        </div>
+        <div id="m-list"></div>
       </div>
 
       <!-- 신규 회원 추가 -->
@@ -494,13 +535,14 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
         <div class="mgmt-title">➕ 신규 회원 추가</div>
         <div class="mgmt-lbl">이름</div>
         <div class="mgmt-row"><input class="mgmt-inp" id="new-name" type="text" placeholder="홍길동"></div>
-        <div class="mgmt-lbl">학과</div>
-        <div class="mgmt-row"><input class="mgmt-inp" id="new-dept" type="text" placeholder="컴퓨터공학과"></div>
+        <div class="mgmt-lbl">학과 (기존 학과 선택 또는 직접 입력)</div>
+        <div class="mgmt-row">
+          <input class="mgmt-inp" id="new-dept" type="text" placeholder="학과명 입력 또는 선택" list="dept-list">
+          <datalist id="dept-list"></datalist>
+        </div>
         <div class="mgmt-lbl">학번 (앞 2자리)</div>
-        <div class="mgmt-row"><input class="mgmt-inp" id="new-grade" type="text" placeholder="24"></div>
-        <div class="mgmt-lbl">에버리지 (없으면 0)</div>
-        <div class="mgmt-row"><input class="mgmt-inp" id="new-avg" type="number" placeholder="0" value="0"></div>
-        <div class="mgmt-lbl">상태</div>
+        <div class="mgmt-row"><input class="mgmt-inp" id="new-grade" type="text" placeholder="24" maxlength="2"></div>
+        <div class="mgmt-lbl">게스트 여부</div>
         <div class="mgmt-row">
           <select class="mgmt-sel" id="new-status">
             <option value="active">일반 회원</option>
@@ -558,20 +600,21 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
     <!-- 점수 입력 -->
     <div id="msec-score" style="display:none">
       <div class="mgmt-card">
-        <div class="mgmt-title">🎳 점수 입력</div>
-        <div class="mgmt-lbl">이름</div>
-        <div class="mgmt-row">
-          <input class="mgmt-inp" id="sc-name" type="text" placeholder="이름 검색 후 선택" oninput="filterScoreMembers()">
+        <div class="mgmt-title">🎳 점수 일괄 입력</div>
+        <div style="font-size:11px;color:var(--muted);line-height:1.7;margin-bottom:10px;background:var(--bg);padding:9px;border-radius:8px">
+          📋 <strong>붙여넣기 형식</strong><br>
+          엑셀/AI에서 복사 후 붙여넣기<br>
+          <code style="font-size:10px;background:#e2e8f0;padding:2px 5px;border-radius:4px">이름 탭 총점 탭 게임수</code><br>
+          또는 한 줄씩: <code style="font-size:10px;background:#e2e8f0;padding:2px 5px;border-radius:4px">이름,총점,게임수</code>
         </div>
-        <div id="sc-name-list" style="margin-bottom:8px"></div>
         <div class="mgmt-lbl">날짜</div>
-        <div class="mgmt-row"><input class="mgmt-inp" id="sc-date" type="date"></div>
-        <div class="mgmt-lbl">총합 점수</div>
-        <div class="mgmt-row"><input class="mgmt-inp" id="sc-total" type="number" placeholder="390"></div>
-        <div class="mgmt-lbl">게임 수</div>
-        <div class="mgmt-row"><input class="mgmt-inp" id="sc-games" type="number" placeholder="3" value="3"></div>
-        <div id="sc-avg-preview" style="font-size:12px;color:var(--muted);margin-bottom:10px"></div>
-        <button class="mgmt-btn navy" style="width:100%;height:40px" onclick="submitScore()">✅ 점수 저장</button>
+        <div class="mgmt-row" style="margin-bottom:10px">
+          <input class="mgmt-inp" id="sc-date" type="date">
+        </div>
+        <div class="mgmt-lbl">점수 데이터 붙여넣기</div>
+        <textarea id="sc-paste" class="mgmt-inp" rows="8" placeholder="정승택&#9;613&#9;3&#10;배성준&#9;565&#9;3&#10;조세욱&#9;561&#9;3" style="width:100%;resize:vertical;font-family:monospace;font-size:12px" oninput="previewScores()"></textarea>
+        <div id="sc-preview" style="margin-top:8px"></div>
+        <button class="mgmt-btn navy" style="width:100%;height:40px;margin-top:10px" onclick="submitBulkScore()">✅ 일괄 저장</button>
       </div>
 
       <!-- 최근 점수 -->
@@ -1364,6 +1407,7 @@ function finalizeManual(){
 //  대시보드
 // ══════════════════════════════════════════════════════
 async function renderDash(){
+  renderDashSummary();
   try{
     const res=await gasGet('getDashboard');
     if(res.error){toast('대시보드 로드 실패');return;}
@@ -1457,9 +1501,11 @@ function toast(msg){
 // ══════════════════════════════════════════════════════
 let currentMgmtTab = 'member';
 let finances = [];
+let memFilter = 'all';
 
 function setMgmtTab(tab, el) {
   currentMgmtTab = tab;
+  // 서브탭 버튼만 갱신 (상위 탭 건드리지 않음)
   document.querySelectorAll('.tab-pill').forEach(b => b.classList.remove('active'));
   el.classList.add('active');
   ['member','finance','score'].forEach(t => {
@@ -1468,37 +1514,60 @@ function setMgmtTab(tab, el) {
   if (tab === 'finance') loadFinances();
   if (tab === 'score') {
     const today = new Date().toISOString().slice(0,10);
-    document.getElementById('sc-date').value = today;
+    if(document.getElementById('sc-date')) document.getElementById('sc-date').value = today;
     loadRecentScores();
   }
+  if (tab === 'member') renderMemberList();
 }
 
-// ── 회원 검색 ──
-function searchMember() {
-  const q = document.getElementById('m-search').value.trim();
-  const el = document.getElementById('m-search-result');
-  if (!q) { el.innerHTML = ''; return; }
-  const filtered = members.filter(m => m.name.includes(q));
-  if (!filtered.length) { el.innerHTML = '<div class="empty">없음</div>'; return; }
-  el.innerHTML = filtered.map(m => `
+// ── 회원 필터 ──
+function setMemFilter(f, el) {
+  memFilter = f;
+  document.querySelectorAll('#msec-member .tab-pill').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  renderMemberList();
+}
+
+function renderMemberList() {
+  const el = document.getElementById('m-list');
+  if (!el) return;
+  const q = (document.getElementById('m-search')?.value || '').trim();
+
+  let data = [...members];
+  if (q) data = data.filter(m => m.name.includes(q));
+  if (memFilter === 'active')  data = data.filter(m => m.status === 'active');
+  if (memFilter === 'unpaid')  data = data.filter(m => m.feePaid !== 'O' && m.status === 'active');
+  if (memFilter === 'left')    data = data.filter(m => m.status === 'left');
+
+  if (!data.length) { el.innerHTML = '<div class="empty">없음</div>'; return; }
+
+  el.innerHTML = data.map(m => {
+    const nm = m.name.replace(/'/g, "\'");
+    const statusLabel = m.status === 'active' ? '활성' : m.status === 'guest' ? '게스트' : '탈퇴';
+    const feeLabel    = m.feePaid === 'O' ? '납부' : '미납';
+    return `
     <div class="member-item">
       <div class="member-item-info">
-        <div class="member-item-name">${m.name}
-          <span class="badge ${m.status}">${m.status==='active'?'활성':m.status==='guest'?'게스트':'탈퇴'}</span>
-          <span class="badge ${m.feePaid==='O'?'paid':'unpaid'}">${m.feePaid==='O'?'납부':'미납'}</span>
+        <div class="member-item-name">
+          ${m.name}
+          <span class="badge ${m.status}">${statusLabel}</span>
+          <span class="badge ${m.feePaid==='O'?'paid':'unpaid'}">${feeLabel}</span>
         </div>
-        <div class="member-item-sub">${m.dept} · ${m.grade}학번 · 에버 ${m.avg||'-'}</div>
+        <div class="member-item-sub">${m.dept||'-'} · ${m.grade||'-'}학번${m.avg?' · 에버 '+m.avg:''}</div>
       </div>
-      <div style="display:flex;flex-direction:column;gap:4px">
-        <button class="mgmt-btn amber" style="font-size:10px;padding:4px 8px" onclick="toggleFee('${m.name.replace(/'/g,"\'")}','${m.feePaid}')">
-          ${m.feePaid==='O'?'납부→미납':'미납→납부'}
+      <div style="display:flex;gap:4px;flex-shrink:0">
+        <button class="mgmt-btn ${m.feePaid==='O'?'amber':'green'}"
+          style="font-size:10px;padding:5px 8px;border-radius:7px"
+          onclick="toggleFee('${nm}','${m.feePaid}')">
+          ${m.feePaid==='O'?'💸 납부취소':'💰 납부처리'}
         </button>
-        ${m.status==='active'
-          ? `<button class="mgmt-btn red" style="font-size:10px;padding:4px 8px" onclick="setLeft('${m.name.replace(/'/g,"\'")}')">탈퇴처리</button>`
-          : `<button class="mgmt-btn green" style="font-size:10px;padding:4px 8px" onclick="setActive('${m.name.replace(/'/g,"\'")}')">복귀처리</button>`
+        ${m.status !== 'left'
+          ? `<button class="mgmt-btn red" style="font-size:10px;padding:5px 8px;border-radius:7px" onclick="setLeft('${nm}')">탈퇴</button>`
+          : `<button class="mgmt-btn green" style="font-size:10px;padding:5px 8px;border-radius:7px" onclick="setActive('${nm}')">복귀</button>`
         }
       </div>
-    </div>`).join('');
+    </div>`;
+  }).join('');
 }
 
 async function toggleFee(name, current) {
@@ -1508,19 +1577,19 @@ async function toggleFee(name, current) {
     const m = members.find(m => m.name === name);
     if (m) m.feePaid = newFee;
     toast(`✅ ${name} 회비 ${newFee==='O'?'납부':'미납'} 처리`);
-    searchMember(); renderList();
-  }
+    renderMemberList(); renderList(); renderDashSummary();
+  } else toast('❌ ' + (res.error || '실패'));
 }
 
 async function setLeft(name) {
-  if (!confirm(`"${name}"을 탈퇴 처리하시겠어요?`)) return;
+  if (!confirm(`"${name}"을 탈퇴 처리할까요?`)) return;
   const res = await callGAS({ action:'updateMember', name, status:'left' });
   if (res.ok) {
     const m = members.find(m => m.name === name);
     if (m) m.status = 'left';
     toast(`✅ ${name} 탈퇴 처리됨`);
-    searchMember(); renderList();
-  }
+    renderMemberList(); renderList();
+  } else toast('❌ ' + (res.error || '실패'));
 }
 
 async function setActive(name) {
@@ -1529,31 +1598,37 @@ async function setActive(name) {
     const m = members.find(m => m.name === name);
     if (m) m.status = 'active';
     toast(`✅ ${name} 복귀 처리됨`);
-    searchMember(); renderList();
-  }
+    renderMemberList(); renderList();
+  } else toast('❌ ' + (res.error || '실패'));
 }
 
 async function addNewMember() {
-  const name    = document.getElementById('new-name').value.trim();
-  const dept    = document.getElementById('new-dept').value.trim();
-  const grade   = document.getElementById('new-grade').value.trim();
-  const avg     = document.getElementById('new-avg').value || 0;
-  const status  = document.getElementById('new-status').value;
-
+  const name   = document.getElementById('new-name').value.trim();
+  const dept   = document.getElementById('new-dept').value.trim();
+  const grade  = document.getElementById('new-grade').value.trim();
+  const status = document.getElementById('new-status').value;
   if (!name) { toast('이름을 입력하세요'); return; }
-
-  const res = await callGAS({ action:'addMember', name, dept, grade, avg, feePaid:'X', status });
+  const res = await callGAS({ action:'addMember', name, dept, grade, avg:0, feePaid:'X', status });
   if (res.ok) {
-    members.push({ name, dept, grade, avg: parseFloat(avg)||0, feePaid:'X', status });
+    members.push({ name, dept, grade, avg:0, feePaid:'X', status });
     toast(`✅ ${name} 추가됨`);
-    document.getElementById('new-name').value = '';
-    document.getElementById('new-dept').value = '';
-    document.getElementById('new-grade').value = '';
-    document.getElementById('new-avg').value = '0';
-    renderList();
-  } else {
-    toast('❌ ' + (res.message || res.error));
-  }
+    ['new-name','new-dept','new-grade'].forEach(id => document.getElementById(id).value = '');
+    renderMemberList(); renderList();
+    // datalist 갱신
+    updateDeptDatalist();
+  } else toast('❌ ' + (res.message || res.error));
+}
+
+function updateDeptDatalist() {
+  const dl = document.getElementById('dept-list');
+  if (!dl) return;
+  const KNOWN_NAMES = new Set(members.map(m => m.name));
+  const depts = [...new Set(
+    members
+      .map(m => (m.dept || '').trim())
+      .filter(d => d && d.length > 2 && !KNOWN_NAMES.has(d) && !d.includes('★'))
+  )].sort();
+  dl.innerHTML = depts.map(d => `<option value="${d}">`).join('');
 }
 
 // ── 가계부 ──
@@ -1564,18 +1639,39 @@ async function loadFinances() {
     if (res.error) throw new Error(res.error);
     finances = res;
     renderFinances();
-    // 잔액 업데이트
-    const dash = await gasGet('getDashboard');
-    if (!dash.error) {
-      document.getElementById('balance-val').textContent = fmt(dash.balance) + '원';
-      document.getElementById('balance-income').textContent = fmt(dash.income) + '원';
-      document.getElementById('balance-expense').textContent = fmt(Math.abs(dash.expense)) + '원';
-    }
+    updateBalanceDisplay();
   } catch(e) { toast('가계부 로드 실패: ' + e.message); }
+}
+
+function updateBalanceDisplay() {
+  // 회비 수입 = active 회원 중 납부자 수 × 20000
+  const paidCnt = members.filter(m => m.feePaid === 'O').length;
+  const feeIncome = paidCnt * 20000;
+
+  const finSum  = finances.reduce((s,f) => s + f.amount, 0);
+  const balance = feeIncome + finSum;
+  const income  = feeIncome + finances.filter(f => f.amount > 0).reduce((s,f) => s + f.amount, 0);
+  const expense = finances.filter(f => f.amount < 0).reduce((s,f) => s + f.amount, 0);
+
+  const bv = document.getElementById('balance-val');
+  const bi = document.getElementById('balance-income');
+  const be = document.getElementById('balance-expense');
+  if (bv) bv.textContent = fmt(balance) + '원';
+  if (bi) bi.textContent = '+' + fmt(income) + '원';
+  if (be) be.textContent = '-' + fmt(Math.abs(expense)) + '원';
+
+  // 대시보드 카드도 업데이트
+  const db = document.getElementById('d-balance');
+  const di = document.getElementById('d-income');
+  const de = document.getElementById('d-expense');
+  if (db) db.textContent = fmt(balance) + '원';
+  if (di) di.textContent = '+' + fmt(income) + '원';
+  if (de) de.textContent = '-' + fmt(Math.abs(expense)) + '원';
 }
 
 function renderFinances() {
   const el = document.getElementById('fin-list');
+  if (!el) return;
   if (!finances.length) { el.innerHTML = '<div class="empty">내역 없음</div>'; return; }
   const sorted = [...finances].sort((a,b) => b.date.localeCompare(a.date));
   el.innerHTML = sorted.map(f => `
@@ -1595,10 +1691,8 @@ async function addFinanceEntry() {
   const amount = parseFloat(document.getElementById('fin-amount').value);
   const cat    = document.getElementById('fin-cat').value;
   const note   = document.getElementById('fin-note').value.trim();
-
   if (!desc) { toast('내용을 입력하세요'); return; }
   if (isNaN(amount)) { toast('금액을 입력하세요'); return; }
-
   const res = await callGAS({ action:'addFinance', date, desc, amount, category:cat, note });
   if (res.ok) {
     toast('✅ 추가됨');
@@ -1610,98 +1704,168 @@ async function addFinanceEntry() {
 }
 
 async function deleteFinEntry(rowNum) {
-  if (!confirm('이 내역을 삭제할까요?')) return;
+  if (!confirm('삭제할까요?')) return;
   const res = await callGAS({ action:'deleteFinance', rowNum });
   if (res.ok) { toast('🗑 삭제됨'); loadFinances(); }
 }
 
-// ── 점수 입력 ──
-function filterScoreMembers() {
-  const q = document.getElementById('sc-name').value.trim();
-  const el = document.getElementById('sc-name-list');
-  updateScoreAvgPreview();
-  if (!q || q.length < 1) { el.innerHTML = ''; return; }
-  const filtered = members.filter(m => m.name.includes(q) && m.status !== 'left').slice(0, 5);
-  el.innerHTML = filtered.map(m =>
-    `<div style="padding:6px 10px;background:var(--bg);border-radius:7px;margin-bottom:3px;cursor:pointer;font-size:13px;font-weight:700"
-      onclick="selectScoreName('${m.name.replace(/'/g,"\'")}')">${m.name} <span style="font-size:10px;color:var(--muted)">${m.dept}</span></div>`
-  ).join('');
+// ── 점수 일괄 입력 ──
+function previewScores() {
+  const text = document.getElementById('sc-paste').value;
+  const el   = document.getElementById('sc-preview');
+  if (!text.trim()) { el.innerHTML = ''; return; }
+
+  const parsed = parseScoreText(text);
+  if (!parsed.length) { el.innerHTML = '<div style="color:var(--red);font-size:12px">파싱 실패 — 형식 확인</div>'; return; }
+
+  el.innerHTML = `
+    <div style="background:var(--bg);border-radius:9px;padding:10px;font-size:12px">
+      <div style="font-weight:700;margin-bottom:6px;color:var(--navy)">미리보기 (${parsed.length}명)</div>
+      ${parsed.map(r => {
+        const found = members.find(m => m.name === r.name);
+        const warn  = !found ? '⚠️ 미등록' : '';
+        return `<div style="display:flex;gap:8px;padding:3px 0;border-bottom:1px solid #e2e8f0">
+          <span style="flex:1;font-weight:700">${r.name} ${warn}</span>
+          <span style="color:var(--muted)">총점 ${r.total}</span>
+          <span style="color:var(--muted)">${r.games}게임</span>
+          <span style="color:var(--navy);font-weight:700">avg ${Math.round(r.total/r.games*10)/10}</span>
+        </div>`;
+      }).join('')}
+    </div>`;
 }
 
-function selectScoreName(name) {
-  document.getElementById('sc-name').value = name;
-  document.getElementById('sc-name-list').innerHTML = '';
-  updateScoreAvgPreview();
+function parseScoreText(text) {
+  const lines = text.trim().split('\n').filter(l => l.trim());
+  const result = [];
+  lines.forEach(line => {
+    // 탭 구분 또는 쉼표 구분
+    const parts = line.includes('\t')
+      ? line.split('\t').map(p => p.trim())
+      : line.split(',').map(p => p.trim());
+    if (parts.length >= 2) {
+      const name  = parts[0];
+      const total = parseFloat(parts[1]);
+      const games = parts[2] ? parseInt(parts[2]) : 3; // 기본 3게임
+      if (name && !isNaN(total) && total > 0) {
+        result.push({ name, total, games: games || 3 });
+      }
+    }
+  });
+  return result;
 }
 
-function updateScoreAvgPreview() {
-  const total = parseFloat(document.getElementById('sc-total').value) || 0;
-  const games = parseInt(document.getElementById('sc-games').value) || 1;
-  const el = document.getElementById('sc-avg-preview');
-  if (total && games) {
-    el.textContent = `→ 1게임 평균: ${Math.round(total/games*10)/10}점`;
-  } else {
-    el.textContent = '';
+async function submitBulkScore() {
+  const date   = document.getElementById('sc-date').value;
+  const text   = document.getElementById('sc-paste').value;
+  const parsed = parseScoreText(text);
+
+  if (!parsed.length) { toast('입력된 점수가 없어요'); return; }
+  if (!date) { toast('날짜를 선택하세요'); return; }
+
+  const btn = document.querySelector('[onclick="submitBulkScore()"]');
+  if (btn) { btn.textContent = '⏳ 저장 중...'; btn.disabled = true; }
+
+  let ok = 0, fail = [];
+  for (const r of parsed) {
+    const res = await callGAS({ action:'addScore', name:r.name, date, totalScore:r.total, games:r.games });
+    if (res.ok) {
+      ok++;
+      const m = members.find(m => m.name === r.name);
+      if (m && res.avg) m.avg = res.avg;
+    } else {
+      fail.push(r.name);
+    }
   }
-}
 
-async function submitScore() {
-  const name  = document.getElementById('sc-name').value.trim();
-  const date  = document.getElementById('sc-date').value;
-  const total = parseFloat(document.getElementById('sc-total').value);
-  const games = parseInt(document.getElementById('sc-games').value) || 1;
-
-  if (!name) { toast('이름을 입력하세요'); return; }
-  if (!total || isNaN(total)) { toast('점수를 입력하세요'); return; }
-
-  const res = await callGAS({ action:'addScore', name, date, totalScore:total, games });
-  if (res.ok) {
-    toast(`✅ ${name} 점수 저장됨 (평균 ${res.avg}점)`);
-    // 로컬 에버리지 업데이트
-    const m = members.find(m => m.name === name);
-    if (m) m.avg = res.avg;
-    document.getElementById('sc-total').value = '';
-    loadRecentScores(); renderList();
-  } else toast('❌ ' + res.error);
+  if (btn) { btn.textContent = '✅ 일괄 저장'; btn.disabled = false; }
+  toast(`✅ ${ok}명 저장 완료${fail.length?' · ❌'+fail.join(','):''}`);
+  document.getElementById('sc-paste').value = '';
+  document.getElementById('sc-preview').innerHTML = '';
+  loadRecentScores(); renderList();
 }
 
 async function loadRecentScores() {
   const el = document.getElementById('recent-scores');
+  if (!el) return;
   try {
     const res = await gasGet('getScores');
     if (res.error) throw new Error(res.error);
-    const recent = [...res].sort((a,b) => b.date.localeCompare(a.date)).slice(0, 15);
+    const recent = [...res].sort((a,b) => b.date.localeCompare(a.date)).slice(0, 20);
     el.innerHTML = recent.map(s =>
       `<div class="fin-item">
         <div class="fin-item-info">
           <div class="fin-item-desc">${s.name}</div>
-          <div class="fin-item-sub">${s.date} · ${s.games}게임</div>
+          <div class="fin-item-sub">${s.date} · ${s.games}게임 · 총 ${Math.round(s.totalScore)}</div>
         </div>
         <div class="fin-item-amt plus">avg ${s.avg}</div>
       </div>`).join('') || '<div class="empty">없음</div>';
   } catch(e) { el.innerHTML = '<div class="empty">로드 실패</div>'; }
 }
 
-// ── 공통 유틸 ──
-function fmt(n) {
-  return Math.round(n).toLocaleString('ko-KR');
+// ── 대시보드 요약 업데이트 ──
+function renderDashSummary() {
+  const active  = members.filter(m => m.status === 'active');
+  const paid    = members.filter(m => m.feePaid === 'O');
+  const unpaid  = active.filter(m => m.feePaid !== 'O');
+  const guest   = members.filter(m => m.status === 'guest');
+
+  const dTotal  = document.getElementById('d-total');
+  const dAtt    = document.getElementById('d-att');
+  const dFeeR   = document.getElementById('d-fee-rate');
+  const dFeeR2  = document.getElementById('d-fee-rate2');
+  const dFeeSub = document.getElementById('d-fee-sub');
+  const dFeeSub2= document.getElementById('d-fee-sub2');
+  const dUnpaid = document.getElementById('d-unpaid');
+  const dGuest  = document.getElementById('d-guest');
+
+  if (dTotal)   dTotal.textContent   = active.length;
+  if (dAtt)     dAtt.textContent     = members.filter(m => statusMap[m.name]==='attend').length || '-';
+  const rate = active.length ? Math.round(paid.length/active.length*100) : 0;
+  if (dFeeR)    dFeeR.textContent    = rate + '%';
+  if (dFeeR2)   dFeeR2.textContent   = rate + '%';
+  if (dFeeSub)  dFeeSub.textContent  = paid.length + '/' + active.length + '명 납부';
+  if (dFeeSub2) dFeeSub2.textContent = paid.length + '/' + active.length + '명 납부';
+  if (dUnpaid)  dUnpaid.textContent  = unpaid.length;
+  if (dGuest)   dGuest.textContent   = guest.length;
+
+  // 미납자 명단
+  const ul = document.getElementById('unpaid-list');
+  const uc = document.getElementById('unpaid-cnt');
+  if (ul) {
+    ul.innerHTML = unpaid.length
+      ? unpaid.map(m => `<div class="fin-item" style="padding:7px 10px">
+          <div class="fin-item-info">
+            <div class="fin-item-desc">${m.name}</div>
+            <div class="fin-item-sub">${m.dept||'-'} · ${m.grade||'-'}학번</div>
+          </div>
+          <button class="mgmt-btn green" style="font-size:10px;padding:4px 8px;border-radius:7px"
+            onclick="toggleFee('${m.name.replace(/'/g,"\'")}','X')">납부처리</button>
+        </div>`).join('')
+      : '<div class="empty">미납자 없음 🎉</div>';
+  }
+  if (uc) uc.textContent = unpaid.length + '명';
+
+  updateBalanceDisplay();
 }
 
+// ── 공통 유틸 ──
+function fmt(n) { return Math.round(n).toLocaleString('ko-KR'); }
+
 async function callGAS(body) {
-  try {
-    return await gasPost(body);
-  } catch(e) {
-    // POST 실패시 GET fallback
+  try { return await gasPost(body); }
+  catch(e) {
     try { return await gasGet(body.action, body); }
     catch(e2) { return { error: e2.message }; }
   }
 }
 
-// 오늘 날짜 기본값
+// 오늘 날짜 기본값 + datalist 초기화
 window.addEventListener('DOMContentLoaded', () => {
   const today = new Date().toISOString().slice(0,10);
-  const finDate = document.getElementById('fin-date');
-  if (finDate) finDate.value = today;
+  ['fin-date','sc-date'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = today;
+  });
 });
 
 // init
