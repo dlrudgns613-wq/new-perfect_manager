@@ -285,6 +285,27 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
 .tab-pill{flex:1;padding:7px 4px;border:1.5px solid var(--border);border-radius:9px;background:#fff;color:var(--muted);font-size:11px;font-weight:700;font-family:'Noto Sans KR',sans-serif;cursor:pointer;text-align:center}
 .tab-pill.active{background:var(--navy);border-color:var(--navy);color:var(--amber)}
 
+
+/* ── MEMBER EDIT MODAL ── */
+.modal-bg{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.5);z-index:500;display:none;align-items:center;justify-content:center;padding:20px}
+.modal-bg.show{display:flex}
+.modal{background:var(--card);border-radius:16px;width:100%;max-width:400px;padding:20px;box-shadow:0 20px 60px rgba(0,0,0,.3);max-height:85vh;overflow-y:auto}
+.modal-title{font-size:15px;font-weight:900;color:var(--navy);margin-bottom:14px;display:flex;justify-content:space-between;align-items:center}
+.modal-close{background:none;border:none;font-size:20px;cursor:pointer;color:var(--muted);padding:4px}
+.field-group{margin-bottom:10px}
+.field-label{font-size:11px;font-weight:700;color:var(--muted);margin-bottom:4px}
+.field-input{width:100%;border:1.5px solid var(--border);border-radius:9px;padding:9px 12px;font-size:13px;font-family:'Noto Sans KR',sans-serif;outline:none;color:var(--text);background:var(--bg)}
+.field-input:focus{border-color:var(--navy);background:#fff}
+.field-select{width:100%;border:1.5px solid var(--border);border-radius:9px;padding:9px 12px;font-size:13px;font-family:'Noto Sans KR',sans-serif;outline:none;color:var(--text);background:var(--bg);appearance:none}
+.modal-actions{display:flex;gap:8px;margin-top:16px}
+.modal-actions .mgmt-btn{flex:1;height:42px;font-size:13px;border-radius:10px}
+.danger-zone{margin-top:16px;padding-top:12px;border-top:1px solid #fee2e2}
+.danger-zone-title{font-size:11px;font-weight:700;color:var(--red);margin-bottom:8px}
+
+/* ── ACCESSIBILITY ── */
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);border:0}
+:focus-visible{outline:2px solid var(--amber);outline-offset:2px}
+
 /* ── MISC ── */
 .empty{text-align:center;padding:28px 20px;color:var(--muted);font-size:14px}
 .loading{text-align:center;padding:48px 20px;color:var(--muted)}
@@ -299,7 +320,7 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
 <div class="hdr" id="hdr">
   <div class="hdr-top">
     <div class="logo">🎳 팀<span>퍼펙트</span></div>
-    <div class="hdr-right">
+    <div class="hdr-right"><span id="last-saved" style="display:none;font-size:9px;color:rgba(255,255,255,.4);margin-right:4px"></span>
       <div class="pill" onclick="syncAll()">
         <div class="sdot" id="sdot"></div>
         <span id="stxt">대기중</span>
@@ -355,6 +376,10 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
   <button class="tBtn"        id="tab-mgmt" onclick="switchTab('mgmt')">⚙️ 관리</button>
 </div>
 
+<div id="offline-bar" style="display:none;background:#ef4444;color:#fff;text-align:center;padding:6px;font-size:12px;font-weight:700;position:sticky;top:0;z-index:999">
+  ⚠️ 오프라인 상태 — 저장이 안 됩니다
+</div>
+<style>#offline-bar.show{display:block}</style>
 <div class="scr" id="scr">
 
 <!-- ══ 참석여부 ══ -->
@@ -728,6 +753,12 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
 // ══════════════════════════════════════════════════════
 let GAS_URL = localStorage.getItem('pf_url') || '';
 let members=[], events=[], statusMap={}, tempAvgMap={};
+let _lastSavedAt=null, _lastSaveState=null;
+let _isOnline=navigator.onLine;
+
+// ★ U6: 오프라인 감지
+window.addEventListener('online',()=>{_isOnline=true;document.getElementById('offline-bar')?.classList.remove('show');toast('🌐 온라인 복구');});
+window.addEventListener('offline',()=>{_isOnline=false;document.getElementById('offline-bar')?.classList.add('show');toast('⚠️ 오프라인 상태');});
 let currentEventId=null, currentEventTitle='';
 let filter='all', sortMode='name', viewMode='grid';
 let laneMode='auto', autoTeamMode=2, manualTeamMode=2;
@@ -741,7 +772,12 @@ let dashData=null;
 function save(){
   try{
     localStorage.setItem('pf_url', GAS_URL);
-    localStorage.setItem('pf_st', JSON.stringify(statusMap));
+    // ★ B8 FIX: statusMap은 현재 이벤트 것만 저장 (용량 초과 방지)
+    const compactSM={};
+    if(currentEventId){
+      Object.entries(statusMap).forEach(([k,v])=>{if(v==='attend')compactSM[k]=v;});
+    }
+    localStorage.setItem('pf_st', JSON.stringify(compactSM));
     localStorage.setItem('pf_tmp', JSON.stringify(tempAvgMap));
     localStorage.setItem('pf_evt', currentEventId||'');
     localStorage.setItem('pf_view', viewMode);
@@ -784,17 +820,36 @@ function setScrHeight(){
 async function gasGet(action, params={}){
   const url=new URL(GAS_URL);
   url.searchParams.set('action',action);
-  Object.entries(params).forEach(([k,v])=>url.searchParams.set(k,v));
-  const r=await fetch(url.toString());
-  return r.json();
+  Object.entries(params).forEach(([k,v])=>url.searchParams.set(k,typeof v==='object'?JSON.stringify(v):v));
+  const ctrl=new AbortController();
+  const timer=setTimeout(()=>ctrl.abort(),20000);
+  try{
+    const r=await fetch(url.toString(),{signal:ctrl.signal});
+    clearTimeout(timer);
+    return r.json();
+  }catch(e){
+    clearTimeout(timer);
+    if(e.name==='AbortError') throw new Error('서버 응답 시간 초과 (20초)');
+    throw e;
+  }
 }
 async function gasPost(body){
-  const res=await fetch(GAS_URL,{
-    method:'POST',
-    headers:{'Content-Type':'text/plain;charset=utf-8'},
-    body:JSON.stringify(body)
-  });
-  return JSON.parse(await res.text());
+  const ctrl=new AbortController();
+  const timer=setTimeout(()=>ctrl.abort(),25000);
+  try{
+    const res=await fetch(GAS_URL,{
+      method:'POST',
+      headers:{'Content-Type':'text/plain;charset=utf-8'},
+      body:JSON.stringify(body),
+      signal:ctrl.signal
+    });
+    clearTimeout(timer);
+    return JSON.parse(await res.text());
+  }catch(e){
+    clearTimeout(timer);
+    if(e.name==='AbortError') throw new Error('서버 응답 시간 초과 (25초)');
+    throw e;
+  }
 }
 
 function setSS(s,t){
@@ -814,7 +869,17 @@ async function syncAll(){
     ]);
     if(mRes.error) throw new Error(mRes.error);
 
-    members = (mRes||[]).filter(m=>m.status!=='left');
+    // 이름 기준 중복 제거 (동명이인 방어)
+    const _raw = (mRes||[]).filter(m=>m.status!=='left');
+    const _seen = new Set();
+    members = _raw.filter(m => {
+      if(_seen.has(m.name)) return false;
+      _seen.add(m.name);
+      return true;
+    });
+    // ★ B4: left 회원도 별도 보관 (레인배정 시 참조 가능)
+    const _allMembers = (mRes||[]);
+    const _leftMembers = _allMembers.filter(m=>m.status==='left');
     events  = Array.isArray(eRes)?eRes:[];
 
     document.getElementById('evt-bar').style.display='block';
@@ -1097,34 +1162,39 @@ async function saveAttendance(){
   const attendees=members.filter(m=>statusMap[m.name]==='attend').map(m=>m.name);
   if(!attendees.length){toast('참석자가 없습니다');return;}
 
+  // ★ U2: undo용 이전 상태 저장
+  _lastSaveState={eventId:currentEventId,attendees:[...attendees],statusMap:{...statusMap}};
+
   _isSaving=true;
   showOverlay('시트에 저장 중...', `${attendees.length}명 · ${currentEventTitle}`, true);
   document.getElementById('float-save').disabled=true;
 
-  let data=null, lastErr='';
   try{
-    data=await gasPost({action:'saveAttendance', eventId:currentEventId, attendees});
-    if(data.error) throw new Error(data.error);
-  }catch(e1){
-    lastErr=e1.message;
+    let data=null;
     try{
-      data=await gasGet('saveAttendance',{eventId:currentEventId, attendees:attendees.join(',')});
+      data=await gasPost({action:'saveAttendance', eventId:currentEventId, attendees});
       if(data.error) throw new Error(data.error);
-    }catch(e2){lastErr=e2.message;data=null;}
+    }catch(e1){
+      // POST 실패 → GET fallback
+      try{
+        data=await gasGet('saveAttendance',{eventId:currentEventId, attendees:JSON.stringify(attendees)});
+        if(data.error) throw new Error(data.error);
+      }catch(e2){ throw e2; }
+    }
+    // 성공
+    _lastSavedAt=new Date();
+    updateLastSaved();
+    toast(`✅ ${attendees.length}명 저장 완료!`);
+    showOverlay('저장 완료!', `${attendees.length}명 · ${currentEventTitle}`, false);
+    setTimeout(hideOverlay, 1200);
+  }catch(e){
+    toast('❌ 저장 실패: '+e.message);
+    hideOverlay();
+  }finally{
+    // ★ B2 FIX: 어떤 경로로든 반드시 복구
+    _isSaving=false;
+    document.getElementById('float-save').disabled=false;
   }
-
-  _isSaving=false;
-  document.getElementById('float-save').disabled=false;
-
-  if(!data){
-    showOverlay('저장 실패 ❌', lastErr, false);
-    setTimeout(hideOverlay, 3000);
-    return;
-  }
-
-  save();
-  showOverlay(`✅ ${attendees.length}명 저장 완료!`, currentEventTitle, false);
-  setTimeout(hideOverlay, 1500);
 }
 
 function showOverlay(title, sub, spinning){
@@ -1457,7 +1527,7 @@ async function renderDash(){
     dashData=res;
 
     document.getElementById('d-total').textContent=res.totalMembers||'-';
-    document.getElementById('d-att').textContent=members.filter(m=>statusMap[m.name]==='attend').length||'-';
+    document.getElementById('d-att').textContent='-'; // B9: 세션 데이터 미사용
     document.getElementById('d-fee-rate').textContent=(res.feeRate||0)+'%';
     document.getElementById('d-fee-sub').textContent=`${res.paidCount||0}/${res.totalMembers||0}명 납부`;
     document.getElementById('d-unpaid').textContent=res.unpaidCount||'0';
@@ -1599,10 +1669,12 @@ function renderMemberList() {
         <div class="member-item-sub">${m.dept||'-'} · ${m.grade||'-'}학번${m.avg?' · 에버 '+m.avg:''}</div>
       </div>
       <div style="display:flex;gap:4px;flex-shrink:0">
+        <button class="mgmt-btn" style="font-size:10px;padding:5px 8px;border-radius:7px;background:var(--border);color:var(--text)"
+          onclick="openEditModal('${nm}')">✏️</button>
         <button class="mgmt-btn ${m.feePaid==='O'?'amber':'green'}"
           style="font-size:10px;padding:5px 8px;border-radius:7px"
           onclick="toggleFee('${nm}','${m.feePaid}')">
-          ${m.feePaid==='O'?'💸 납부취소':'💰 납부처리'}
+          ${m.feePaid==='O'?'💸':'💰'}
         </button>
         ${m.status !== 'left'
           ? `<button class="mgmt-btn red" style="font-size:10px;padding:5px 8px;border-radius:7px" onclick="setLeft('${nm}')">탈퇴</button>`
@@ -1615,6 +1687,8 @@ function renderMemberList() {
 
 async function toggleFee(name, current) {
   const newFee = current === 'O' ? 'X' : 'O';
+  const msg = newFee==='O' ? `"${name}" 납부 처리할까요?` : `"${name}" 납부 취소할까요?`;
+  if(!confirm(msg)) return;
   const res = await callGAS({ action:'updateMember', name, feePaid: newFee });
   if (res.ok) {
     const m = members.find(m => m.name === name);
@@ -1884,9 +1958,16 @@ async function submitBulkScore() {
   const btn = document.querySelector('[onclick="submitBulkScore()"]');
   if (btn) { btn.textContent = '⏳ 저장 중...'; btn.disabled = true; }
 
-  // ★ 핵심: 개별 저장 대신 한 번에 전송
+  // ★ B5 FIX: 배열 데이터는 POST만 사용 (GET fallback 불가)
   const scores = parsed.map(r => ({ name:r.name, date, totalScore:r.total, games:r.games }));
-  const res = await callGAS({ action:'bulkAddScores', scores });
+  let res;
+  try{
+    res = await gasPost({ action:'bulkAddScores', scores });
+  }catch(e){
+    if(btn){btn.textContent='✅ 일괄 저장';btn.disabled=false;}
+    toast('❌ 저장 실패: '+e.message);
+    return;
+  }
 
   if (btn) { btn.textContent = '✅ 일괄 저장'; btn.disabled = false; }
 
@@ -1974,6 +2055,37 @@ function renderDashSummary() {
 // ── 공통 유틸 ──
 function fmt(n) { return Math.round(n).toLocaleString('ko-KR'); }
 
+
+// ★ U1: 마지막 저장 시간 표시
+function updateLastSaved(){
+  const el=document.getElementById('last-saved');
+  if(!el||!_lastSavedAt) return;
+  const h=String(_lastSavedAt.getHours()).padStart(2,'0');
+  const m=String(_lastSavedAt.getMinutes()).padStart(2,'0');
+  el.textContent=`마지막 저장 ${h}:${m}`;
+  el.style.display='inline';
+}
+
+// ★ U2: 되돌리기
+async function undoLastSave(){
+  if(!_lastSaveState){toast('되돌릴 내역이 없습니다');return;}
+  if(!confirm('직전 저장을 되돌릴까요?')) return;
+  // 이전 상태로 서버 재저장은 복잡 → 로컬 statusMap만 복원하고 안내
+  statusMap={..._lastSaveState.statusMap};
+  renderList();save();
+  toast('⏪ 로컬 상태 복원됨 — 서버에 다시 저장하세요');
+  _lastSaveState=null;
+}
+
+// ★ U7: Web Share API
+function shareText(text, title='팀퍼펙트'){
+  if(navigator.share){
+    navigator.share({title,text}).catch(()=>{});
+  }else{
+    navigator.clipboard.writeText(text).then(()=>toast('📋 복사됨!'));
+  }
+}
+
 async function callGAS(body) {
   try { return await gasPost(body); }
   catch(e) {
@@ -1991,9 +2103,133 @@ window.addEventListener('DOMContentLoaded', () => {
   });
 });
 
+
+// ══════════════════════════════════════════════════════
+//  SQL CRUD — INSERT / UPDATE / DELETE
+// ══════════════════════════════════════════════════════
+let _editingMember = null;
+
+function openEditModal(name) {
+  const m = members.find(m => m.name === name) 
+    || _leftMembers?.find(m => m.name === name);
+  if (!m) { toast('회원을 찾을 수 없습니다'); return; }
+  _editingMember = m;
+  
+  document.getElementById('edit-name').value = m.name;
+  document.getElementById('edit-dept').value = m.dept || '';
+  document.getElementById('edit-grade').value = m.grade || '';
+  document.getElementById('edit-avg').value = m.avg || 0;
+  document.getElementById('edit-fee').value = m.feePaid || 'X';
+  document.getElementById('edit-status').value = m.status || 'active';
+  document.getElementById('edit-modal-title').textContent = `${m.name} 수정`;
+
+  // datalist
+  const dl = document.getElementById('dept-list-edit');
+  const depts = [...new Set(members.map(m=>(m.dept||'').trim()).filter(d=>d&&d.length>2))].sort();
+  dl.innerHTML = depts.map(d=>`<option value="${d}">`).join('');
+
+  document.getElementById('edit-modal').classList.add('show');
+}
+
+function closeEditModal() {
+  document.getElementById('edit-modal').classList.remove('show');
+  _editingMember = null;
+}
+
+async function submitEdit() {
+  if (!_editingMember) return;
+  const name   = _editingMember.name;
+  const dept   = document.getElementById('edit-dept').value.trim();
+  const grade  = document.getElementById('edit-grade').value.trim();
+  const avg    = parseFloat(document.getElementById('edit-avg').value) || 0;
+  const fee    = document.getElementById('edit-fee').value;
+  const status = document.getElementById('edit-status').value;
+
+  const res = await callGAS({ action:'updateMember', name, dept, grade, avg, feePaid:fee, status });
+  if (res.ok) {
+    // 로컬 업데이트
+    const m = members.find(m => m.name === name);
+    if (m) { m.dept=dept; m.grade=grade; m.avg=avg; m.feePaid=fee; m.status=status; }
+    toast(`✅ ${name} 수정 완료`);
+    closeEditModal();
+    renderMemberList(); renderList(); renderDashSummary();
+  } else {
+    toast('❌ 수정 실패: ' + (res.error || ''));
+  }
+}
+
+async function deleteCurrentMember() {
+  if (!_editingMember) return;
+  const name = _editingMember.name;
+  
+  if (!confirm(`⚠️ "${name}"을 완전 삭제합니다.\n\n출석/점수/납부 기록은 유지됩니다.\n정말 삭제할까요?`)) return;
+  if (!confirm(`마지막 확인: "${name}" 삭제합니다.`)) return;
+
+  const res = await callGAS({ action:'deleteMember', name });
+  if (res.ok) {
+    members = members.filter(m => m.name !== name);
+    toast(`🗑 ${name} 삭제됨`);
+    closeEditModal();
+    renderMemberList(); renderList(); renderDashSummary();
+  } else {
+    toast('❌ 삭제 실패: ' + (res.error || ''));
+  }
+}
+
 // init
 updateLaneLbl();
 updateManualLaneLbl();
 </script>
+
+<!-- ══ 회원 수정 모달 ══ -->
+<div class="modal-bg" id="edit-modal">
+  <div class="modal">
+    <div class="modal-title">
+      <span id="edit-modal-title">회원 수정</span>
+      <button class="modal-close" onclick="closeEditModal()">✕</button>
+    </div>
+    <div class="field-group">
+      <div class="field-label">이름 (수정 불가)</div>
+      <input class="field-input" id="edit-name" readonly style="background:#e2e8f0;color:var(--muted)">
+    </div>
+    <div class="field-group">
+      <div class="field-label">학과</div>
+      <input class="field-input" id="edit-dept" list="dept-list-edit">
+      <datalist id="dept-list-edit"></datalist>
+    </div>
+    <div class="field-group">
+      <div class="field-label">학번</div>
+      <input class="field-input" id="edit-grade" maxlength="2" placeholder="26">
+    </div>
+    <div class="field-group">
+      <div class="field-label">에버리지</div>
+      <input class="field-input" id="edit-avg" type="number" placeholder="0">
+    </div>
+    <div class="field-group">
+      <div class="field-label">회비</div>
+      <select class="field-select" id="edit-fee">
+        <option value="O">O (납부)</option>
+        <option value="X">X (미납)</option>
+      </select>
+    </div>
+    <div class="field-group">
+      <div class="field-label">상태</div>
+      <select class="field-select" id="edit-status">
+        <option value="active">활성</option>
+        <option value="left">탈퇴</option>
+        <option value="guest">게스트</option>
+      </select>
+    </div>
+    <div class="modal-actions">
+      <button class="mgmt-btn navy" onclick="submitEdit()">💾 수정 저장</button>
+      <button class="mgmt-btn" style="background:var(--border);color:var(--text)" onclick="closeEditModal()">취소</button>
+    </div>
+    <div class="danger-zone">
+      <div class="danger-zone-title">⚠️ 위험 영역</div>
+      <button class="mgmt-btn red" style="width:100%;height:38px" onclick="deleteCurrentMember()">🗑 이 회원 완전 삭제</button>
+    </div>
+  </div>
+</div>
+
 </body>
 </html>
