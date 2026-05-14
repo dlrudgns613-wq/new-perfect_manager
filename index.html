@@ -286,6 +286,31 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
 .tab-pill.active{background:var(--navy);border-color:var(--navy);color:var(--amber)}
 
 
+
+/* ── ROLL CALL ── */
+.roll-sec{padding:10px 11px 100px}
+.roll-header{background:var(--navy);border-radius:var(--r);padding:14px;margin-bottom:10px;color:#fff}
+.roll-header-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.roll-title{font-size:14px;font-weight:900;color:var(--amber)}
+.roll-counts{display:flex;gap:8px}
+.roll-count-box{flex:1;background:rgba(255,255,255,.1);border-radius:8px;padding:8px;text-align:center}
+.roll-count-num{font-size:22px;font-weight:900;line-height:1}
+.roll-count-lbl{font-size:10px;opacity:.7;margin-top:2px}
+.roll-count-num.arrived{color:#34d399}
+.roll-count-num.pending{color:#fbbf24}
+.roll-search{width:100%;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);border-radius:9px;padding:8px 12px;font-size:13px;color:#fff;outline:none;font-family:'Noto Sans KR',sans-serif}
+.roll-search::placeholder{color:rgba(255,255,255,.4)}
+.roll-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;margin-bottom:8px}
+.roll-chip{background:var(--card);border-radius:10px;padding:10px 6px;text-align:center;cursor:pointer;transition:.12s;border:2px solid transparent;user-select:none;-webkit-user-select:none}
+.roll-chip.here{background:#ecfdf5;border-color:#10b981}
+.roll-chip .rc-name{font-size:12px;font-weight:700;margin-bottom:2px}
+.roll-chip .rc-dept{font-size:9px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.roll-chip .rc-check{font-size:14px;margin-top:3px;min-height:16px}
+.roll-chip.here .rc-name{color:#065f46}
+.roll-chip.here .rc-check{color:#10b981}
+.roll-actions{display:flex;gap:6px;margin-bottom:10px}
+.roll-section-lbl{font-size:11px;font-weight:700;color:var(--muted);margin:10px 0 6px;padding:0 2px}
+
 /* ── MEMBER EDIT MODAL ── */
 .modal-bg{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.5);z-index:500;display:none;align-items:center;justify-content:center;padding:20px}
 .modal-bg.show{display:flex}
@@ -374,6 +399,7 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
   <button class="tBtn"        id="tab-lane" onclick="switchTab('lane')">🎳 레인배정</button>
   <button class="tBtn"        id="tab-dash" onclick="switchTab('dash')">📊 대시보드</button>
   <button class="tBtn"        id="tab-mgmt" onclick="switchTab('mgmt')">⚙️ 관리</button>
+  <button class="tBtn"        id="tab-roll" onclick="switchTab('roll')">📋 현장</button>
 </div>
 
 <div id="offline-bar" style="display:none;background:#ef4444;color:#fff;text-align:center;padding:6px;font-size:12px;font-weight:700;position:sticky;top:0;z-index:999">
@@ -491,9 +517,10 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
     <div class="chart-card">
       <div class="chart-title">💰 가계부 현황</div>
       <div style="display:flex;gap:8px;margin-bottom:8px">
-        <div style="flex:1;background:var(--bg);border-radius:9px;padding:10px;text-align:center">
+        <div style="flex:1;background:var(--bg);border-radius:9px;padding:10px;text-align:center;cursor:pointer" onclick="switchTab('mgmt');setMgmtTab('finance',document.getElementById('mtab-finance'))">
           <div style="font-size:10px;color:var(--muted);margin-bottom:3px">회계상 잔액</div>
           <div style="font-size:15px;font-weight:900;color:var(--navy)" id="d-balance">-</div>
+          <div id="d-bank-diff" style="font-size:9px;margin-top:2px;display:none"></div>
         </div>
         <div style="flex:1;background:var(--bg);border-radius:9px;padding:10px;text-align:center">
           <div style="font-size:10px;color:var(--muted);margin-bottom:3px">총 수입</div>
@@ -584,6 +611,18 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
 
     <!-- 가계부 -->
     <div id="msec-finance" style="display:none">
+      <!-- 통장 잔액 입력 + 빵구 체크 -->
+      <div class="mgmt-card" id="bank-check-card">
+        <div class="mgmt-title">🏦 실제 통장 잔액 입력 (빵구 확인)</div>
+        <div class="mgmt-row">
+          <input class="mgmt-inp" id="bank-input" type="number" placeholder="실제 통장 잔액 입력 (원)">
+          <button class="mgmt-btn navy" onclick="checkBankBalance()">확인</button>
+        </div>
+        <div id="bank-result" style="margin-top:8px;display:none">
+          <div id="bank-result-inner"></div>
+        </div>
+      </div>
+
       <!-- 잔액 카드 -->
       <div class="balance-card">
         <div class="balance-lbl">💰 현재 잔액</div>
@@ -690,6 +729,52 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
         <div class="mgmt-title">📊 최근 점수 기록</div>
         <div id="recent-scores"></div>
       </div>
+    </div>
+
+  </div>
+</div>
+
+
+<!-- ══ 현장 출석 체크 ══ -->
+<div class="sec" id="sec-roll">
+  <div class="roll-sec">
+
+    <div class="roll-header">
+      <div class="roll-header-top">
+        <span class="roll-title">📋 현장 출석 체크</span>
+        <span style="font-size:10px;opacity:.5">저장 안 됨 · 현장 전용</span>
+      </div>
+      <div class="roll-counts" style="margin-bottom:10px">
+        <div class="roll-count-box">
+          <div class="roll-count-num arrived" id="roll-cnt-here">0</div>
+          <div class="roll-count-lbl">✅ 도착</div>
+        </div>
+        <div class="roll-count-box">
+          <div class="roll-count-num pending" id="roll-cnt-left">0</div>
+          <div class="roll-count-lbl">⏳ 미도착</div>
+        </div>
+        <div class="roll-count-box">
+          <div class="roll-count-num" style="color:#fff" id="roll-cnt-total">0</div>
+          <div class="roll-count-lbl">👥 전체</div>
+        </div>
+      </div>
+      <input class="roll-search" id="roll-search" type="search" placeholder="이름 검색..." oninput="renderRoll()">
+    </div>
+
+    <div class="roll-actions">
+      <button class="mgmt-btn navy" style="flex:1;height:36px;font-size:12px" onclick="rollCheckAll()">✅ 전체 도착</button>
+      <button class="mgmt-btn" style="flex:1;height:36px;font-size:12px;background:var(--border);color:var(--text)" onclick="rollReset()">🔄 초기화</button>
+      <button class="mgmt-btn amber" style="flex:1;height:36px;font-size:12px;color:var(--navy)" onclick="rollCopyMissing()">📋 미도착 복사</button>
+    </div>
+
+    <div id="roll-arrived-section" style="display:none">
+      <div class="roll-section-lbl">✅ 도착 (<span id="roll-arrived-cnt">0</span>명)</div>
+      <div class="roll-grid" id="roll-grid-arrived"></div>
+    </div>
+
+    <div id="roll-pending-section">
+      <div class="roll-section-lbl">⏳ 미도착 (<span id="roll-pending-cnt">0</span>명)</div>
+      <div class="roll-grid" id="roll-grid-pending"></div>
     </div>
 
   </div>
@@ -1051,12 +1136,13 @@ function setEvtBadge(title){
 //  탭
 // ══════════════════════════════════════════════════════
 function switchTab(tab){
-  ['att','lane','dash','mgmt'].forEach(t=>{
+  ['att','lane','dash','mgmt','roll'].forEach(t=>{
     document.getElementById(`sec-${t}`).classList.toggle('active',t===tab);
     document.getElementById(`tab-${t}`).classList.toggle('active',t===tab);
   });
   document.getElementById('evt-bar').style.display=(tab==='att'&&members.length)?'block':'none';
   if(tab==='dash') renderDash();
+  if(tab==='roll') initRoll();
   if(tab==='lane'){const att=getAttendees();if(att.length)checkNoAvg(att);}
   setScrHeight();
 }
@@ -1781,7 +1867,23 @@ function updateBalanceDisplay() {
   const db = document.getElementById('d-balance');
   const di = document.getElementById('d-income');
   const de = document.getElementById('d-expense');
-  if (db) db.textContent = fmt(balance) + '원';
+  if (db) {
+    db.textContent = fmt(balance) + '원';
+    // 통장잔액 저장돼 있으면 빵구 표시
+    const bankSaved = parseFloat(localStorage.getItem('pf_bank'));
+    const diffEl = document.getElementById('d-bank-diff');
+    if (diffEl && !isNaN(bankSaved)) {
+      const diff = bankSaved - balance;
+      if (Math.abs(diff) <= 100) {
+        diffEl.textContent = '✅ 통장 일치';
+        diffEl.style.color = 'var(--green)';
+      } else {
+        diffEl.textContent = `⚠️ 빵구 ${diff>0?'+':''}${fmt(diff)}원`;
+        diffEl.style.color = 'var(--red)';
+      }
+      diffEl.style.display = 'block';
+    }
+  }
   if (di) di.textContent = '+' + fmt(income) + '원';
   if (de) de.textContent = '-' + fmt(Math.abs(expense)) + '원';
 }
@@ -1793,12 +1895,13 @@ function renderFinances() {
   if (!finances.length) { el.innerHTML = '<div class="empty">내역 없음</div>'; return; }
   const sorted = [...finances].sort((a,b) => b.date.localeCompare(a.date));
   el.innerHTML = sorted.map(f => `
-    <div class="fin-item">
+    <div class="fin-item" id="fin-row-${f.rowNum}">
       <div class="fin-item-info">
         <div class="fin-item-desc">${f.desc}</div>
-        <div class="fin-item-sub">${f.date} · ${f.category}</div>
+        <div class="fin-item-sub">${f.date} · ${f.category}${f.note?' · '+f.note:''}</div>
       </div>
-      <div class="fin-item-amt ${f.amount>=0?'plus':'minus'}">${f.amount>=0?'+':''}${fmt(f.amount)}</div>
+      <div class="fin-item-amt ${f.amount>=0?'plus':'minus'}">${f.amount>=0?'+':''}${fmt(f.amount)}원</div>
+      <button class="fin-del" style="font-size:14px" onclick="openFinEdit(${JSON.stringify(f).replace(/"/g,'&quot;')})">✏️</button>
       <button class="fin-del" onclick="deleteFinEntry(${f.rowNum})">🗑</button>
     </div>`).join('');
 }
@@ -2052,6 +2155,113 @@ function renderDashSummary() {
   updateBalanceDisplay();
 }
 
+
+// ══════════════════════════════════════════════════════
+//  가계부 수정 (UPDATE)
+// ══════════════════════════════════════════════════════
+let _editingFin = null;
+
+function openFinEdit(f) {
+  if (typeof f === 'string') f = JSON.parse(f.replace(/&quot;/g,'"'));
+  _editingFin = f;
+  document.getElementById('fin-edit-date').value = f.date || '';
+  document.getElementById('fin-edit-desc').value = f.desc || '';
+  document.getElementById('fin-edit-amount').value = f.amount || 0;
+  document.getElementById('fin-edit-cat').value = f.category || '기타';
+  document.getElementById('fin-edit-note').value = f.note || '';
+  document.getElementById('fin-edit-rownum').value = f.rowNum;
+  document.getElementById('fin-edit-modal').classList.add('show');
+}
+
+function closeFinEdit() {
+  document.getElementById('fin-edit-modal').classList.remove('show');
+  _editingFin = null;
+}
+
+async function submitFinEdit() {
+  const rowNum = parseInt(document.getElementById('fin-edit-rownum').value);
+  const date   = document.getElementById('fin-edit-date').value;
+  const desc   = document.getElementById('fin-edit-desc').value.trim();
+  const amount = parseFloat(document.getElementById('fin-edit-amount').value);
+  const cat    = document.getElementById('fin-edit-cat').value;
+  const note   = document.getElementById('fin-edit-note').value.trim();
+
+  if (!desc) { toast('내용을 입력하세요'); return; }
+  if (isNaN(amount)) { toast('금액을 입력하세요'); return; }
+
+  // 삭제 후 재추가 방식 (GAS updateFinance 없음 → delete+add)
+  const delRes = await callGAS({ action:'deleteFinance', rowNum });
+  if (!delRes.ok) { toast('❌ 수정 실패 (삭제 단계)'); return; }
+
+  const addRes = await callGAS({ action:'addFinance', date, desc, amount, category:cat, note });
+  if (addRes.ok) {
+    toast('✅ 수정 완료');
+    closeFinEdit();
+    loadFinances();
+  } else {
+    toast('❌ 수정 실패: ' + (addRes.error||''));
+  }
+}
+
+// ══════════════════════════════════════════════════════
+//  통장 잔액 빵구 체크
+// ══════════════════════════════════════════════════════
+function checkBankBalance() {
+  const bankInput = parseFloat(document.getElementById('bank-input').value);
+  if (isNaN(bankInput)) { toast('잔액을 입력하세요'); return; }
+
+  // 앱 계산 잔액
+  const paidCnt   = members.filter(m => m.feePaid === 'O').length;
+  const feeIncome = paidCnt * 20000;
+  const finSum    = finances.reduce((s, f) => s + f.amount, 0);
+  const calcBalance = feeIncome + finSum;
+
+  const diff = bankInput - calcBalance;
+  const el = document.getElementById('bank-result');
+  const inner = document.getElementById('bank-result-inner');
+  el.style.display = 'block';
+
+  if (Math.abs(diff) <= 100) {
+    inner.innerHTML = `
+      <div style="background:#dcfce7;border-radius:9px;padding:12px;text-align:center">
+        <div style="font-size:20px;margin-bottom:4px">✅</div>
+        <div style="font-weight:900;color:#065f46;font-size:14px">일치!</div>
+        <div style="font-size:11px;color:#166534;margin-top:3px">
+          통장 ${fmt(bankInput)}원 = 회계 ${fmt(calcBalance)}원 (차이 ${diff}원)
+        </div>
+      </div>`;
+  } else {
+    const sign = diff > 0 ? '통장이' : '회계가';
+    const absD = Math.abs(diff);
+    inner.innerHTML = `
+      <div style="background:#fee2e2;border-radius:9px;padding:12px">
+        <div style="font-weight:900;color:#991b1b;font-size:14px;margin-bottom:8px">⚠️ 차이 발생!</div>
+        <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px">
+          <span style="color:#64748b">실제 통장</span>
+          <strong>${fmt(bankInput)}원</strong>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px">
+          <span style="color:#64748b">회계상 잔액</span>
+          <strong>${fmt(calcBalance)}원</strong>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-size:13px;margin-top:8px;padding-top:8px;border-top:1px solid #fca5a5">
+          <span style="color:#991b1b;font-weight:700">빵구 (${sign} ${fmt(absD)}원 ${diff>0?'더 많음':'부족'})</span>
+          <strong style="color:#ef4444;font-size:15px">${diff>0?'+':''}${fmt(diff)}원</strong>
+        </div>
+        <div style="font-size:10px;color:#b91c1c;margin-top:6px">가계부 누락 항목 또는 지출 미기록을 확인하세요</div>
+      </div>`;
+  }
+
+  // 로컬 저장 (다음에 열 때 유지)
+  localStorage.setItem('pf_bank', bankInput.toString());
+}
+
+// 페이지 로드 시 이전 통장 잔액 복원
+window.addEventListener('DOMContentLoaded', () => {
+  const saved = localStorage.getItem('pf_bank');
+  if (saved) document.getElementById('bank-input').value = saved;
+});
+
 // ── 공통 유틸 ──
 function fmt(n) { return Math.round(n).toLocaleString('ko-KR'); }
 
@@ -2176,6 +2386,79 @@ async function deleteCurrentMember() {
   }
 }
 
+
+// ══════════════════════════════════════════════════════
+//  현장 출석 체크 (로컬 전용, 서버 저장 안 함)
+// ══════════════════════════════════════════════════════
+let rollMap = {}; // name → true(도착) / false(미도착)
+
+function initRoll() {
+  rollMap = {};
+  const src = members.filter(m => m.status === 'active');
+  // 참석여부 탭에서 체크된 사람 초기값으로 반영
+  src.forEach(m => {
+    rollMap[m.name] = statusMap[m.name] === 'attend';
+  });
+  renderRoll();
+}
+
+function renderRoll() {
+  const q = (document.getElementById('roll-search')?.value || '').toLowerCase();
+  const src = members.filter(m => m.status === 'active'
+    && (!q || m.name.includes(q) || (m.dept||'').includes(q)));
+
+  const arrived = src.filter(m => rollMap[m.name]);
+  const pending = src.filter(m => !rollMap[m.name]);
+
+  document.getElementById('roll-cnt-here').textContent  = arrived.length;
+  document.getElementById('roll-cnt-left').textContent  = pending.length;
+  document.getElementById('roll-cnt-total').textContent = src.length;
+  document.getElementById('roll-arrived-cnt').textContent = arrived.length;
+  document.getElementById('roll-pending-cnt').textContent = pending.length;
+
+  document.getElementById('roll-arrived-section').style.display = arrived.length ? 'block' : 'none';
+
+  const chip = (m) => {
+    const here = rollMap[m.name];
+    const nm = m.name.replace(/'/g,"\'");
+    return `<div class="roll-chip ${here?'here':''}" onclick="toggleRoll('${nm}')" role="checkbox" aria-checked="${here}" aria-label="${m.name}">
+      <div class="rc-name">${m.name}</div>
+      <div class="rc-dept">${m.dept||''}</div>
+      <div class="rc-check">${here ? '✅' : ''}</div>
+    </div>`;
+  };
+
+  document.getElementById('roll-grid-arrived').innerHTML = arrived.map(chip).join('');
+  document.getElementById('roll-grid-pending').innerHTML = pending.map(chip).join('');
+}
+
+function toggleRoll(name) {
+  rollMap[name] = !rollMap[name];
+  renderRoll();
+}
+
+function rollReset() {
+  if (!confirm('현장 체크를 초기화할까요?')) return;
+  initRoll();
+  toast('🔄 초기화됨');
+}
+
+function rollCheckAll() {
+  members.filter(m => m.status === 'active').forEach(m => { rollMap[m.name] = true; });
+  renderRoll();
+  toast('✅ 전체 도착 체크');
+}
+
+function rollCopyMissing() {
+  const missing = members
+    .filter(m => m.status === 'active' && !rollMap[m.name])
+    .map(m => m.name);
+  if (!missing.length) { toast('미도착자 없음 🎉'); return; }
+  const text = `미도착 ${missing.length}명:\n` + missing.join(', ');
+  shareText(text, '팀퍼펙트 미도착 명단');
+  toast(`📋 미도착 ${missing.length}명 복사됨`);
+}
+
 // init
 updateLaneLbl();
 updateManualLaneLbl();
@@ -2227,6 +2510,52 @@ updateManualLaneLbl();
     <div class="danger-zone">
       <div class="danger-zone-title">⚠️ 위험 영역</div>
       <button class="mgmt-btn red" style="width:100%;height:38px" onclick="deleteCurrentMember()">🗑 이 회원 완전 삭제</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══ 가계부 수정 모달 ══ -->
+<div class="modal-bg" id="fin-edit-modal">
+  <div class="modal">
+    <div class="modal-title">
+      <span>가계부 수정</span>
+      <button class="modal-close" onclick="closeFinEdit()">✕</button>
+    </div>
+    <div class="field-group">
+      <div class="field-label">날짜</div>
+      <input class="field-input" id="fin-edit-date" type="date">
+    </div>
+    <div class="field-group">
+      <div class="field-label">내용</div>
+      <input class="field-input" id="fin-edit-desc" type="text">
+    </div>
+    <div class="field-group">
+      <div class="field-label">금액 (지출은 - 붙이기)</div>
+      <input class="field-input" id="fin-edit-amount" type="number">
+    </div>
+    <div class="field-group">
+      <div class="field-label">카테고리</div>
+      <select class="field-select" id="fin-edit-cat">
+        <option value="수입">수입</option>
+        <option value="지출">지출</option>
+        <option value="경품">경품</option>
+        <option value="이자">이자</option>
+        <option value="캐시백">캐시백</option>
+        <option value="이월">이월</option>
+        <option value="반올림">반올림</option>
+        <option value="환불">환불</option>
+        <option value="기타">기타</option>
+      </select>
+    </div>
+    <div class="field-group">
+      <div class="field-label">메모</div>
+      <input class="field-input" id="fin-edit-note" type="text" placeholder="">
+    </div>
+    <input type="hidden" id="fin-edit-rownum">
+    <div class="modal-actions">
+      <button class="mgmt-btn navy" onclick="submitFinEdit()">💾 수정 저장</button>
+      <button class="mgmt-btn" style="background:var(--border);color:var(--text)" onclick="closeFinEdit()">취소</button>
     </div>
   </div>
 </div>
