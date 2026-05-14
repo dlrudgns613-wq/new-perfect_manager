@@ -89,6 +89,7 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
 .mlist{padding:6px 11px 100px}
 .mc{background:var(--card);border-radius:10px;padding:9px 12px;margin-bottom:4px;display:flex;align-items:center;gap:9px;box-shadow:var(--sh);border-left:4px solid transparent;cursor:pointer;user-select:none;transition:all .14s}
 .mc.attend{border-left-color:var(--green);background:#f0fdf4}
+.mc.mc-guest{border-left-color:#fcd34d}
 .mc-info{flex:1;min-width:0}
 .mc-name{font-size:13px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .mc-sub{font-size:10px;color:var(--muted);display:flex;align-items:center;gap:4px;margin-top:1px}
@@ -100,6 +101,7 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
 .grid-view{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;padding:6px 10px 100px}
 .gc{background:var(--card);border-radius:9px;padding:8px;box-shadow:var(--sh);border-left:3px solid transparent;cursor:pointer;user-select:none;transition:all .14s;position:relative;min-height:64px}
 .gc.attend{border-left-color:var(--green);background:#f0fdf4}
+.gc.gc-guest{border-left-color:#fcd34d}
 .gc-name{font-size:12px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding-right:14px;line-height:1.3}
 .gc-avg{background:var(--navy);color:var(--amber);font-size:9px;font-weight:700;padding:1px 5px;border-radius:4px;display:inline-flex;margin-top:2px}
 .gc-dept{font-size:9px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px}
@@ -243,7 +245,6 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
 .m-save{width:100%;height:42px;border:none;border-radius:10px;background:var(--navy);color:var(--amber);font-size:14px;font-weight:700;font-family:'Noto Sans KR',sans-serif;cursor:pointer}
 .m-cancel{width:100%;height:36px;border:none;border-radius:10px;background:var(--bg);color:var(--muted);font-size:13px;font-weight:700;font-family:'Noto Sans KR',sans-serif;cursor:pointer;margin-top:6px}
 
-
 /* ── MANAGEMENT TAB ── */
 .mgmt-sec{padding:10px 11px 100px}
 .mgmt-card{background:var(--card);border-radius:var(--r);padding:14px;margin-bottom:10px;box-shadow:var(--sh)}
@@ -258,7 +259,6 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
 .mgmt-btn.red{background:var(--red);color:#fff}
 .mgmt-btn.amber{background:var(--amber);color:var(--navy)}
 .mgmt-lbl{font-size:11px;font-weight:700;color:var(--muted);margin-bottom:4px}
-.member-search-result{margin-top:8px}
 .member-item{background:var(--bg);border-radius:9px;padding:10px 12px;margin-bottom:5px;display:flex;align-items:center;gap:9px}
 .member-item-info{flex:1;min-width:0}
 .member-item-name{font-size:13px;font-weight:700}
@@ -285,35 +285,144 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
 .tab-pill{flex:1;padding:7px 4px;border:1.5px solid var(--border);border-radius:9px;background:#fff;color:var(--muted);font-size:11px;font-weight:700;font-family:'Noto Sans KR',sans-serif;cursor:pointer;text-align:center}
 .tab-pill.active{background:var(--navy);border-color:var(--navy);color:var(--amber)}
 
+/* ══════════════════════════════════════════════
+   현장 출석체크 — 전면 리뉴얼
+══════════════════════════════════════════════ */
+.roll-sec{padding:0 0 100px}
 
+/* 이벤트 선택 헤더 */
+.roll-event-bar{background:var(--navy);padding:12px 14px}
+.roll-event-label{font-size:10px;font-weight:700;color:rgba(255,255,255,.5);margin-bottom:6px;text-transform:uppercase;letter-spacing:.6px}
+.roll-event-chips{display:flex;gap:5px;overflow-x:auto;scrollbar-width:none;padding-bottom:2px}
+.roll-event-chips::-webkit-scrollbar{display:none}
+.roll-evt-chip{flex-shrink:0;padding:6px 12px;border-radius:99px;background:rgba(255,255,255,.1);border:1.5px solid rgba(255,255,255,.2);color:rgba(255,255,255,.75);font-size:11px;font-weight:700;cursor:pointer;font-family:'Noto Sans KR',sans-serif;transition:.13s;white-space:nowrap}
+.roll-evt-chip.active{background:var(--amber);border-color:var(--amber);color:var(--navy)}
+.roll-evt-chip.future-evt{border-color:rgba(16,185,129,.5)}
 
-/* ── ROLL CALL ── */
-.roll-sec{padding:10px 11px 100px}
-.roll-header{background:var(--navy);border-radius:var(--r);padding:14px;margin-bottom:10px;color:#fff}
-.roll-header-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
-.roll-title{font-size:14px;font-weight:900;color:var(--amber)}
-.roll-counts{display:flex;gap:8px}
-.roll-count-box{flex:1;background:rgba(255,255,255,.1);border-radius:8px;padding:8px;text-align:center}
-.roll-count-num{font-size:22px;font-weight:900;line-height:1}
-.roll-count-lbl{font-size:10px;opacity:.7;margin-top:2px}
-.roll-count-num.arrived{color:#34d399}
-.roll-count-num.pending{color:#fbbf24}
-.roll-search{width:100%;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);border-radius:9px;padding:8px 12px;font-size:13px;color:#fff;outline:none;font-family:'Noto Sans KR',sans-serif}
-.roll-search::placeholder{color:rgba(255,255,255,.4)}
-.roll-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;margin-bottom:8px}
-.roll-chip{background:var(--card);border-radius:10px;padding:10px 6px;text-align:center;cursor:pointer;transition:.12s;border:2px solid transparent;user-select:none;-webkit-user-select:none}
-.roll-chip.here{background:#ecfdf5;border-color:#10b981}
-.roll-chip .rc-name{font-size:12px;font-weight:700;margin-bottom:2px}
-.roll-chip .rc-dept{font-size:9px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.roll-chip .rc-check{font-size:14px;margin-top:3px;min-height:16px}
-.roll-chip.here .rc-name{color:#065f46}
-.roll-chip.here .rc-check{color:#10b981}
-.roll-actions{display:flex;gap:6px;margin-bottom:10px}
-.roll-section-lbl{font-size:11px;font-weight:700;color:var(--muted);margin:10px 0 6px;padding:0 2px}
+/* 스탯 카운터 바 */
+.roll-stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:0;background:var(--navy);border-top:1px solid rgba(255,255,255,.08)}
+.roll-stat-box{padding:10px 8px;text-align:center;border-right:1px solid rgba(255,255,255,.08)}
+.roll-stat-box:last-child{border-right:none}
+.roll-stat-num{font-size:24px;font-weight:900;line-height:1;color:#fff}
+.roll-stat-num.green{color:#34d399}
+.roll-stat-num.amber{color:#fbbf24}
+.roll-stat-lbl{font-size:9px;font-weight:700;color:rgba(255,255,255,.45);margin-top:3px;letter-spacing:.4px}
+
+/* 툴바 */
+.roll-toolbar{background:var(--card);padding:9px 12px;display:flex;gap:7px;align-items:center;border-bottom:1px solid var(--border);position:sticky;top:0;z-index:10}
+.roll-search-wrap{flex:1;position:relative}
+.roll-search-wrap input{width:100%;background:var(--bg);border:1.5px solid var(--border);border-radius:10px;padding:7px 11px 7px 30px;font-size:13px;font-family:'Noto Sans KR',sans-serif;outline:none;color:var(--text)}
+.roll-search-wrap input:focus{border-color:var(--navy)}
+.roll-search-ico{position:absolute;left:9px;top:50%;transform:translateY(-50%);font-size:12px;color:var(--muted);pointer-events:none}
+
+/* 필터 바 */
+.roll-filter-bar{display:flex;gap:5px;padding:7px 12px;background:var(--card);border-bottom:1px solid var(--border);overflow-x:auto;scrollbar-width:none}
+.roll-filter-bar::-webkit-scrollbar{display:none}
+.roll-fp{flex-shrink:0;padding:5px 12px;border-radius:99px;font-size:12px;font-weight:700;font-family:'Noto Sans KR',sans-serif;border:1.5px solid var(--border);background:#fff;color:var(--muted);cursor:pointer;transition:.12s}
+.roll-fp.active{background:var(--navy);border-color:var(--navy);color:#fff}
+.roll-fp.green.active{background:var(--green);border-color:var(--green)}
+
+/* 액션 버튼 바 */
+.roll-actions{display:flex;gap:5px;padding:8px 12px;background:var(--card);border-bottom:1px solid var(--border)}
+.roll-act-btn{flex:1;height:36px;border:none;border-radius:9px;font-size:11px;font-weight:700;font-family:'Noto Sans KR',sans-serif;cursor:pointer}
+.roll-act-btn.navy{background:var(--navy);color:var(--amber)}
+.roll-act-btn.ghost{background:var(--bg);color:var(--text);border:1.5px solid var(--border)}
+.roll-act-btn.amber{background:var(--amber);color:var(--navy)}
+
+/* 섹션 라벨 */
+.roll-section-lbl{font-size:11px;font-weight:700;color:var(--muted);padding:10px 14px 5px;display:flex;align-items:center;gap:6px}
+.roll-section-cnt{background:var(--navy);color:#fff;font-size:10px;font-weight:700;padding:2px 7px;border-radius:99px}
+.roll-section-cnt.green{background:var(--green)}
+
+/* 멤버 그리드 */
+.roll-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:5px;padding:0 10px 10px}
+
+.roll-chip{
+  background:var(--card);
+  border-radius:12px;
+  padding:12px 8px 10px;
+  text-align:center;
+  cursor:pointer;
+  transition:all .15s;
+  border:2px solid var(--border);
+  user-select:none;
+  -webkit-user-select:none;
+  position:relative;
+  box-shadow:0 1px 4px rgba(0,0,0,.06);
+}
+.roll-chip:active{transform:scale(.95)}
+.roll-chip.here{
+  background:#ecfdf5;
+  border-color:#10b981;
+  box-shadow:0 2px 8px rgba(16,185,129,.2);
+}
+.roll-chip.guest-chip{border-color:#fcd34d;background:#fffbeb}
+.roll-chip.here.guest-chip{background:#ecfdf5;border-color:#10b981}
+.roll-chip .rc-avatar{
+  width:36px;height:36px;border-radius:50%;
+  background:var(--bg);
+  display:flex;align-items:center;justify-content:center;
+  font-size:14px;font-weight:900;color:var(--navy);
+  margin:0 auto 6px;
+  border:2px solid var(--border);
+  transition:.15s;
+}
+.roll-chip.here .rc-avatar{
+  background:var(--green);color:#fff;border-color:var(--green);
+}
+.roll-chip .rc-name{font-size:12px;font-weight:700;color:var(--text);line-height:1.3;word-break:keep-all}
+.roll-chip.here .rc-name{color:#065f46;font-weight:900}
+.roll-chip .rc-dept{font-size:9px;color:var(--muted);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.roll-chip .rc-badge{
+  position:absolute;top:-5px;right:-5px;
+  background:var(--green);color:#fff;
+  font-size:10px;font-weight:900;
+  width:20px;height:20px;border-radius:50%;
+  display:none;align-items:center;justify-content:center;
+  border:2px solid #fff;
+}
+.roll-chip.here .rc-badge{display:flex}
+.roll-chip .rc-avg{
+  display:inline-block;margin-top:4px;
+  background:var(--navy);color:var(--amber);
+  font-size:9px;font-weight:700;padding:1px 5px;border-radius:4px;
+}
+.roll-chip.here .rc-avg{background:#065f46;color:#6ee7b7}
+.roll-chip .rc-guest-tag{
+  position:absolute;top:4px;left:4px;
+  background:#fcd34d;color:#92400e;
+  font-size:8px;font-weight:700;padding:1px 4px;border-radius:4px;
+}
+
+/* 빈 상태 */
+.roll-empty{text-align:center;padding:32px 20px;color:var(--muted)}
+.roll-empty-icon{font-size:36px;margin-bottom:8px}
+.roll-empty-txt{font-size:13px;font-weight:700;margin-bottom:4px}
+.roll-empty-sub{font-size:11px}
+
+/* 이벤트 미선택 상태 */
+.roll-no-event{
+  margin:20px 14px;
+  background:var(--card);
+  border-radius:var(--r);
+  padding:28px 20px;
+  text-align:center;
+  box-shadow:var(--sh);
+}
+.roll-no-event-icon{font-size:40px;margin-bottom:12px}
+.roll-no-event-txt{font-size:14px;font-weight:700;color:var(--navy);margin-bottom:6px}
+.roll-no-event-sub{font-size:12px;color:var(--muted);line-height:1.6}
+
+/* ── MISC ── */
+.empty{text-align:center;padding:28px 20px;color:var(--muted);font-size:14px}
+.loading{text-align:center;padding:48px 20px;color:var(--muted)}
+.spinner{width:28px;height:28px;border:3px solid var(--border);border-top-color:var(--navy);border-radius:50%;animation:spin .7s linear infinite;margin:0 auto 11px}
+.err-box{background:#fef2f2;border:1px solid #fecaca;border-radius:10px;padding:13px;margin:12px;font-size:13px;color:#991b1b;line-height:1.8}
+#toast{position:fixed;bottom:16px;left:50%;transform:translateX(-50%) translateY(4px);background:var(--navy);color:#fff;font-size:13px;font-weight:700;padding:8px 18px;border-radius:99px;opacity:0;transition:all .2s;pointer-events:none;white-space:nowrap;z-index:400}
 
 /* ── MEMBER EDIT MODAL ── */
-.modal-bg{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.5);z-index:500;display:none;align-items:center;justify-content:center;padding:20px}
-.modal-bg.show{display:flex}
+.modal-bg2{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.5);z-index:500;display:none;align-items:center;justify-content:center;padding:20px}
+.modal-bg2.show{display:flex}
 .modal{background:var(--card);border-radius:16px;width:100%;max-width:400px;padding:20px;box-shadow:0 20px 60px rgba(0,0,0,.3);max-height:85vh;overflow-y:auto}
 .modal-title{font-size:15px;font-weight:900;color:var(--navy);margin-bottom:14px;display:flex;justify-content:space-between;align-items:center}
 .modal-close{background:none;border:none;font-size:20px;cursor:pointer;color:var(--muted);padding:4px}
@@ -327,16 +436,8 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
 .danger-zone{margin-top:16px;padding-top:12px;border-top:1px solid #fee2e2}
 .danger-zone-title{font-size:11px;font-weight:700;color:var(--red);margin-bottom:8px}
 
-/* ── ACCESSIBILITY ── */
-.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);border:0}
-:focus-visible{outline:2px solid var(--amber);outline-offset:2px}
-
-/* ── MISC ── */
-.empty{text-align:center;padding:28px 20px;color:var(--muted);font-size:14px}
-.loading{text-align:center;padding:48px 20px;color:var(--muted)}
-.spinner{width:28px;height:28px;border:3px solid var(--border);border-top-color:var(--navy);border-radius:50%;animation:spin .7s linear infinite;margin:0 auto 11px}
-.err-box{background:#fef2f2;border:1px solid #fecaca;border-radius:10px;padding:13px;margin:12px;font-size:13px;color:#991b1b;line-height:1.8}
-#toast{position:fixed;bottom:16px;left:50%;transform:translateX(-50%) translateY(4px);background:var(--navy);color:#fff;font-size:13px;font-weight:700;padding:8px 18px;border-radius:99px;opacity:0;transition:all .2s;pointer-events:none;white-space:nowrap;z-index:400}
+#offline-bar{display:none;background:#ef4444;color:#fff;text-align:center;padding:6px;font-size:12px;font-weight:700;position:sticky;top:0;z-index:999}
+#offline-bar.show{display:block}
 </style>
 </head>
 <body>
@@ -345,7 +446,8 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
 <div class="hdr" id="hdr">
   <div class="hdr-top">
     <div class="logo">🎳 팀<span>퍼펙트</span></div>
-    <div class="hdr-right"><span id="last-saved" style="display:none;font-size:9px;color:rgba(255,255,255,.4);margin-right:4px"></span>
+    <div class="hdr-right">
+      <span id="last-saved" style="display:none;font-size:9px;color:rgba(255,255,255,.4);margin-right:4px"></span>
       <div class="pill" onclick="syncAll()">
         <div class="sdot" id="sdot"></div>
         <span id="stxt">대기중</span>
@@ -353,7 +455,6 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
       <button class="iBtn" onclick="openCfg()">⚙️</button>
     </div>
   </div>
-  <!-- 이벤트 바 -->
   <div class="evt-bar" id="evt-bar" style="display:none">
     <div class="evt-badge" onclick="toggleEvtPanel()">
       <span class="evt-badge-name" id="evt-badge-name">모임 선택</span>
@@ -361,15 +462,12 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
     </div>
     <button class="iBtn" onclick="syncAll()" style="width:30px;height:30px;font-size:11px">🔄</button>
   </div>
-  <!-- 이벤트 패널 -->
   <div class="evt-panel" id="evt-panel">
-    <!-- 기존 모임 -->
     <div id="evt-existing" style="display:none">
       <div class="evt-section-lbl">📋 기존 모임</div>
       <div class="evt-chips" id="evt-chips"></div>
       <div class="evt-divider"></div>
     </div>
-    <!-- 새 모임 -->
     <div class="evt-section-lbl">➕ 새 모임 만들기</div>
     <div class="new-evt-row">
       <button class="evt-type-btn" onclick="selType('번개',this)">⚡번개</button>
@@ -395,17 +493,15 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
 
 <!-- TABS -->
 <div class="tabs" id="tabs">
-  <button class="tBtn active" id="tab-att"  onclick="switchTab('att')">☑️ 참석여부</button>
-  <button class="tBtn"        id="tab-lane" onclick="switchTab('lane')">🎳 레인배정</button>
-  <button class="tBtn"        id="tab-dash" onclick="switchTab('dash')">📊 대시보드</button>
+  <button class="tBtn active" id="tab-att"  onclick="switchTab('att')">☑️ 참석</button>
+  <button class="tBtn"        id="tab-lane" onclick="switchTab('lane')">🎳 레인</button>
+  <button class="tBtn"        id="tab-dash" onclick="switchTab('dash')">📊 현황</button>
   <button class="tBtn"        id="tab-mgmt" onclick="switchTab('mgmt')">⚙️ 관리</button>
   <button class="tBtn"        id="tab-roll" onclick="switchTab('roll')">📋 현장</button>
 </div>
 
-<div id="offline-bar" style="display:none;background:#ef4444;color:#fff;text-align:center;padding:6px;font-size:12px;font-weight:700;position:sticky;top:0;z-index:999">
-  ⚠️ 오프라인 상태 — 저장이 안 됩니다
-</div>
-<style>#offline-bar.show{display:block}</style>
+<div id="offline-bar">⚠️ 오프라인 상태 — 저장이 안 됩니다</div>
+
 <div class="scr" id="scr">
 
 <!-- ══ 참석여부 ══ -->
@@ -479,7 +575,6 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
         </div>
       </div>
     </div>
-    <!-- 에버리지 없는 신입 입력 -->
     <div class="noavg-sec" id="noavg-sec">
       <div class="noavg-lbl">⚠️ 에버리지 없는 참석자</div>
       <div style="font-size:11px;color:var(--muted);margin-bottom:9px;line-height:1.6">배정 전 에버리지 입력<br>📌 남자 평균 <strong style="color:var(--navy)">100</strong> &nbsp;/&nbsp; 여자 평균 <strong style="color:var(--navy)">80</strong></div>
@@ -498,13 +593,10 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
       <div class="stat-card"><div class="stat-lbl">회비 납부율</div><div class="stat-val" id="d-fee-rate">-</div><div class="stat-sub" id="d-fee-sub">명 납부</div></div>
       <div class="stat-card"><div class="stat-lbl">미납자</div><div class="stat-val" id="d-unpaid" style="color:var(--red)">-</div><div class="stat-sub">명</div></div>
     </div>
-    <!-- 상세 통계 -->
     <div class="stat-grid" style="margin-bottom:10px">
       <div class="stat-card"><div class="stat-lbl">💰 회비 납부율</div><div class="stat-val" id="d-fee-rate2">-</div><div class="stat-sub" id="d-fee-sub2">-</div></div>
       <div class="stat-card"><div class="stat-lbl">⚠️ 게스트</div><div class="stat-val" id="d-guest">-</div><div class="stat-sub">명</div></div>
     </div>
-
-    <!-- 미납자 명단 -->
     <div class="chart-card">
       <div class="chart-title" style="display:flex;justify-content:space-between;align-items:center">
         <span>⚠️ 회비 미납자 명단</span>
@@ -512,8 +604,6 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
       </div>
       <div id="unpaid-list"></div>
     </div>
-
-    <!-- 가계부 요약 -->
     <div class="chart-card">
       <div class="chart-title">💰 가계부 현황</div>
       <div style="display:flex;gap:8px;margin-bottom:8px">
@@ -536,8 +626,6 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
         <span style="font-size:15px;font-weight:900;color:var(--navy)" id="d-rounding">-</span>
       </div>
     </div>
-
-    <!-- 모임별 참석자 -->
     <div class="chart-card">
       <div class="chart-title">📅 모임별 참석자 수</div>
       <div class="evt-trend" id="evt-trend"></div>
@@ -557,21 +645,15 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
   </div>
 </div>
 
-
 <!-- ══ 관리 ══ -->
 <div class="sec" id="sec-mgmt">
   <div class="mgmt-sec">
-
-    <!-- 서브탭 -->
     <div class="tab-row">
       <button class="tab-pill active" id="mtab-member" onclick="setMgmtTab('member',this)">👤 회원</button>
       <button class="tab-pill" id="mtab-finance" onclick="setMgmtTab('finance',this)">💰 가계부</button>
       <button class="tab-pill" id="mtab-score" onclick="setMgmtTab('score',this)">🎳 점수</button>
     </div>
-
-    <!-- 회원 관리 -->
     <div id="msec-member">
-      <!-- 필터 + 검색 -->
       <div class="mgmt-card">
         <div class="mgmt-title">👥 회원 목록</div>
         <div class="mgmt-row" style="margin-bottom:8px">
@@ -585,13 +667,11 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
         </div>
         <div id="m-list"></div>
       </div>
-
-      <!-- 신규 회원 추가 -->
       <div class="mgmt-card">
         <div class="mgmt-title">➕ 신규 회원 추가</div>
         <div class="mgmt-lbl">이름</div>
         <div class="mgmt-row"><input class="mgmt-inp" id="new-name" type="text" placeholder="홍길동"></div>
-        <div class="mgmt-lbl">학과 (기존 학과 선택 또는 직접 입력)</div>
+        <div class="mgmt-lbl">학과</div>
         <div class="mgmt-row">
           <input class="mgmt-inp" id="new-dept" type="text" placeholder="학과명 입력 또는 선택" list="dept-list">
           <datalist id="dept-list"></datalist>
@@ -608,10 +688,7 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
         <button class="mgmt-btn navy" style="width:100%;height:40px" onclick="addNewMember()">✅ 추가</button>
       </div>
     </div>
-
-    <!-- 가계부 -->
     <div id="msec-finance" style="display:none">
-      <!-- 통장 잔액 입력 + 빵구 체크 -->
       <div class="mgmt-card" id="bank-check-card">
         <div class="mgmt-title">🏦 실제 통장 잔액 입력 (빵구 확인)</div>
         <div class="mgmt-row">
@@ -622,8 +699,6 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
           <div id="bank-result-inner"></div>
         </div>
       </div>
-
-      <!-- 잔액 카드 -->
       <div class="balance-card">
         <div class="balance-lbl">💰 현재 잔액</div>
         <div class="balance-val" id="balance-val">-</div>
@@ -632,47 +707,25 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
           <span>지출 <strong id="balance-expense">-</strong></span>
         </div>
       </div>
-
-      <!-- 뒷풀이 반올림 계산기 -->
       <div class="mgmt-card">
         <div class="mgmt-title">🔢 뒷풀이 반올림 계산기</div>
-        <div style="font-size:11px;color:var(--muted);margin-bottom:10px;line-height:1.6">
-          총액 ÷ 인원수 = 1인당 금액(올림) → 잔돈 자동 계산 후 가계부 기록
-        </div>
-        <div class="mgmt-lbl">모임 (ex: [정기] 5/14)</div>
-        <div class="mgmt-row"><input class="mgmt-inp" id="rd-event" type="text" placeholder="[정기] 5/14" list="event-list-rd">
-          <datalist id="event-list-rd"></datalist>
-        </div>
+        <div style="font-size:11px;color:var(--muted);margin-bottom:10px;line-height:1.6">총액 ÷ 인원수 = 1인당 금액(올림) → 잔돈 자동 계산 후 가계부 기록</div>
+        <div class="mgmt-lbl">모임</div>
+        <div class="mgmt-row"><input class="mgmt-inp" id="rd-event" type="text" placeholder="[정기] 5/14" list="event-list-rd"><datalist id="event-list-rd"></datalist></div>
         <div style="display:flex;gap:8px">
-          <div style="flex:1">
-            <div class="mgmt-lbl">뒷풀이 총액</div>
-            <input class="mgmt-inp" id="rd-total" type="number" placeholder="150000" oninput="calcRounding()">
-          </div>
-          <div style="flex:1">
-            <div class="mgmt-lbl">참석 인원수</div>
-            <input class="mgmt-inp" id="rd-cnt" type="number" placeholder="12" oninput="calcRounding()">
-          </div>
+          <div style="flex:1"><div class="mgmt-lbl">뒷풀이 총액</div><input class="mgmt-inp" id="rd-total" type="number" placeholder="150000" oninput="calcRounding()"></div>
+          <div style="flex:1"><div class="mgmt-lbl">참석 인원수</div><input class="mgmt-inp" id="rd-cnt" type="number" placeholder="12" oninput="calcRounding()"></div>
         </div>
         <div id="rd-result" style="background:var(--bg);border-radius:9px;padding:10px;margin:8px 0;display:none">
-          <div style="display:flex;justify-content:space-between;margin-bottom:4px">
-            <span style="font-size:12px;color:var(--muted)">1인당 금액</span>
-            <span style="font-size:15px;font-weight:900;color:var(--navy)" id="rd-per">-</span>
-          </div>
-          <div style="display:flex;justify-content:space-between">
-            <span style="font-size:12px;color:var(--muted)">잔돈 (가계부 반영)</span>
-            <span style="font-size:15px;font-weight:900" id="rd-remain">-</span>
-          </div>
+          <div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="font-size:12px;color:var(--muted)">1인당 금액</span><span style="font-size:15px;font-weight:900;color:var(--navy)" id="rd-per">-</span></div>
+          <div style="display:flex;justify-content:space-between"><span style="font-size:12px;color:var(--muted)">잔돈 (가계부 반영)</span><span style="font-size:15px;font-weight:900" id="rd-remain">-</span></div>
         </div>
         <button class="mgmt-btn navy" style="width:100%;height:38px" onclick="submitRounding()">💾 가계부에 기록</button>
       </div>
-
-      <!-- 반올림 이력 -->
       <div class="mgmt-card">
         <div class="mgmt-title">📋 반올림 이력 <span id="rounding-total" style="font-size:11px;color:var(--muted);font-weight:400"></span></div>
         <div id="rounding-list"></div>
       </div>
-
-      <!-- 수입/지출 입력 -->
       <div class="mgmt-card">
         <div class="mgmt-title">➕ 내역 추가</div>
         <div class="mgmt-lbl">날짜</div>
@@ -683,101 +736,101 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
         <div class="mgmt-row">
           <input class="mgmt-inp" id="fin-amount" type="number" placeholder="-50000">
           <select class="mgmt-sel" id="fin-cat" style="max-width:100px">
-            <option value="수입">수입</option>
-            <option value="지출">지출</option>
-            <option value="경품">경품</option>
-            <option value="이자">이자</option>
-            <option value="캐시백">캐시백</option>
-            <option value="이월">이월</option>
-            <option value="기타">기타</option>
+            <option value="수입">수입</option><option value="지출">지출</option><option value="경품">경품</option>
+            <option value="이자">이자</option><option value="캐시백">캐시백</option><option value="이월">이월</option><option value="기타">기타</option>
           </select>
         </div>
         <div class="mgmt-lbl">메모 (선택)</div>
         <div class="mgmt-row"><input class="mgmt-inp" id="fin-note" type="text" placeholder=""></div>
         <button class="mgmt-btn navy" style="width:100%;height:40px" onclick="addFinanceEntry()">✅ 추가</button>
       </div>
-
-      <!-- 내역 목록 -->
       <div class="mgmt-card">
         <div class="mgmt-title">📋 내역 목록</div>
         <div id="fin-list"><div class="loading"><div class="spinner"></div>불러오는 중...</div></div>
       </div>
     </div>
-
-    <!-- 점수 입력 -->
     <div id="msec-score" style="display:none">
       <div class="mgmt-card">
         <div class="mgmt-title">🎳 점수 일괄 입력</div>
         <div style="font-size:11px;color:var(--muted);line-height:1.7;margin-bottom:10px;background:var(--bg);padding:9px;border-radius:8px">
-          📋 <strong>붙여넣기 형식</strong><br>
-          엑셀/AI에서 복사 후 붙여넣기<br>
+          📋 <strong>붙여넣기 형식</strong><br>엑셀/AI에서 복사 후 붙여넣기<br>
           <code style="font-size:10px;background:#e2e8f0;padding:2px 5px;border-radius:4px">이름 탭 총점 탭 게임수</code><br>
           또는 한 줄씩: <code style="font-size:10px;background:#e2e8f0;padding:2px 5px;border-radius:4px">이름,총점,게임수</code>
         </div>
         <div class="mgmt-lbl">날짜</div>
-        <div class="mgmt-row" style="margin-bottom:10px">
-          <input class="mgmt-inp" id="sc-date" type="date">
-        </div>
+        <div class="mgmt-row" style="margin-bottom:10px"><input class="mgmt-inp" id="sc-date" type="date"></div>
         <div class="mgmt-lbl">점수 데이터 붙여넣기</div>
-        <textarea id="sc-paste" class="mgmt-inp" rows="8" placeholder="정승택&#9;613&#9;3&#10;배성준&#9;565&#9;3&#10;조세욱&#9;561&#9;3" style="width:100%;resize:vertical;font-family:monospace;font-size:12px" oninput="previewScores()"></textarea>
+        <textarea id="sc-paste" class="mgmt-inp" rows="8" placeholder="정승택&#9;613&#9;3&#10;배성준&#9;565&#9;3" style="width:100%;resize:vertical;font-family:monospace;font-size:12px" oninput="previewScores()"></textarea>
         <div id="sc-preview" style="margin-top:8px"></div>
         <button class="mgmt-btn navy" style="width:100%;height:40px;margin-top:10px" onclick="submitBulkScore()">✅ 일괄 저장</button>
       </div>
-
-      <!-- 최근 점수 -->
       <div class="mgmt-card">
         <div class="mgmt-title">📊 최근 점수 기록</div>
         <div id="recent-scores"></div>
       </div>
     </div>
-
   </div>
 </div>
 
-
-<!-- ══ 현장 출석 체크 ══ -->
+<!-- ══ 현장 출석체크 — 완전 리뉴얼 ══ -->
 <div class="sec" id="sec-roll">
-  <div class="roll-sec">
 
-    <div class="roll-header">
-      <div class="roll-header-top">
-        <span class="roll-title">📋 현장 출석 체크</span>
-        <span style="font-size:10px;opacity:.5">저장 안 됨 · 현장 전용</span>
-      </div>
-      <div class="roll-counts" style="margin-bottom:10px">
-        <div class="roll-count-box">
-          <div class="roll-count-num arrived" id="roll-cnt-here">0</div>
-          <div class="roll-count-lbl">✅ 도착</div>
-        </div>
-        <div class="roll-count-box">
-          <div class="roll-count-num pending" id="roll-cnt-left">0</div>
-          <div class="roll-count-lbl">⏳ 미도착</div>
-        </div>
-        <div class="roll-count-box">
-          <div class="roll-count-num" style="color:#fff" id="roll-cnt-total">0</div>
-          <div class="roll-count-lbl">👥 전체</div>
-        </div>
-      </div>
-      <input class="roll-search" id="roll-search" type="search" placeholder="이름 검색..." oninput="renderRoll()">
+  <!-- 이벤트 선택 바 -->
+  <div class="roll-event-bar">
+    <div class="roll-event-label">📅 모임 선택</div>
+    <div class="roll-event-chips" id="roll-evt-chips">
+      <div style="color:rgba(255,255,255,.4);font-size:12px;padding:6px 0">동기화 후 모임이 표시됩니다</div>
     </div>
-
-    <div class="roll-actions">
-      <button class="mgmt-btn navy" style="flex:1;height:36px;font-size:12px" onclick="rollCheckAll()">✅ 전체 도착</button>
-      <button class="mgmt-btn" style="flex:1;height:36px;font-size:12px;background:var(--border);color:var(--text)" onclick="rollReset()">🔄 초기화</button>
-      <button class="mgmt-btn amber" style="flex:1;height:36px;font-size:12px;color:var(--navy)" onclick="rollCopyMissing()">📋 미도착 복사</button>
-    </div>
-
-    <div id="roll-arrived-section" style="display:none">
-      <div class="roll-section-lbl">✅ 도착 (<span id="roll-arrived-cnt">0</span>명)</div>
-      <div class="roll-grid" id="roll-grid-arrived"></div>
-    </div>
-
-    <div id="roll-pending-section">
-      <div class="roll-section-lbl">⏳ 미도착 (<span id="roll-pending-cnt">0</span>명)</div>
-      <div class="roll-grid" id="roll-grid-pending"></div>
-    </div>
-
   </div>
+
+  <!-- 카운터 -->
+  <div class="roll-stats">
+    <div class="roll-stat-box">
+      <div class="roll-stat-num green" id="roll-cnt-here">0</div>
+      <div class="roll-stat-lbl">✅ 도착</div>
+    </div>
+    <div class="roll-stat-box">
+      <div class="roll-stat-num amber" id="roll-cnt-left">0</div>
+      <div class="roll-stat-lbl">⏳ 미도착</div>
+    </div>
+    <div class="roll-stat-box">
+      <div class="roll-stat-num" id="roll-cnt-total">0</div>
+      <div class="roll-stat-lbl">👥 체크대상</div>
+    </div>
+  </div>
+
+  <!-- 검색 + 액션 -->
+  <div class="roll-toolbar">
+    <div class="roll-search-wrap">
+      <span class="roll-search-ico">🔍</span>
+      <input type="search" id="roll-search" placeholder="이름 검색..." oninput="renderRoll()">
+    </div>
+  </div>
+
+  <!-- 필터 -->
+  <div class="roll-filter-bar">
+    <button class="roll-fp active" id="rf-all"     onclick="setRollFilter('all',this)">전체</button>
+    <button class="roll-fp green"  id="rf-here"    onclick="setRollFilter('here',this)">✅ 도착</button>
+    <button class="roll-fp"        id="rf-pending" onclick="setRollFilter('pending',this)">⏳ 미도착</button>
+    <button class="roll-fp"        id="rf-attend"  onclick="setRollFilter('attend',this)">☑️ 참석예정</button>
+  </div>
+
+  <!-- 액션 버튼 -->
+  <div class="roll-actions">
+    <button class="roll-act-btn navy"  onclick="rollCheckAll()">✅ 전체 도착</button>
+    <button class="roll-act-btn ghost" onclick="rollReset()">🔄 초기화</button>
+    <button class="roll-act-btn amber" onclick="rollCopyMissing()">📋 미도착 복사</button>
+  </div>
+
+  <!-- 콘텐츠 영역 -->
+  <div id="roll-content">
+    <div class="roll-no-event">
+      <div class="roll-no-event-icon">📅</div>
+      <div class="roll-no-event-txt">모임을 먼저 선택하세요</div>
+      <div class="roll-no-event-sub">위에서 오늘 모임을 탭하면<br>참석 예정 인원이 표시됩니다</div>
+    </div>
+  </div>
+
 </div>
 
 </div><!-- /scr -->
@@ -830,1642 +883,8 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
   </div>
 </div>
 
-<div id="toast"></div>
-
-<script>
-// ══════════════════════════════════════════════════════
-//  설정 & 상태
-// ══════════════════════════════════════════════════════
-let GAS_URL = localStorage.getItem('pf_url') || '';
-let members=[], events=[], statusMap={}, tempAvgMap={};
-let _lastSavedAt=null, _lastSaveState=null;
-let _isOnline=navigator.onLine;
-
-// ★ U6: 오프라인 감지
-window.addEventListener('online',()=>{_isOnline=true;document.getElementById('offline-bar')?.classList.remove('show');toast('🌐 온라인 복구');});
-window.addEventListener('offline',()=>{_isOnline=false;document.getElementById('offline-bar')?.classList.add('show');toast('⚠️ 오프라인 상태');});
-let currentEventId=null, currentEventTitle='';
-let filter='all', sortMode='name', viewMode='grid';
-let laneMode='auto', autoTeamMode=2, manualTeamMode=2;
-let laneGroups=[], laneCount=0, _assignCount=0;
-let manualLanes={}, manualUnassigned=[], manualSelChip=null;
-let swapMode=false, swapSel=null, avgPopupTarget=null;
-let _isSaving=false, selectedType='';
-let dashData=null;
-
-// ── 로컬 저장 ──
-function save(){
-  try{
-    localStorage.setItem('pf_url', GAS_URL);
-    // ★ B8 FIX: statusMap은 현재 이벤트 것만 저장 (용량 초과 방지)
-    const compactSM={};
-    if(currentEventId){
-      Object.entries(statusMap).forEach(([k,v])=>{if(v==='attend')compactSM[k]=v;});
-    }
-    localStorage.setItem('pf_st', JSON.stringify(compactSM));
-    localStorage.setItem('pf_tmp', JSON.stringify(tempAvgMap));
-    localStorage.setItem('pf_evt', currentEventId||'');
-    localStorage.setItem('pf_view', viewMode);
-  }catch(e){}
-}
-function load(){
-  try{
-    GAS_URL = localStorage.getItem('pf_url')||'';
-    const s=localStorage.getItem('pf_st'); if(s) statusMap=JSON.parse(s);
-    const t=localStorage.getItem('pf_tmp'); if(t) tempAvgMap=JSON.parse(t);
-    const e=localStorage.getItem('pf_evt'); if(e) currentEventId=e;
-    const v=localStorage.getItem('pf_view'); if(v) viewMode=v;
-  }catch(e){}
-}
-
-// ══════════════════════════════════════════════════════
-//  초기화
-// ══════════════════════════════════════════════════════
-window.addEventListener('DOMContentLoaded', ()=>{
-  load();
-  applyViewMode();
-  initDatePickers();
-  setScrHeight();
-  window.addEventListener('resize', setScrHeight);
-  if(GAS_URL) syncAll();
-  else{
-    setSS('err','URL 없음');
-    document.getElementById('mlist').innerHTML='<div class="err-box">⚙️ 설정에서 GAS URL을 먼저 입력하세요.</div>';
-  }
-});
-
-function setScrHeight(){
-  const h=document.getElementById('hdr').offsetHeight+document.getElementById('tabs').offsetHeight;
-  document.getElementById('scr').style.height=`calc(100dvh - ${h}px)`;
-}
-
-// ══════════════════════════════════════════════════════
-//  API
-// ══════════════════════════════════════════════════════
-async function gasGet(action, params={}){
-  const url=new URL(GAS_URL);
-  url.searchParams.set('action',action);
-  Object.entries(params).forEach(([k,v])=>url.searchParams.set(k,typeof v==='object'?JSON.stringify(v):v));
-  const ctrl=new AbortController();
-  const timer=setTimeout(()=>ctrl.abort(),20000);
-  try{
-    const r=await fetch(url.toString(),{signal:ctrl.signal});
-    clearTimeout(timer);
-    return r.json();
-  }catch(e){
-    clearTimeout(timer);
-    if(e.name==='AbortError') throw new Error('서버 응답 시간 초과 (20초)');
-    throw e;
-  }
-}
-async function gasPost(body){
-  const ctrl=new AbortController();
-  const timer=setTimeout(()=>ctrl.abort(),25000);
-  try{
-    const res=await fetch(GAS_URL,{
-      method:'POST',
-      headers:{'Content-Type':'text/plain;charset=utf-8'},
-      body:JSON.stringify(body),
-      signal:ctrl.signal
-    });
-    clearTimeout(timer);
-    return JSON.parse(await res.text());
-  }catch(e){
-    clearTimeout(timer);
-    if(e.name==='AbortError') throw new Error('서버 응답 시간 초과 (25초)');
-    throw e;
-  }
-}
-
-function setSS(s,t){
-  document.getElementById('sdot').className='sdot '+s;
-  document.getElementById('stxt').textContent=t;
-}
-
-// ══════════════════════════════════════════════════════
-//  동기화
-// ══════════════════════════════════════════════════════
-async function syncAll(){
-  setSS('spin','동기화 중...');
-  try{
-    const [mRes, eRes] = await Promise.all([
-      gasGet('getMembers'),
-      gasGet('getEvents')
-    ]);
-    if(mRes.error) throw new Error(mRes.error);
-
-    // 이름 기준 중복 제거 (동명이인 방어)
-    const _raw = (mRes||[]).filter(m=>m.status!=='left');
-    const _seen = new Set();
-    members = _raw.filter(m => {
-      if(_seen.has(m.name)) return false;
-      _seen.add(m.name);
-      return true;
-    });
-    // ★ B4: left 회원도 별도 보관 (레인배정 시 참조 가능)
-    const _allMembers = (mRes||[]);
-    const _leftMembers = _allMembers.filter(m=>m.status==='left');
-    events  = Array.isArray(eRes)?eRes:[];
-
-    document.getElementById('evt-bar').style.display='block';
-    renderEvtChips();
-
-    // 현재 이벤트 복원
-    if(currentEventId){
-      const ev=events.find(e=>e.eventId===currentEventId);
-      if(ev){
-        currentEventTitle=ev.title;
-        setEvtBadge(ev.title);
-        await loadAttendance(currentEventId);
-      }else{
-        // 저장된 이벤트가 목록에 없으면 최신으로
-        autoSelectEvent();
-      }
-    }else{
-      autoSelectEvent();
-    }
-
-    setSS('ok',`${members.length}명`);
-    setScrHeight(); renderList(); save();
-    toast(`✅ ${members.length}명 동기화 완료`);
-  }catch(e){
-    setSS('err','오류');
-    document.getElementById('mlist').innerHTML=`<div class="err-box">❌ <strong>동기화 실패</strong><br><br>${e.message}<br><br>· GAS URL 확인<br>· 배포 → "모든 사용자" 확인<br>· 시트명 확인 (members/events)</div>`;
-  }
-}
-
-function autoSelectEvent(){
-  if(!events.length) return;
-  const now=new Date(); now.setHours(0,0,0,0);
-  const future=events.filter(e=>{
-    const d=e.date?new Date(e.date):null;
-    return d&&d>=now;
-  }).sort((a,b)=>new Date(a.date)-new Date(b.date));
-  const sel = future.length ? future[0] : events[events.length-1];
-  if(sel) selectEvent(sel.eventId, sel.title, false);
-}
-
-async function loadAttendance(eventId){
-  if(!GAS_URL||!eventId) return;
-  try{
-    const res=await gasGet('getAttendance',{eventId});
-    if(res.error||!res.attendees) return;
-    statusMap={};
-    res.attendees.forEach(n=>{ statusMap[n]='attend'; });
-    renderList();
-    toast(`📥 ${res.attendees.length}명 불러옴`);
-  }catch(e){}
-}
-
-// ══════════════════════════════════════════════════════
-//  이벤트 피커
-// ══════════════════════════════════════════════════════
-function initDatePickers(){
-  const now=new Date();
-  const mSel=document.getElementById('sel-month');
-  const dSel=document.getElementById('sel-day');
-  if(mSel.options.length>0) return;
-  for(let m=1;m<=12;m++){const o=document.createElement('option');o.value=m;o.textContent=m+'월';if(m===now.getMonth()+1)o.selected=true;mSel.add(o);}
-  for(let d=1;d<=31;d++){const o=document.createElement('option');o.value=d;o.textContent=d+'일';if(d===now.getDate())o.selected=true;dSel.add(o);}
-  mSel.onchange=dSel.onchange=updateDatePreview;
-  updateDatePreview();
-}
-function updateDatePreview(){
-  const m=document.getElementById('sel-month')?.value;
-  const d=document.getElementById('sel-day')?.value;
-  if(selectedType&&selectedType!=='직접'&&m&&d)
-    document.getElementById('date-preview').textContent=`[${selectedType}] ${m}/${d}`;
-}
-
-function toggleEvtPanel(){
-  const p=document.getElementById('evt-panel');
-  const a=document.getElementById('evt-arrow');
-  const isOpen=p.classList.contains('open');
-  p.classList.toggle('open',!isOpen);
-  a.textContent=isOpen?'▼':'▲';
-  setScrHeight();
-}
-function closeEvtPanel(){
-  document.getElementById('evt-panel').classList.remove('open');
-  document.getElementById('evt-arrow').textContent='▼';
-  setScrHeight();
-}
-
-function selType(type,el){
-  selectedType=type;
-  document.querySelectorAll('.evt-type-btn').forEach(b=>b.classList.remove('sel'));
-  el.classList.add('sel');
-  const dateRow=document.getElementById('date-row');
-  const directRow=document.getElementById('direct-row');
-  if(type==='직접'){
-    dateRow.style.display='none'; directRow.style.display='flex';
-  }else{
-    dateRow.style.display='flex'; directRow.style.display='none';
-  }
-  updateDatePreview();
-}
-
-async function confirmNewEvent(){
-  let title='';
-  if(selectedType==='직접'){
-    title=document.getElementById('direct-inp').value.trim();
-    if(!title){toast('이름을 입력하세요');return;}
-  }else{
-    if(!selectedType){toast('종류를 선택하세요');return;}
-    const m=document.getElementById('sel-month').value;
-    const d=document.getElementById('sel-day').value;
-    title=`[${selectedType}] ${m}/${d}`;
-  }
-  const type = title.includes('번개')?'flash':'regular';
-  const m=document.getElementById('sel-month')?.value;
-  const d=document.getElementById('sel-day')?.value;
-  const date = (selectedType!=='직접'&&m&&d) ? `2026-${String(m).padStart(2,'0')}-${String(d).padStart(2,'0')}` : '';
-
-  try{
-    const res=await gasPost({action:'createEvent',title,type,date});
-    if(res.error){toast('❌ '+res.error);return;}
-    const eventId=res.eventId;
-    if(!events.find(e=>e.eventId===eventId)) events.push({eventId,title,type,date});
-    renderEvtChips();
-    statusMap={};
-    selectEvent(eventId,title,true);
-    toast(`✅ "${title}" 생성됨`);
-  }catch(e){toast('❌ 생성 실패: '+e.message);}
-}
-
-function renderEvtChips(){
-  const container=document.getElementById('evt-chips');
-  const wrap=document.getElementById('evt-existing');
-  if(!events.length){wrap.style.display='none';return;}
-  wrap.style.display='block';
-  const now=new Date();now.setHours(0,0,0,0);
-  const sorted=[...events].sort((a,b)=>{
-    const da=a.date?new Date(a.date):null, db=b.date?new Date(b.date):null;
-    if(!da&&!db)return 0;if(!da)return 1;if(!db)return-1;
-    const fa=da>=now,fb=db>=now;
-    if(fa&&fb)return da-db;if(fa&&!fb)return-1;if(!fa&&fb)return 1;
-    return db-da;
-  });
-  container.innerHTML=sorted.map(ev=>{
-    const isFuture=ev.date&&new Date(ev.date)>=now;
-    const isSel=ev.eventId===currentEventId;
-    return `<div class="evt-chip ${isSel?'sel':''} ${isFuture?'future':''}"
-      onclick="selectEvent('${ev.eventId}','${ev.title.replace(/'/g,"\\'")}',true)">
-      ${isFuture&&!isSel?'🔜 ':''}${ev.title}
-    </div>`;
-  }).join('');
-}
-
-function selectEvent(eventId, title, loadData=true){
-  currentEventId=eventId;
-  currentEventTitle=title;
-  setEvtBadge(title);
-  renderEvtChips();
-  closeEvtPanel();
-  save();
-  if(loadData){
-    statusMap={};
-    loadAttendance(eventId).then(()=>renderList());
-  }
-}
-function setEvtBadge(title){
-  document.getElementById('evt-badge-name').textContent=title||'모임 선택';
-}
-
-// ══════════════════════════════════════════════════════
-//  탭
-// ══════════════════════════════════════════════════════
-function switchTab(tab){
-  ['att','lane','dash','mgmt','roll'].forEach(t=>{
-    document.getElementById(`sec-${t}`).classList.toggle('active',t===tab);
-    document.getElementById(`tab-${t}`).classList.toggle('active',t===tab);
-  });
-  document.getElementById('evt-bar').style.display=(tab==='att'&&members.length)?'block':'none';
-  if(tab==='dash') renderDash();
-  if(tab==='roll') initRoll();
-  if(tab==='lane'){const att=getAttendees();if(att.length)checkNoAvg(att);}
-  setScrHeight();
-}
-
-// ══════════════════════════════════════════════════════
-//  뷰 토글
-// ══════════════════════════════════════════════════════
-function toggleView(){
-  viewMode=viewMode==='list'?'grid':'list';
-  applyViewMode();save();renderList();
-  toast(viewMode==='grid'?'⊞ 그리드 뷰':'☰ 리스트 뷰');
-}
-function applyViewMode(){
-  const btn=document.getElementById('view-btn');
-  if(viewMode==='grid'){btn.textContent='⊞';btn.classList.add('on');}
-  else{btn.textContent='☰';btn.classList.remove('on');}
-}
-
-// ══════════════════════════════════════════════════════
-//  멤버 리스트
-// ══════════════════════════════════════════════════════
-function renderList(){
-  const el=document.getElementById('mlist');
-  if(!members.length) return;
-  const q=(document.getElementById('srch')?.value||'').trim();
-  let data=members.filter(m=>m.status==='active');
-  if(q) data=data.filter(m=>m.name.includes(q));
-  if(filter==='attend') data=data.filter(m=>statusMap[m.name]==='attend');
-  if(filter==='pending') data=data.filter(m=>(statusMap[m.name]||'pending')==='pending');
-  data=applySort(data);
-
-  const attCnt=members.filter(m=>statusMap[m.name]==='attend').length;
-  document.getElementById('cnt-all').textContent=members.length;
-  document.getElementById('cnt-att').textContent=attCnt;
-  document.getElementById('cnt-pnd').textContent=members.length-attCnt;
-
-  // 저장 버튼
-  document.getElementById('float-save').classList.toggle('show', attCnt>0);
-
-  if(!data.length){el.className='mlist';el.innerHTML='<div class="empty">검색 결과 없음 🤔</div>';return;}
-
-  if(viewMode==='grid'){
-    el.className='grid-view';
-    el.innerHTML=data.map(m=>{
-      const att=statusMap[m.name]==='attend';
-      const eff=m.avg||0;
-      const nm=m.name.replace(/'/g,"\\'");
-      return `<div class="gc ${att?'attend':''}" onclick="toggleMember('${nm}')">
-        <div class="gc-name">${m.name}</div>
-        ${eff?`<div class="gc-avg">${eff}</div>`:''}
-        <div class="gc-dept">${m.dept||''}</div>
-        ${att?`<div class="gc-chk">✓</div>`:''}
-        ${m.feePaid!=='O'?`<div class="gc-fee">미납</div>`:''}
-      </div>`;
-    }).join('');
-  }else{
-    el.className='mlist';
-    el.innerHTML=data.map(m=>{
-      const att=statusMap[m.name]==='attend';
-      const eff=m.avg||0;
-      const nm=m.name.replace(/'/g,"\\'");
-      return `<div class="mc ${att?'attend':''}" onclick="toggleMember('${nm}')">
-        <div class="mc-info">
-          <div class="mc-name">${m.name}${m.feePaid!=='O'?' <span style="font-size:10px;color:var(--red);font-weight:700">미납</span>':''}</div>
-          <div class="mc-sub">
-            ${eff?`<span class="avg-chip">${eff}</span>`:''}<span>${m.dept}</span>
-          </div>
-        </div>
-        <div class="chk">${att?'✓':''}</div>
-      </div>`;
-    }).join('');
-  }
-}
-
-function getEffAvg(m, inclTemp=false){
-  if(inclTemp&&tempAvgMap[m.name]) return tempAvgMap[m.name];
-  return m.avg||0;
-}
-function toggleMember(name){
-  statusMap[name]=statusMap[name]==='attend'?'pending':'attend';
-  renderList();
-}
-function setFilter(f,el){filter=f;document.querySelectorAll('.fp').forEach(p=>p.classList.remove('active'));el.classList.add('active');renderList();}
-function setSort(s,el){sortMode=s;document.querySelectorAll('.sp').forEach(p=>p.classList.remove('active'));el.classList.add('active');renderList();}
-function applySort(data){
-  const ok=data.filter(m=>m.feePaid==='O');
-  const no=data.filter(m=>m.feePaid!=='O');
-  function srt(arr){
-    if(sortMode==='name') return[...arr].sort((a,b)=>a.name.localeCompare(b.name,'ko'));
-    if(sortMode==='avg-d') return[...arr].sort((a,b)=>(b.avg||0)-(a.avg||0));
-    if(sortMode==='avg-a') return[...arr].sort((a,b)=>(a.avg||0)-(b.avg||0));
-    return arr;
-  }
-  return [...srt(ok),...srt(no)];
-}
-
-// ══════════════════════════════════════════════════════
-//  저장
-// ══════════════════════════════════════════════════════
-async function saveAttendance(){
-  if(_isSaving){toast('저장 중입니다...');return;}
-  if(!currentEventId){toast('모임을 먼저 선택하세요');return;}
-  const attendees=members.filter(m=>statusMap[m.name]==='attend').map(m=>m.name);
-  if(!attendees.length){toast('참석자가 없습니다');return;}
-
-  // ★ U2: undo용 이전 상태 저장
-  _lastSaveState={eventId:currentEventId,attendees:[...attendees],statusMap:{...statusMap}};
-
-  _isSaving=true;
-  showOverlay('시트에 저장 중...', `${attendees.length}명 · ${currentEventTitle}`, true);
-  document.getElementById('float-save').disabled=true;
-
-  try{
-    let data=null;
-    try{
-      data=await gasPost({action:'saveAttendance', eventId:currentEventId, attendees});
-      if(data.error) throw new Error(data.error);
-    }catch(e1){
-      // POST 실패 → GET fallback
-      try{
-        data=await gasGet('saveAttendance',{eventId:currentEventId, attendees:JSON.stringify(attendees)});
-        if(data.error) throw new Error(data.error);
-      }catch(e2){ throw e2; }
-    }
-    // 성공
-    _lastSavedAt=new Date();
-    updateLastSaved();
-    toast(`✅ ${attendees.length}명 저장 완료!`);
-    showOverlay('저장 완료!', `${attendees.length}명 · ${currentEventTitle}`, false);
-    setTimeout(hideOverlay, 1200);
-  }catch(e){
-    toast('❌ 저장 실패: '+e.message);
-    hideOverlay();
-  }finally{
-    // ★ B2 FIX: 어떤 경로로든 반드시 복구
-    _isSaving=false;
-    document.getElementById('float-save').disabled=false;
-  }
-}
-
-function showOverlay(title, sub, spinning){
-  document.getElementById('save-spinner').style.display=spinning?'block':'none';
-  document.getElementById('save-title').textContent=title;
-  document.getElementById('save-sub').textContent=sub;
-  document.getElementById('save-overlay').classList.add('show');
-}
-function hideOverlay(){ document.getElementById('save-overlay').classList.remove('show'); }
-
-// ══════════════════════════════════════════════════════
-//  레인 배정
-// ══════════════════════════════════════════════════════
-function getAttendees(){
-  return members.filter(m=>statusMap[m.name]==='attend').map(m=>({name:m.name,avg:getEffAvg(m,true)||0}));
-}
-function setLaneMode(mode){
-  laneMode=mode;
-  document.getElementById('mt-auto').classList.toggle('active',mode==='auto');
-  document.getElementById('mt-manual').classList.toggle('active',mode==='manual');
-  document.getElementById('auto-cfg').style.display=mode==='auto'?'block':'none';
-  document.getElementById('manual-cfg').style.display=mode==='manual'?'block':'none';
-  document.getElementById('lane-results').innerHTML='';
-  cancelSwap();
-}
-function setAutoTeamMode(n,el){
-  autoTeamMode=n;
-  document.querySelectorAll('#tt-2,#tt-1').forEach(b=>b.classList.remove('active'));
-  el.classList.add('active');updateLaneLbl();
-}
-function setManualTeamMode(n,el){
-  manualTeamMode=n;
-  document.querySelectorAll('#mt-2,#mt-1').forEach(b=>b.classList.remove('active'));
-  el.classList.add('active');updateManualLaneLbl();
-}
-function adjLane(d){
-  const inp=document.getElementById('lane-cnt');
-  const min=autoTeamMode===2?2:1;
-  let v=Math.max(min,Math.min(12,parseInt(inp.value)+d));
-  if(autoTeamMode===2)v=Math.round(v/2)*2;
-  inp.value=v;updateLaneLbl();
-}
-function adjManualLane(d){
-  const inp=document.getElementById('m-lane-cnt');
-  const min=manualTeamMode===2?2:1;
-  let v=Math.max(min,Math.min(12,parseInt(inp.value)+d));
-  if(manualTeamMode===2)v=Math.round(v/2)*2;
-  inp.value=v;updateManualLaneLbl();
-}
-function updateLaneLbl(){
-  const v=parseInt(document.getElementById('lane-cnt').value)||6;
-  const teams=autoTeamMode===2?Math.floor(v/2):v;
-  document.getElementById('lane-lbl').textContent=`= ${teams}팀`;
-  document.getElementById('lane-hint').textContent=autoTeamMode===2?`${v}레인, ${teams}팀 (2레인씩 한팀)`:`${v}레인, ${teams}팀`;
-}
-function updateManualLaneLbl(){
-  const v=parseInt(document.getElementById('m-lane-cnt').value)||6;
-  const teams=manualTeamMode===2?Math.floor(v/2):v;
-  document.getElementById('m-lane-lbl').textContent=`= ${teams}팀`;
-}
-
-function checkNoAvg(att){
-  const noAvg=att.filter(m=>!m.avg||m.avg===0);
-  const sec=document.getElementById('noavg-sec');
-  const list=document.getElementById('noavg-list');
-  if(!noAvg.length){sec.style.display='none';return;}
-  sec.style.display='block';
-  list.innerHTML=noAvg.map(m=>{
-    const nm=m.name.replace(/'/g,"\\'");
-    const tmp=tempAvgMap[m.name]||'';
-    return `<div style="display:flex;align-items:center;gap:7px;margin-bottom:7px">
-      <span style="flex:1;font-size:13px;font-weight:700">${m.name}</span>
-      <button onclick="setNG('${nm}',100)" style="padding:4px 8px;border:1.5px solid var(--border);border-radius:7px;background:var(--bg);font-size:11px;font-weight:700;cursor:pointer">남100</button>
-      <button onclick="setNG('${nm}',80)" style="padding:4px 8px;border:1.5px solid var(--border);border-radius:7px;background:var(--bg);font-size:11px;font-weight:700;cursor:pointer">여80</button>
-      <input type="number" id="ng-${nm.replace(/[^가-힣a-zA-Z0-9]/g,'_')}" value="${tmp}" placeholder="직접"
-        min="50" max="300" style="width:65px;border:1.5px solid var(--border);border-radius:7px;padding:4px 6px;font-size:13px;font-weight:700;font-family:'Noto Sans KR',sans-serif;outline:none;text-align:center;color:var(--navy)"
-        oninput="applyNG('${nm}',this.value)">
-    </div>`;
-  }).join('');
-}
-function setNG(name,v){const inp=document.getElementById('ng-'+name.replace(/[^가-힣a-zA-Z0-9]/g,'_'));if(inp)inp.value=v;applyNG(name,v);}
-function applyNG(name,v){const n=parseInt(v);if(n>=50&&n<=300){tempAvgMap[name]=n;save();}}
-
-// 자동 배정
-const TC=['#162447','#065f46','#7c2d12','#4c1d95','#1e3a5f','#1f2937'];
-let _laneAssignCount=0;
-function autoAssign(){
-  const att=getAttendees();
-  if(!att.length){toast('참석자를 먼저 체크하세요');return;}
-  checkNoAvg(att);
-  _laneAssignCount++;
-  const numLanes=parseInt(document.getElementById('lane-cnt').value)||6;
-  const numTeams=autoTeamMode===2?Math.floor(numLanes/2):numLanes;
-  const sorted=[...att].sort((a,b)=>b.avg-a.avg);
-
-  if(_laneAssignCount>1){
-    for(let i=0;i<sorted.length-1;i++){
-      if(Math.abs((sorted[i].avg||0)-(sorted[i+1].avg||0))<=8&&Math.random()<0.5)
-        [sorted[i],sorted[i+1]]=[sorted[i+1],sorted[i]];
-    }
-  }
-
-  const teams=Array.from({length:numTeams},(_,i)=>({
-    teamNum:i+1,laneAN:autoTeamMode===2?i*2+1:i+1,laneBN:autoTeamMode===2?i*2+2:i+1,members:[],total:0
-  }));
-  sorted.forEach(m=>{const t=teams.reduce((mn,t)=>t.total<mn.total?t:mn,teams[0]);t.members.push(m);t.total+=m.avg;});
-
-  // 2-opt 최적화
-  let improved=true,iter=0;
-  while(improved&&iter<200){
-    improved=false;iter++;
-    for(let ti=0;ti<teams.length-1;ti++){
-      for(let tj=ti+1;tj<teams.length;tj++){
-        for(let mi=0;mi<teams[ti].members.length;mi++){
-          for(let mj=0;mj<teams[tj].members.length;mj++){
-            const ai=teams[ti].members[mi].avg||0,aj=teams[tj].members[mj].avg||0;
-            if(ai===aj)continue;
-            const oldS=Math.max(...teams.map(t=>t.total))-Math.min(...teams.map(t=>t.total));
-            teams[ti].total+=aj-ai;teams[tj].total+=ai-aj;
-            const newS=Math.max(...teams.map(t=>t.total))-Math.min(...teams.map(t=>t.total));
-            if(newS<oldS-0.5){const tmp=teams[ti].members[mi];teams[ti].members[mi]=teams[tj].members[mj];teams[tj].members[mj]=tmp;improved=true;}
-            else{teams[ti].total+=ai-aj;teams[tj].total+=aj-ai;}
-          }
-        }
-      }
-    }
-  }
-
-  function setAnchor(lane){
-    if(lane.length<2)return lane;
-    const maxIdx=lane.reduce((mi,m,i)=>(m.avg||0)>(lane[mi].avg||0)?i:mi,0);
-    const anchor=lane.splice(maxIdx,1)[0];lane.push(anchor);return lane;
-  }
-  laneGroups=teams.map(t=>{
-    if(autoTeamMode===1)return{...t,laneA:setAnchor([...t.members]),laneB:[]};
-    const s2=[...t.members].sort((a,b)=>(b.avg||0)-(a.avg||0));
-    const a=[],b=[];let sa=0,sb=0;
-    s2.forEach(m=>{if(sa<=sb){a.push(m);sa+=m.avg||0;}else{b.push(m);sb+=m.avg||0;}});
-    return{...t,laneA:setAnchor(a),laneB:setAnchor(b)};
-  });
-
-  const spread=Math.round(Math.max(...laneGroups.map(t=>t.total))-Math.min(...laneGroups.map(t=>t.total)));
-  cancelSwap();renderAutoResults();
-  toast(`⚡ ${numTeams}팀 배정 완료 (편차: ${spread}점)${_laneAssignCount>1?' · 재배정':''}`);
-}
-
-function renderAutoResults(){
-  const con=document.getElementById('lane-results');
-  if(!laneGroups.length){con.innerHTML='';return;}
-  const tots=laneGroups.map(t=>t.total),maxT=Math.max(...tots)||1;
-  const spread=Math.round(Math.max(...tots)-Math.min(...tots));
-
-  let html=`<div class="bal-card"><div class="bal-title">⚖️ 팀별 균형 (편차 ${spread}점)</div>`;
-  laneGroups.forEach((t,i)=>{
-    const avg=t.members.length?Math.round(t.total/t.members.length):0;
-    html+=`<div class="bal-row">
-      <div class="bal-lbl">${t.laneAN}·${t.laneBN}</div>
-      <div class="bal-track"><div class="bal-fill" style="width:${(t.total/maxT*100).toFixed(0)}%;background:${TC[i%TC.length]}"></div></div>
-      <div class="bal-num">${Math.round(t.total)}</div>
-      <div class="bal-avg">avg ${avg}</div>
-    </div>`;
-  });
-  html+='</div>';
-
-  html+=laneGroups.map((t,ti)=>`
-    <div class="team-card">
-      <div class="team-hdr" style="background:${TC[ti%TC.length]}">
-        <div class="team-hdr-l">팀${ti+1} (${t.laneAN}·${t.laneBN}레인)</div>
-        <div class="team-hdr-r">합계 ${Math.round(t.total)} · 평균 ${t.members.length?Math.round(t.total/t.members.length):0} · ${t.members.length}명</div>
-      </div>
-      <div class="lanes-wrap">
-        <div class="lane-col">
-          <div class="lane-col-hdr"><span>${t.laneAN}번</span><span class="lane-avg-val">${lavg(t.laneA)}</span></div>
-          <div id="lc-${ti}-A">${t.laneA.map((m,ci)=>chp(m,ti,'A',ci)).join('')}</div>
-        </div>
-        <div class="lane-col">
-          <div class="lane-col-hdr"><span>${t.laneBN}번</span><span class="lane-avg-val">${lavg(t.laneB)}</span></div>
-          <div id="lc-${ti}-B">${t.laneB.map((m,ci)=>chp(m,ti,'B',ci)).join('')}</div>
-        </div>
-      </div>
-      <div class="team-footer">
-        <button class="smBtn" onclick="shuffleTeam(${ti})">🔀 섞기</button>
-        <button class="smBtn" onclick="copyTeam(${ti})">📋 복사</button>
-      </div>
-    </div>`).join('');
-
-  html+=`<button class="bigBtn" style="width:100%;margin-bottom:7px" onclick="startSwap()">🔄 수동 조정</button>`;
-  html+=`<button class="copy-all" onclick="copyKakao()">📤 카카오톡 공유</button>`;
-  con.innerHTML=html;
-}
-
-function chp(m,ti,lane,ci){
-  const warn=!m.avg||m.avg===0;
-  return `<div class="mchip ${warn?'warn':''}" id="chip-${ti}-${lane}-${ci}" onclick="onChip(${ti},'${lane}',${ci})">
-    <span class="chip-name">${m.name}</span>
-    ${m.avg?`<span class="chip-avg">${m.avg}</span>`:`<span style="font-size:10px;color:#92400e">?</span>`}
-  </div>`;
-}
-function lavg(arr){const f=arr.filter(m=>m.avg>0);return f.length?Math.round(f.reduce((s,m)=>s+m.avg,0)/f.length)+'':'—';}
-
-function shuffleTeam(ti){const t=laneGroups[ti],all=[...t.laneA,...t.laneB];for(let i=all.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[all[i],all[j]]=[all[j],all[i]];}t.laneA=all.slice(0,Math.ceil(all.length/2));t.laneB=all.slice(Math.ceil(all.length/2));renderAutoResults();toast('🔀 섞었어요');}
-function copyTeam(ti){const t=laneGroups[ti];navigator.clipboard.writeText(`[팀${t.teamNum}] ${t.laneAN}레인:${t.laneA.map(m=>m.name).join(',')} / ${t.laneBN}레인:${t.laneB.map(m=>m.name).join(',')}`).then(()=>toast('📋 복사됨!'));}
-
-function copyKakao(){
-  if(!laneGroups.length){toast('배정 결과가 없어요');return;}
-  const spread=Math.round(Math.max(...laneGroups.map(t=>t.total))-Math.min(...laneGroups.map(t=>t.total)));
-  const total=laneGroups.reduce((s,t)=>s+t.members.length,0);
-  let txt=`🎳 레인배정 결과\n📅 ${currentEventTitle||'미정'}\n👥 참석 ${total}명 · 편차 ${spread}점\n${'━'.repeat(20)}\n\n`;
-  laneGroups.forEach(t=>{
-    const avg=t.members.length?Math.round(t.total/t.members.length):0;
-    txt+=`🏆 팀${t.teamNum} (${t.laneAN}·${t.laneBN}번레인)\n   합계 ${Math.round(t.total)} / 평균 ${avg}\n`;
-    txt+=`   ${t.laneAN}번 🎳 ${t.laneA.map(m=>m.avg?m.name+'('+m.avg+')':m.name).join(' · ')}\n`;
-    if(t.laneB.length) txt+=`   ${t.laneBN}번 🎳 ${t.laneB.map(m=>m.avg?m.name+'('+m.avg+')':m.name).join(' · ')}\n`;
-    txt+='\n';
-  });
-  txt+=`${'━'.repeat(20)}\n🎉 모두 즐거운 게임 되세요!`;
-  navigator.clipboard.writeText(txt.trim()).then(()=>toast('📤 카카오톡 형식 복사!'));
-}
-
-// 수동 조정
-function startSwap(){swapMode=true;document.getElementById('swap-banner').classList.add('show');document.getElementById('swap-txt').textContent='교체할 멤버 선택';toast('멤버를 탭해서 교체하세요');}
-function cancelSwap(){swapMode=false;swapSel=null;document.getElementById('swap-banner').classList.remove('show');document.querySelectorAll('.mchip').forEach(c=>c.classList.remove('sel','tgt'));}
-function onChip(ti,lane,ci){
-  if(!swapMode)return;
-  if(!swapSel){
-    swapSel={ti,lane,ci};
-    document.getElementById(`chip-${ti}-${lane}-${ci}`).classList.add('sel');
-    document.querySelectorAll('.mchip').forEach(c=>{if(c.id!==`chip-${ti}-${lane}-${ci}`)c.classList.add('tgt');});
-    document.getElementById('swap-txt').textContent='교체할 대상 선택';
-  }else{
-    const{ti:ti2,lane:lane2,ci:ci2}=swapSel;
-    if(ti===ti2&&lane===lane2&&ci===ci2){cancelSwap();startSwap();return;}
-    const a1=lane2==='A'?laneGroups[ti2].laneA:laneGroups[ti2].laneB;
-    const a2=lane==='A'?laneGroups[ti].laneA:laneGroups[ti].laneB;
-    [a1[ci2],a2[ci]]=[a2[ci],a1[ci2]];
-    laneGroups.forEach(t=>{t.total=[...t.laneA,...t.laneB].reduce((s,m)=>s+m.avg,0);t.members=[...t.laneA,...t.laneB];});
-    swapSel=null;renderAutoResults();toast('✅ 교체 완료!');startSwap();
-  }
-}
-
-// 수동 배정
-function initManual(){
-  const numLanes=parseInt(document.getElementById('m-lane-cnt').value)||6;
-  const att=getAttendees();
-  if(!att.length){toast('참석자를 먼저 체크하세요');return;}
-  checkNoAvg(att);
-  manualUnassigned=[...att].sort((a,b)=>(b.avg||0)-(a.avg||0));
-  manualLanes={};
-  if(manualTeamMode===2){const t=Math.floor(numLanes/2);for(let i=0;i<t;i++){manualLanes[`${i*2+1}`]=[];manualLanes[`${i*2+2}`]=[];}}
-  else{for(let i=0;i<numLanes;i++)manualLanes[`${i+1}`]=[];}
-  manualSelChip=null;
-  renderManual();
-  toast('탭해서 선택 → 레인 탭해서 배치');
-}
-
-function renderManual(){
-  const con=document.getElementById('lane-results');
-  let html=`<div class="card"><div class="card-lbl">📦 미배정 (탭→선택, 레인→배치)</div>
-    <div class="pool" id="pool">
-      ${manualUnassigned.map(m=>`
-        <div class="pool-chip ${!m.avg?'warn':''}" id="pool-${m.name.replace(/[^가-힣a-zA-Z0-9]/g,'_')}"
-          onclick="selPool('${m.name.replace(/'/g,"\\'")}')">
-          <span>${m.name}</span>
-          ${m.avg?`<span style="font-size:9px;color:var(--muted)">${m.avg}</span>`:`<span style="font-size:9px;color:#92400e">?</span>`}
-        </div>`).join('')}
-      ${!manualUnassigned.length?'<span style="font-size:12px;color:var(--muted)">모두 배치됨 ✅</span>':''}
-    </div>
-  </div>`;
-
-  html+=`<div class="card"><div class="card-lbl">🎳 레인 배치</div>`;
-  const keys=Object.keys(manualLanes).map(Number).sort((a,b)=>a-b);
-  if(manualTeamMode===2){
-    for(let i=0;i<keys.length;i+=2){
-      const la=keys[i],lb=keys[i+1];
-      html+=`<div class="lane-pair">
-        <div class="lane-pair-hdr">팀${i/2+1} — ${la}·${lb}레인 <span style="float:right;color:var(--muted)">${mLaneTotal(la,lb)}</span></div>
-        <div class="lanes-grid">
-          <div class="m-lane" id="ml-${la}" onclick="assignLane(${la})">
-            <div class="m-lane-lbl">${la}번</div>
-            ${(manualLanes[la]||[]).map(m=>`<div class="m-chip"><span>${m.name}${m.avg?` <span style="font-size:9px;color:var(--muted)">${m.avg}</span>`:''}</span><button class="m-remove" onclick="event.stopPropagation();removeFromLane(${la},'${m.name.replace(/'/g,"\\'")}')">×</button></div>`).join('')}
-          </div>
-          ${lb?`<div class="m-lane" id="ml-${lb}" onclick="assignLane(${lb})">
-            <div class="m-lane-lbl">${lb}번</div>
-            ${(manualLanes[lb]||[]).map(m=>`<div class="m-chip"><span>${m.name}${m.avg?` <span style="font-size:9px;color:var(--muted)">${m.avg}</span>`:''}</span><button class="m-remove" onclick="event.stopPropagation();removeFromLane(${lb},'${m.name.replace(/'/g,"\\'")}')">×</button></div>`).join('')}
-          </div>`:''}
-        </div>
-      </div>`;
-    }
-  }else{
-    keys.forEach((la,pi)=>{
-      html+=`<div class="lane-pair">
-        <div class="lane-pair-hdr">팀${pi+1} — ${la}번레인 <span style="float:right;color:var(--muted)">${(manualLanes[la]||[]).reduce((s,m)=>s+(m.avg||0),0)||0}</span></div>
-        <div class="m-lane" id="ml-${la}" onclick="assignLane(${la})" style="padding:6px;border:2px dashed var(--border);border-radius:7px;min-height:44px;cursor:pointer">
-          <div class="m-lane-lbl">${la}번</div>
-          ${(manualLanes[la]||[]).map(m=>`<div class="m-chip"><span>${m.name}${m.avg?` <span style="font-size:9px;color:var(--muted)">${m.avg}</span>`:''}</span><button class="m-remove" onclick="event.stopPropagation();removeFromLane(${la},'${m.name.replace(/'/g,"\\'")}')">×</button></div>`).join('')}
-        </div>
-      </div>`;
-    });
-  }
-  html+='</div>';
-  html+=`<div style="display:flex;gap:7px;margin-bottom:10px">
-    <button class="bigBtn amber" onclick="finalizeManual()">✅ 배정 완료 → 결과 보기</button>
-  </div>`;
-  con.innerHTML=html;
-  if(manualSelChip){const el=document.getElementById('pool-'+manualSelChip.replace(/[^가-힣a-zA-Z0-9]/g,'_'));if(el)el.classList.add('sel');}
-}
-function mLaneTotal(la,lb){const s=[...(manualLanes[la]||[]),...(lb?manualLanes[lb]||[]:[])]  .reduce((s,m)=>s+(m.avg||0),0);return s?Math.round(s):'0';}
-function selPool(name){manualSelChip=(manualSelChip===name?null:name);document.querySelectorAll('.pool-chip').forEach(c=>c.classList.remove('sel'));if(manualSelChip){const el=document.getElementById('pool-'+name.replace(/[^가-힣a-zA-Z0-9]/g,'_'));if(el)el.classList.add('sel');toast('레인을 탭해서 배치하세요');}}
-function assignLane(laneNum){if(!manualSelChip){toast('먼저 인원을 선택하세요');return;}const member=manualUnassigned.find(m=>m.name===manualSelChip);if(!member){manualSelChip=null;return;}manualLanes[laneNum]=[...(manualLanes[laneNum]||[]),member];manualUnassigned=manualUnassigned.filter(m=>m.name!==manualSelChip);manualSelChip=null;renderManual();}
-function removeFromLane(laneNum,name){const member=manualLanes[laneNum]?.find(m=>m.name===name);if(!member)return;manualLanes[laneNum]=manualLanes[laneNum].filter(m=>m.name!==name);manualUnassigned.push(member);renderManual();}
-function finalizeManual(){
-  const keys=Object.keys(manualLanes).map(Number).sort((a,b)=>a-b);
-  if(manualTeamMode===2){
-    laneGroups=[];
-    for(let i=0;i<keys.length;i+=2){const la=keys[i],lb=keys[i+1];const laneA=manualLanes[la]||[],laneB=lb?manualLanes[lb]||[]:[];const members=[...laneA,...laneB];laneGroups.push({teamNum:laneGroups.length+1,laneAN:la,laneBN:lb||la,laneA,laneB,members,total:members.reduce((s,m)=>s+(m.avg||0),0)});}
-  }else{
-    laneGroups=keys.map((la,i)=>{const laneA=manualLanes[la]||[];return{teamNum:i+1,laneAN:la,laneBN:la,laneA,laneB:[],members:[...laneA],total:laneA.reduce((s,m)=>s+(m.avg||0),0)};});
-  }
-  renderAutoResults();toast('✅ 수동 배정 확정!');
-}
-
-// ══════════════════════════════════════════════════════
-//  대시보드
-// ══════════════════════════════════════════════════════
-async function renderDash(){
-  renderDashSummary();
-  try{
-    const res=await gasGet('getDashboard');
-    if(res.error){toast('대시보드 로드 실패');return;}
-    dashData=res;
-
-    document.getElementById('d-total').textContent=res.totalMembers||'-';
-    document.getElementById('d-att').textContent='-'; // B9: 세션 데이터 미사용
-    document.getElementById('d-fee-rate').textContent=(res.feeRate||0)+'%';
-    document.getElementById('d-fee-sub').textContent=`${res.paidCount||0}/${res.totalMembers||0}명 납부`;
-    document.getElementById('d-unpaid').textContent=res.unpaidCount||'0';
-
-    // 모임별 참석 추이
-    const trendEl=document.getElementById('evt-trend');
-    if(res.events&&res.events.length){
-      trendEl.innerHTML=[...res.events].sort((a,b)=>(a.date||'').localeCompare(b.date||'')).map(ev=>`
-        <div class="trend-item">
-          <div class="trend-cnt">${ev.attendeeCount}</div>
-          <div class="trend-name">${ev.title.replace(/\[|\]/g,'').trim()}</div>
-        </div>`).join('');
-    }
-
-    // 에버리지 분포
-    drawDistChart(members.filter(m=>m.avg>0));
-
-    // TOP 10 에버리지
-    document.getElementById('rank-avg').innerHTML=(res.topAvg||[]).map((m,i)=>`
-      <div class="rank-item">
-        <div class="rnum ${i===0?'g':i===1?'s':i===2?'b':''}">${i+1}</div>
-        <div class="rname">${m.name}</div>
-        <div class="rval">${m.avg}</div>
-      </div>`).join('')||'<div class="empty">없음</div>';
-
-    // TOP 10 참석
-    const maxAtt=(res.topAtt||[])[0]?.count||1;
-    document.getElementById('rank-att').innerHTML=(res.topAtt||[]).map((m,i)=>`
-      <div class="rank-item">
-        <div class="rnum ${i===0?'g':i===1?'s':i===2?'b':''}">${i+1}</div>
-        <div class="rname">${m.name}</div>
-        <div class="bar-wrap"><div class="bar-fill" style="width:${Math.round(m.count/maxAtt*100)}%"></div></div>
-        <div class="rval">${m.count}회</div>
-      </div>`).join('')||'<div class="empty">없음</div>';
-
-  }catch(e){toast('대시보드 오류: '+e.message);}
-}
-
-function drawDistChart(all){
-  const cv=document.getElementById('dist-chart');
-  const W=cv.offsetWidth||360,H=90;
-  cv.width=W*devicePixelRatio;cv.height=H*devicePixelRatio;cv.style.width=W+'px';cv.style.height=H+'px';
-  const ctx=cv.getContext('2d');ctx.scale(devicePixelRatio,devicePixelRatio);
-  const labels=['<80','80','100','120','140','160','180','200+'],counts=new Array(8).fill(0);
-  all.forEach(m=>{const v=m.avg;if(v<80)counts[0]++;else if(v<100)counts[1]++;else if(v<120)counts[2]++;else if(v<140)counts[3]++;else if(v<160)counts[4]++;else if(v<180)counts[5]++;else if(v<200)counts[6]++;else counts[7]++;});
-  const p={t:8,r:4,b:20,l:16},w=W-p.l-p.r,h=H-p.t-p.b,maxC=Math.max(...counts)||1;
-  counts.forEach((c,i)=>{
-    const bw=w/8*.72,x=p.l+(i+.5)*(w/8)-bw/2,bh=(c/maxC)*h,y=p.t+h-bh;
-    ctx.fillStyle='#1f3a6e';rr(ctx,x,y,bw,bh,3);ctx.fill();
-    if(c>0){ctx.fillStyle='#fff';ctx.font='bold 9px sans-serif';ctx.textAlign='center';ctx.fillText(c,x+bw/2,y-2);}
-    ctx.fillStyle='#64748b';ctx.font='8px sans-serif';ctx.fillText(labels[i],x+bw/2,p.t+h+13);
-  });
-}
-function rr(ctx,x,y,w,h,r){if(h<=0)return;ctx.beginPath();ctx.moveTo(x+r,y);ctx.lineTo(x+w-r,y);ctx.arcTo(x+w,y,x+w,y+r,r);ctx.lineTo(x+w,y+h);ctx.lineTo(x,y+h);ctx.lineTo(x,y+r);ctx.arcTo(x,y,x+r,y,r);ctx.closePath();}
-
-// ══════════════════════════════════════════════════════
-//  에버리지 팝업
-// ══════════════════════════════════════════════════════
-function openAvgPopup(name){avgPopupTarget=name;document.getElementById('avg-popup-name').textContent=name+' 에버리지 입력';document.getElementById('avg-inp').value=tempAvgMap[name]||'';document.getElementById('avg-popup').classList.add('show');}
-function closeAvgPopup(){document.getElementById('avg-popup').classList.remove('show');avgPopupTarget=null;}
-function setAvgGuide(v){document.getElementById('avg-inp').value=v;}
-function applyAvg(){const v=parseInt(document.getElementById('avg-inp').value);if(!v||v<50||v>300){toast('50~300 사이 값을 입력하세요');return;}if(avgPopupTarget){tempAvgMap[avgPopupTarget]=v;save();}closeAvgPopup();renderList();toast(`✅ ${avgPopupTarget} 에버리지 ${v} 적용`);}
-
-// ══════════════════════════════════════════════════════
-//  설정
-// ══════════════════════════════════════════════════════
-function openCfg(){document.getElementById('c-url').value=GAS_URL;document.getElementById('cfg-modal').classList.add('show');}
-function closeCfg(e){if(!e||e.target===document.getElementById('cfg-modal'))document.getElementById('cfg-modal').classList.remove('show');}
-function saveCfg(){GAS_URL=document.getElementById('c-url').value.trim()||GAS_URL;document.getElementById('cfg-modal').classList.remove('show');save();syncAll();}
-
-// ══════════════════════════════════════════════════════
-//  토스트
-// ══════════════════════════════════════════════════════
-let _tt;
-function toast(msg){
-  const t=document.getElementById('toast');
-  t.textContent=msg;t.style.opacity='1';t.style.transform='translateX(-50%) translateY(0)';
-  clearTimeout(_tt);_tt=setTimeout(()=>{t.style.opacity='0';},2400);
-}
-
-
-// ══════════════════════════════════════════════════════
-//  관리 탭
-// ══════════════════════════════════════════════════════
-let currentMgmtTab = 'member';
-let finances = [];
-let memFilter = 'all';
-
-function setMgmtTab(tab, el) {
-  currentMgmtTab = tab;
-  // 서브탭 버튼만 갱신 (상위 탭 건드리지 않음)
-  document.querySelectorAll('.tab-pill').forEach(b => b.classList.remove('active'));
-  el.classList.add('active');
-  ['member','finance','score'].forEach(t => {
-    document.getElementById('msec-' + t).style.display = t === tab ? 'block' : 'none';
-  });
-  if (tab === 'finance') loadFinances();
-  if (tab === 'score') {
-    const today = new Date().toISOString().slice(0,10);
-    if(document.getElementById('sc-date')) document.getElementById('sc-date').value = today;
-    loadRecentScores();
-  }
-  if (tab === 'member') renderMemberList();
-}
-
-// ── 회원 필터 ──
-function setMemFilter(f, el) {
-  memFilter = f;
-  document.querySelectorAll('#msec-member .tab-pill').forEach(b => b.classList.remove('active'));
-  el.classList.add('active');
-  renderMemberList();
-}
-
-function renderMemberList() {
-  const el = document.getElementById('m-list');
-  if (!el) return;
-  const q = (document.getElementById('m-search')?.value || '').trim();
-
-  let data = [...members];
-  if (q) data = data.filter(m => m.name.includes(q));
-  if (memFilter === 'active')  data = data.filter(m => m.status === 'active');
-  if (memFilter === 'unpaid')  data = data.filter(m => m.feePaid !== 'O' && m.status === 'active');
-  if (memFilter === 'left')    data = data.filter(m => m.status === 'left');
-
-  if (!data.length) { el.innerHTML = '<div class="empty">없음</div>'; return; }
-
-  el.innerHTML = data.map(m => {
-    const nm = m.name.replace(/'/g, "\'");
-    const statusLabel = m.status === 'active' ? '활성' : m.status === 'guest' ? '게스트' : '탈퇴';
-    const feeLabel    = m.feePaid === 'O' ? '납부' : '미납';
-    return `
-    <div class="member-item">
-      <div class="member-item-info">
-        <div class="member-item-name">
-          ${m.name}
-          <span class="badge ${m.status}">${statusLabel}</span>
-          <span class="badge ${m.feePaid==='O'?'paid':'unpaid'}">${feeLabel}</span>
-        </div>
-        <div class="member-item-sub">${m.dept||'-'} · ${m.grade||'-'}학번${m.avg?' · 에버 '+m.avg:''}</div>
-      </div>
-      <div style="display:flex;gap:4px;flex-shrink:0">
-        <button class="mgmt-btn" style="font-size:10px;padding:5px 8px;border-radius:7px;background:var(--border);color:var(--text)"
-          onclick="openEditModal('${nm}')">✏️</button>
-        <button class="mgmt-btn ${m.feePaid==='O'?'amber':'green'}"
-          style="font-size:10px;padding:5px 8px;border-radius:7px"
-          onclick="toggleFee('${nm}','${m.feePaid}')">
-          ${m.feePaid==='O'?'💸':'💰'}
-        </button>
-        ${m.status !== 'left'
-          ? `<button class="mgmt-btn red" style="font-size:10px;padding:5px 8px;border-radius:7px" onclick="setLeft('${nm}')">탈퇴</button>`
-          : `<button class="mgmt-btn green" style="font-size:10px;padding:5px 8px;border-radius:7px" onclick="setActive('${nm}')">복귀</button>`
-        }
-      </div>
-    </div>`;
-  }).join('');
-}
-
-async function toggleFee(name, current) {
-  const newFee = current === 'O' ? 'X' : 'O';
-  const msg = newFee==='O' ? `"${name}" 납부 처리할까요?` : `"${name}" 납부 취소할까요?`;
-  if(!confirm(msg)) return;
-  const res = await callGAS({ action:'updateMember', name, feePaid: newFee });
-  if (res.ok) {
-    const m = members.find(m => m.name === name);
-    if (m) m.feePaid = newFee;
-    toast(`✅ ${name} 회비 ${newFee==='O'?'납부':'미납'} 처리`);
-    renderMemberList(); renderList(); renderDashSummary();
-  } else toast('❌ ' + (res.error || '실패'));
-}
-
-async function setLeft(name) {
-  if (!confirm(`"${name}"을 탈퇴 처리할까요?`)) return;
-  const res = await callGAS({ action:'updateMember', name, status:'left' });
-  if (res.ok) {
-    const m = members.find(m => m.name === name);
-    if (m) m.status = 'left';
-    toast(`✅ ${name} 탈퇴 처리됨`);
-    renderMemberList(); renderList();
-  } else toast('❌ ' + (res.error || '실패'));
-}
-
-async function setActive(name) {
-  const res = await callGAS({ action:'updateMember', name, status:'active' });
-  if (res.ok) {
-    const m = members.find(m => m.name === name);
-    if (m) m.status = 'active';
-    toast(`✅ ${name} 복귀 처리됨`);
-    renderMemberList(); renderList();
-  } else toast('❌ ' + (res.error || '실패'));
-}
-
-async function addNewMember() {
-  const name   = document.getElementById('new-name').value.trim();
-  const dept   = document.getElementById('new-dept').value.trim();
-  const grade  = document.getElementById('new-grade').value.trim();
-  const status = document.getElementById('new-status').value;
-  if (!name) { toast('이름을 입력하세요'); return; }
-  const res = await callGAS({ action:'addMember', name, dept, grade, avg:0, feePaid:'X', status });
-  if (res.ok) {
-    members.push({ name, dept, grade, avg:0, feePaid:'X', status });
-    toast(`✅ ${name} 추가됨`);
-    ['new-name','new-dept','new-grade'].forEach(id => document.getElementById(id).value = '');
-    renderMemberList(); renderList();
-    // datalist 갱신
-    updateDeptDatalist();
-  } else toast('❌ ' + (res.message || res.error));
-}
-
-function updateDeptDatalist() {
-  const dl = document.getElementById('dept-list');
-  if (!dl) return;
-  const KNOWN_NAMES = new Set(members.map(m => m.name));
-  const depts = [...new Set(
-    members
-      .map(m => (m.dept || '').trim())
-      .filter(d => d && d.length > 2 && !KNOWN_NAMES.has(d) && !d.includes('★'))
-  )].sort();
-  dl.innerHTML = depts.map(d => `<option value="${d}">`).join('');
-}
-
-// ── 가계부 ──
-async function loadFinances() {
-  document.getElementById('fin-list').innerHTML = '<div class="loading"><div class="spinner"></div>불러오는 중...</div>';
-  try {
-    const res = await gasGet('getFinances');
-    if (res.error) throw new Error(res.error);
-    finances = res;
-    renderFinances();
-    updateBalanceDisplay();
-  } catch(e) { toast('가계부 로드 실패: ' + e.message); }
-}
-
-function updateBalanceDisplay() {
-  // 회비 수입 = active 회원 중 납부자 수 × 20000
-  const paidCnt = members.filter(m => m.feePaid === 'O').length;
-  const feeIncome = paidCnt * 20000;
-
-  const finSum  = finances.reduce((s,f) => s + f.amount, 0);
-  const balance = feeIncome + finSum;
-  const income  = feeIncome + finances.filter(f => f.amount > 0).reduce((s,f) => s + f.amount, 0);
-  const expense = finances.filter(f => f.amount < 0).reduce((s,f) => s + f.amount, 0);
-
-  const bv = document.getElementById('balance-val');
-  const bi = document.getElementById('balance-income');
-  const be = document.getElementById('balance-expense');
-  if (bv) bv.textContent = fmt(balance) + '원';
-  if (bi) bi.textContent = '+' + fmt(income) + '원';
-  if (be) be.textContent = '-' + fmt(Math.abs(expense)) + '원';
-
-  // 대시보드 카드도 업데이트
-  const db = document.getElementById('d-balance');
-  const di = document.getElementById('d-income');
-  const de = document.getElementById('d-expense');
-  if (db) {
-    db.textContent = fmt(balance) + '원';
-    // 통장잔액 저장돼 있으면 빵구 표시
-    const bankSaved = parseFloat(localStorage.getItem('pf_bank'));
-    const diffEl = document.getElementById('d-bank-diff');
-    if (diffEl && !isNaN(bankSaved)) {
-      const diff = bankSaved - balance;
-      if (Math.abs(diff) <= 100) {
-        diffEl.textContent = '✅ 통장 일치';
-        diffEl.style.color = 'var(--green)';
-      } else {
-        diffEl.textContent = `⚠️ 빵구 ${diff>0?'+':''}${fmt(diff)}원`;
-        diffEl.style.color = 'var(--red)';
-      }
-      diffEl.style.display = 'block';
-    }
-  }
-  if (di) di.textContent = '+' + fmt(income) + '원';
-  if (de) de.textContent = '-' + fmt(Math.abs(expense)) + '원';
-}
-
-function renderFinances() {
-  const el = document.getElementById('fin-list');
-  if (!el) return;
-  renderRoundingHistory();
-  if (!finances.length) { el.innerHTML = '<div class="empty">내역 없음</div>'; return; }
-  const sorted = [...finances].sort((a,b) => b.date.localeCompare(a.date));
-  el.innerHTML = sorted.map(f => `
-    <div class="fin-item" id="fin-row-${f.rowNum}">
-      <div class="fin-item-info">
-        <div class="fin-item-desc">${f.desc}</div>
-        <div class="fin-item-sub">${f.date} · ${f.category}${f.note?' · '+f.note:''}</div>
-      </div>
-      <div class="fin-item-amt ${f.amount>=0?'plus':'minus'}">${f.amount>=0?'+':''}${fmt(f.amount)}원</div>
-      <button class="fin-del" style="font-size:14px" onclick="openFinEdit(${JSON.stringify(f).replace(/"/g,'&quot;')})">✏️</button>
-      <button class="fin-del" onclick="deleteFinEntry(${f.rowNum})">🗑</button>
-    </div>`).join('');
-}
-
-
-// ── 반올림 계산기 ──
-function calcRounding() {
-  const total = parseFloat(document.getElementById('rd-total').value) || 0;
-  const cnt   = parseInt(document.getElementById('rd-cnt').value) || 0;
-  const el    = document.getElementById('rd-result');
-  if (!total || !cnt) { el.style.display='none'; return; }
-
-  const perPerson = Math.ceil(total / cnt);
-  const rounding  = (perPerson * cnt) - total; // 양수 = 동아리 이득
-
-  el.style.display = 'block';
-  document.getElementById('rd-per').textContent = fmt(perPerson) + '원';
-  const remEl = document.getElementById('rd-remain');
-  remEl.textContent = (rounding >= 0 ? '+' : '') + fmt(rounding) + '원';
-  remEl.style.color = rounding >= 0 ? 'var(--green)' : 'var(--red)';
-}
-
-async function submitRounding() {
-  const eventTitle    = document.getElementById('rd-event').value.trim();
-  const totalExpense  = parseFloat(document.getElementById('rd-total').value);
-  const attendees     = parseInt(document.getElementById('rd-cnt').value);
-
-  if (!eventTitle) { toast('모임명을 입력하세요'); return; }
-  if (!totalExpense || isNaN(totalExpense)) { toast('총액을 입력하세요'); return; }
-  if (!attendees || isNaN(attendees)) { toast('인원수를 입력하세요'); return; }
-
-  const res = await callGAS({ action:'addRounding', eventTitle, totalExpense, attendees });
-  if (res.ok) {
-    toast(`✅ 1인당 ${fmt(res.perPerson)}원 · 잔돈 ${res.rounding >= 0 ? '+' : ''}${res.rounding}원 기록됨`);
-    document.getElementById('rd-event').value = '';
-    document.getElementById('rd-total').value = '';
-    document.getElementById('rd-cnt').value = '';
-    document.getElementById('rd-result').style.display = 'none';
-    loadFinances();
-  } else toast('❌ ' + (res.error || '실패'));
-}
-
-function renderRoundingHistory() {
-  const el    = document.getElementById('rounding-list');
-  const total = document.getElementById('rounding-total');
-  if (!el) return;
-
-  const items = finances.filter(f => f.category === '반올림');
-  if (!items.length) {
-    el.innerHTML = '<div class="empty">반올림 기록 없음</div>';
-    if (total) total.textContent = '';
-    return;
-  }
-
-  const sum = items.reduce((s, f) => s + f.amount, 0);
-  if (total) total.textContent = `합계: ${sum >= 0 ? '+' : ''}${fmt(sum)}원`;
-
-  // 대시보드 반올림 합계도 갱신
-  const dr = document.getElementById('d-rounding');
-  if (dr) dr.textContent = (sum >= 0 ? '+' : '') + fmt(sum) + '원';
-
-  el.innerHTML = items.sort((a,b) => b.date.localeCompare(a.date)).map(f => `
-    <div class="fin-item">
-      <div class="fin-item-info">
-        <div class="fin-item-desc">${f.desc}</div>
-        <div class="fin-item-sub">${f.date} · ${f.note || ''}</div>
-      </div>
-      <div class="fin-item-amt ${f.amount>=0?'plus':'minus'}">${f.amount>=0?'+':''}${fmt(f.amount)}원</div>
-      <button class="fin-del" onclick="deleteFinEntry(${f.rowNum})">🗑</button>
-    </div>`).join('');
-}
-
-// ── 이벤트 datalist 갱신 (반올림 계산기용) ──
-function updateEventDatalist() {
-  const dl = document.getElementById('event-list-rd');
-  if (!dl) return;
-  dl.innerHTML = events.map(e => `<option value="${e.title}">`).join('');
-}
-
-async function addFinanceEntry() {
-  const date   = document.getElementById('fin-date').value;
-  const desc   = document.getElementById('fin-desc').value.trim();
-  const amount = parseFloat(document.getElementById('fin-amount').value);
-  const cat    = document.getElementById('fin-cat').value;
-  const note   = document.getElementById('fin-note').value.trim();
-  if (!desc) { toast('내용을 입력하세요'); return; }
-  if (isNaN(amount)) { toast('금액을 입력하세요'); return; }
-  const res = await callGAS({ action:'addFinance', date, desc, amount, category:cat, note });
-  if (res.ok) {
-    toast('✅ 추가됨');
-    document.getElementById('fin-desc').value = '';
-    document.getElementById('fin-amount').value = '';
-    document.getElementById('fin-note').value = '';
-    loadFinances();
-  } else toast('❌ ' + res.error);
-}
-
-async function deleteFinEntry(rowNum) {
-  if (!confirm('삭제할까요?')) return;
-  const res = await callGAS({ action:'deleteFinance', rowNum });
-  if (res.ok) { toast('🗑 삭제됨'); loadFinances(); }
-}
-
-// ── 점수 일괄 입력 ──
-function previewScores() {
-  const text = document.getElementById('sc-paste').value;
-  const el   = document.getElementById('sc-preview');
-  if (!text.trim()) { el.innerHTML = ''; return; }
-
-  const parsed = parseScoreText(text);
-  if (!parsed.length) { el.innerHTML = '<div style="color:var(--red);font-size:12px">파싱 실패 — 형식 확인</div>'; return; }
-
-  el.innerHTML = `
-    <div style="background:var(--bg);border-radius:9px;padding:10px;font-size:12px">
-      <div style="font-weight:700;margin-bottom:6px;color:var(--navy)">미리보기 (${parsed.length}명)</div>
-      ${parsed.map(r => {
-        const found = members.find(m => m.name === r.name);
-        const warn  = !found ? '⚠️ 미등록' : '';
-        return `<div style="display:flex;gap:8px;padding:3px 0;border-bottom:1px solid #e2e8f0">
-          <span style="flex:1;font-weight:700">${r.name} ${warn}</span>
-          <span style="color:var(--muted)">총점 ${r.total}</span>
-          <span style="color:var(--muted)">${r.games}게임</span>
-          <span style="color:var(--navy);font-weight:700">avg ${Math.round(r.total/r.games*10)/10}</span>
-        </div>`;
-      }).join('')}
-    </div>`;
-}
-
-function parseScoreText(text) {
-  const lines = text.trim().split('\n').filter(l => l.trim());
-  const result = [];
-  lines.forEach(line => {
-    // 탭 구분 또는 쉼표 구분
-    const parts = line.includes('\t')
-      ? line.split('\t').map(p => p.trim())
-      : line.split(',').map(p => p.trim());
-    if (parts.length >= 2) {
-      const name  = parts[0];
-      const total = parseFloat(parts[1]);
-      const games = parts[2] ? parseInt(parts[2]) : 3; // 기본 3게임
-      if (name && !isNaN(total) && total > 0) {
-        result.push({ name, total, games: games || 3 });
-      }
-    }
-  });
-  return result;
-}
-
-async function submitBulkScore() {
-  const date   = document.getElementById('sc-date').value;
-  const text   = document.getElementById('sc-paste').value;
-  const parsed = parseScoreText(text);
-
-  if (!parsed.length) { toast('입력된 점수가 없어요'); return; }
-  if (!date) { toast('날짜를 선택하세요'); return; }
-
-  const btn = document.querySelector('[onclick="submitBulkScore()"]');
-  if (btn) { btn.textContent = '⏳ 저장 중...'; btn.disabled = true; }
-
-  // ★ B5 FIX: 배열 데이터는 POST만 사용 (GET fallback 불가)
-  const scores = parsed.map(r => ({ name:r.name, date, totalScore:r.total, games:r.games }));
-  let res;
-  try{
-    res = await gasPost({ action:'bulkAddScores', scores });
-  }catch(e){
-    if(btn){btn.textContent='✅ 일괄 저장';btn.disabled=false;}
-    toast('❌ 저장 실패: '+e.message);
-    return;
-  }
-
-  if (btn) { btn.textContent = '✅ 일괄 저장'; btn.disabled = false; }
-
-  if (res.ok) {
-    // 로컬 에버리지 업데이트
-    if (res.avgs) {
-      Object.entries(res.avgs).forEach(([name, avg]) => {
-        const m = members.find(m => m.name === name);
-        if (m) m.avg = avg;
-      });
-    }
-    toast(`✅ ${res.count}명 저장 완료!`);
-    document.getElementById('sc-paste').value = '';
-    document.getElementById('sc-preview').innerHTML = '';
-    loadRecentScores(); renderList();
-  } else {
-    toast('❌ 저장 실패: ' + (res.error || ''));
-  }
-}
-
-async function loadRecentScores() {
-  const el = document.getElementById('recent-scores');
-  if (!el) return;
-  try {
-    const res = await gasGet('getScores');
-    if (res.error) throw new Error(res.error);
-    const recent = [...res].sort((a,b) => b.date.localeCompare(a.date)).slice(0, 20);
-    el.innerHTML = recent.map(s =>
-      `<div class="fin-item">
-        <div class="fin-item-info">
-          <div class="fin-item-desc">${s.name}</div>
-          <div class="fin-item-sub">${s.date} · ${s.games}게임 · 총 ${Math.round(s.totalScore)}</div>
-        </div>
-        <div class="fin-item-amt plus">avg ${s.avg}</div>
-      </div>`).join('') || '<div class="empty">없음</div>';
-  } catch(e) { el.innerHTML = '<div class="empty">로드 실패</div>'; }
-}
-
-// ── 대시보드 요약 업데이트 ──
-function renderDashSummary() {
-  const active  = members.filter(m => m.status === 'active');
-  const paid    = members.filter(m => m.feePaid === 'O');
-  const unpaid  = active.filter(m => m.feePaid !== 'O');
-  const guest   = members.filter(m => m.status === 'guest');
-
-  const dTotal  = document.getElementById('d-total');
-  const dAtt    = document.getElementById('d-att');
-  const dFeeR   = document.getElementById('d-fee-rate');
-  const dFeeR2  = document.getElementById('d-fee-rate2');
-  const dFeeSub = document.getElementById('d-fee-sub');
-  const dFeeSub2= document.getElementById('d-fee-sub2');
-  const dUnpaid = document.getElementById('d-unpaid');
-  const dGuest  = document.getElementById('d-guest');
-
-  if (dTotal)   dTotal.textContent   = active.length;
-  if (dAtt)     dAtt.textContent     = members.filter(m => statusMap[m.name]==='attend').length || '-';
-  const rate = active.length ? Math.round(paid.length/active.length*100) : 0;
-  if (dFeeR)    dFeeR.textContent    = rate + '%';
-  if (dFeeR2)   dFeeR2.textContent   = rate + '%';
-  if (dFeeSub)  dFeeSub.textContent  = paid.length + '/' + active.length + '명 납부';
-  if (dFeeSub2) dFeeSub2.textContent = paid.length + '/' + active.length + '명 납부';
-  if (dUnpaid)  dUnpaid.textContent  = unpaid.length;
-  if (dGuest)   dGuest.textContent   = guest.length;
-
-  // 미납자 명단
-  const ul = document.getElementById('unpaid-list');
-  const uc = document.getElementById('unpaid-cnt');
-  if (ul) {
-    ul.innerHTML = unpaid.length
-      ? unpaid.map(m => `<div class="fin-item" style="padding:7px 10px">
-          <div class="fin-item-info">
-            <div class="fin-item-desc">${m.name}</div>
-            <div class="fin-item-sub">${m.dept||'-'} · ${m.grade||'-'}학번</div>
-          </div>
-          <button class="mgmt-btn green" style="font-size:10px;padding:4px 8px;border-radius:7px"
-            onclick="toggleFee('${m.name.replace(/'/g,"\'")}','X')">납부처리</button>
-        </div>`).join('')
-      : '<div class="empty">미납자 없음 🎉</div>';
-  }
-  if (uc) uc.textContent = unpaid.length + '명';
-
-  updateBalanceDisplay();
-}
-
-
-// ══════════════════════════════════════════════════════
-//  가계부 수정 (UPDATE)
-// ══════════════════════════════════════════════════════
-let _editingFin = null;
-
-function openFinEdit(f) {
-  if (typeof f === 'string') f = JSON.parse(f.replace(/&quot;/g,'"'));
-  _editingFin = f;
-  document.getElementById('fin-edit-date').value = f.date || '';
-  document.getElementById('fin-edit-desc').value = f.desc || '';
-  document.getElementById('fin-edit-amount').value = f.amount || 0;
-  document.getElementById('fin-edit-cat').value = f.category || '기타';
-  document.getElementById('fin-edit-note').value = f.note || '';
-  document.getElementById('fin-edit-rownum').value = f.rowNum;
-  document.getElementById('fin-edit-modal').classList.add('show');
-}
-
-function closeFinEdit() {
-  document.getElementById('fin-edit-modal').classList.remove('show');
-  _editingFin = null;
-}
-
-async function submitFinEdit() {
-  const rowNum = parseInt(document.getElementById('fin-edit-rownum').value);
-  const date   = document.getElementById('fin-edit-date').value;
-  const desc   = document.getElementById('fin-edit-desc').value.trim();
-  const amount = parseFloat(document.getElementById('fin-edit-amount').value);
-  const cat    = document.getElementById('fin-edit-cat').value;
-  const note   = document.getElementById('fin-edit-note').value.trim();
-
-  if (!desc) { toast('내용을 입력하세요'); return; }
-  if (isNaN(amount)) { toast('금액을 입력하세요'); return; }
-
-  // 삭제 후 재추가 방식 (GAS updateFinance 없음 → delete+add)
-  const delRes = await callGAS({ action:'deleteFinance', rowNum });
-  if (!delRes.ok) { toast('❌ 수정 실패 (삭제 단계)'); return; }
-
-  const addRes = await callGAS({ action:'addFinance', date, desc, amount, category:cat, note });
-  if (addRes.ok) {
-    toast('✅ 수정 완료');
-    closeFinEdit();
-    loadFinances();
-  } else {
-    toast('❌ 수정 실패: ' + (addRes.error||''));
-  }
-}
-
-// ══════════════════════════════════════════════════════
-//  통장 잔액 빵구 체크
-// ══════════════════════════════════════════════════════
-function checkBankBalance() {
-  const bankInput = parseFloat(document.getElementById('bank-input').value);
-  if (isNaN(bankInput)) { toast('잔액을 입력하세요'); return; }
-
-  // 앱 계산 잔액
-  const paidCnt   = members.filter(m => m.feePaid === 'O').length;
-  const feeIncome = paidCnt * 20000;
-  const finSum    = finances.reduce((s, f) => s + f.amount, 0);
-  const calcBalance = feeIncome + finSum;
-
-  const diff = bankInput - calcBalance;
-  const el = document.getElementById('bank-result');
-  const inner = document.getElementById('bank-result-inner');
-  el.style.display = 'block';
-
-  if (Math.abs(diff) <= 100) {
-    inner.innerHTML = `
-      <div style="background:#dcfce7;border-radius:9px;padding:12px;text-align:center">
-        <div style="font-size:20px;margin-bottom:4px">✅</div>
-        <div style="font-weight:900;color:#065f46;font-size:14px">일치!</div>
-        <div style="font-size:11px;color:#166534;margin-top:3px">
-          통장 ${fmt(bankInput)}원 = 회계 ${fmt(calcBalance)}원 (차이 ${diff}원)
-        </div>
-      </div>`;
-  } else {
-    const sign = diff > 0 ? '통장이' : '회계가';
-    const absD = Math.abs(diff);
-    inner.innerHTML = `
-      <div style="background:#fee2e2;border-radius:9px;padding:12px">
-        <div style="font-weight:900;color:#991b1b;font-size:14px;margin-bottom:8px">⚠️ 차이 발생!</div>
-        <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px">
-          <span style="color:#64748b">실제 통장</span>
-          <strong>${fmt(bankInput)}원</strong>
-        </div>
-        <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px">
-          <span style="color:#64748b">회계상 잔액</span>
-          <strong>${fmt(calcBalance)}원</strong>
-        </div>
-        <div style="display:flex;justify-content:space-between;font-size:13px;margin-top:8px;padding-top:8px;border-top:1px solid #fca5a5">
-          <span style="color:#991b1b;font-weight:700">빵구 (${sign} ${fmt(absD)}원 ${diff>0?'더 많음':'부족'})</span>
-          <strong style="color:#ef4444;font-size:15px">${diff>0?'+':''}${fmt(diff)}원</strong>
-        </div>
-        <div style="font-size:10px;color:#b91c1c;margin-top:6px">가계부 누락 항목 또는 지출 미기록을 확인하세요</div>
-      </div>`;
-  }
-
-  // 로컬 저장 (다음에 열 때 유지)
-  localStorage.setItem('pf_bank', bankInput.toString());
-}
-
-// 페이지 로드 시 이전 통장 잔액 복원
-window.addEventListener('DOMContentLoaded', () => {
-  const saved = localStorage.getItem('pf_bank');
-  if (saved) document.getElementById('bank-input').value = saved;
-});
-
-// ── 공통 유틸 ──
-function fmt(n) { return Math.round(n).toLocaleString('ko-KR'); }
-
-
-// ★ U1: 마지막 저장 시간 표시
-function updateLastSaved(){
-  const el=document.getElementById('last-saved');
-  if(!el||!_lastSavedAt) return;
-  const h=String(_lastSavedAt.getHours()).padStart(2,'0');
-  const m=String(_lastSavedAt.getMinutes()).padStart(2,'0');
-  el.textContent=`마지막 저장 ${h}:${m}`;
-  el.style.display='inline';
-}
-
-// ★ U2: 되돌리기
-async function undoLastSave(){
-  if(!_lastSaveState){toast('되돌릴 내역이 없습니다');return;}
-  if(!confirm('직전 저장을 되돌릴까요?')) return;
-  // 이전 상태로 서버 재저장은 복잡 → 로컬 statusMap만 복원하고 안내
-  statusMap={..._lastSaveState.statusMap};
-  renderList();save();
-  toast('⏪ 로컬 상태 복원됨 — 서버에 다시 저장하세요');
-  _lastSaveState=null;
-}
-
-// ★ U7: Web Share API
-function shareText(text, title='팀퍼펙트'){
-  if(navigator.share){
-    navigator.share({title,text}).catch(()=>{});
-  }else{
-    navigator.clipboard.writeText(text).then(()=>toast('📋 복사됨!'));
-  }
-}
-
-async function callGAS(body) {
-  try { return await gasPost(body); }
-  catch(e) {
-    try { return await gasGet(body.action, body); }
-    catch(e2) { return { error: e2.message }; }
-  }
-}
-
-// 오늘 날짜 기본값 + datalist 초기화
-window.addEventListener('DOMContentLoaded', () => {
-  const today = new Date().toISOString().slice(0,10);
-  ['fin-date','sc-date'].forEach(id => {
-    const el = document.getElementById(id);
-    if (el) el.value = today;
-  });
-});
-
-
-// ══════════════════════════════════════════════════════
-//  SQL CRUD — INSERT / UPDATE / DELETE
-// ══════════════════════════════════════════════════════
-let _editingMember = null;
-
-function openEditModal(name) {
-  const m = members.find(m => m.name === name) 
-    || _leftMembers?.find(m => m.name === name);
-  if (!m) { toast('회원을 찾을 수 없습니다'); return; }
-  _editingMember = m;
-  
-  document.getElementById('edit-name').value = m.name;
-  document.getElementById('edit-dept').value = m.dept || '';
-  document.getElementById('edit-grade').value = m.grade || '';
-  document.getElementById('edit-avg').value = m.avg || 0;
-  document.getElementById('edit-fee').value = m.feePaid || 'X';
-  document.getElementById('edit-status').value = m.status || 'active';
-  document.getElementById('edit-modal-title').textContent = `${m.name} 수정`;
-
-  // datalist
-  const dl = document.getElementById('dept-list-edit');
-  const depts = [...new Set(members.map(m=>(m.dept||'').trim()).filter(d=>d&&d.length>2))].sort();
-  dl.innerHTML = depts.map(d=>`<option value="${d}">`).join('');
-
-  document.getElementById('edit-modal').classList.add('show');
-}
-
-function closeEditModal() {
-  document.getElementById('edit-modal').classList.remove('show');
-  _editingMember = null;
-}
-
-async function submitEdit() {
-  if (!_editingMember) return;
-  const name   = _editingMember.name;
-  const dept   = document.getElementById('edit-dept').value.trim();
-  const grade  = document.getElementById('edit-grade').value.trim();
-  const avg    = parseFloat(document.getElementById('edit-avg').value) || 0;
-  const fee    = document.getElementById('edit-fee').value;
-  const status = document.getElementById('edit-status').value;
-
-  const res = await callGAS({ action:'updateMember', name, dept, grade, avg, feePaid:fee, status });
-  if (res.ok) {
-    // 로컬 업데이트
-    const m = members.find(m => m.name === name);
-    if (m) { m.dept=dept; m.grade=grade; m.avg=avg; m.feePaid=fee; m.status=status; }
-    toast(`✅ ${name} 수정 완료`);
-    closeEditModal();
-    renderMemberList(); renderList(); renderDashSummary();
-  } else {
-    toast('❌ 수정 실패: ' + (res.error || ''));
-  }
-}
-
-async function deleteCurrentMember() {
-  if (!_editingMember) return;
-  const name = _editingMember.name;
-  
-  if (!confirm(`⚠️ "${name}"을 완전 삭제합니다.\n\n출석/점수/납부 기록은 유지됩니다.\n정말 삭제할까요?`)) return;
-  if (!confirm(`마지막 확인: "${name}" 삭제합니다.`)) return;
-
-  const res = await callGAS({ action:'deleteMember', name });
-  if (res.ok) {
-    members = members.filter(m => m.name !== name);
-    toast(`🗑 ${name} 삭제됨`);
-    closeEditModal();
-    renderMemberList(); renderList(); renderDashSummary();
-  } else {
-    toast('❌ 삭제 실패: ' + (res.error || ''));
-  }
-}
-
-
-// ══════════════════════════════════════════════════════
-//  현장 출석 체크 (로컬 전용, 서버 저장 안 함)
-// ══════════════════════════════════════════════════════
-let rollMap = {}; // name → true(도착) / false(미도착)
-
-function initRoll() {
-  rollMap = {};
-  const src = members.filter(m => m.status === 'active');
-  // 참석여부 탭에서 체크된 사람 초기값으로 반영
-  src.forEach(m => {
-    rollMap[m.name] = statusMap[m.name] === 'attend';
-  });
-  renderRoll();
-}
-
-function renderRoll() {
-  const q = (document.getElementById('roll-search')?.value || '').toLowerCase();
-  const src = members.filter(m => m.status === 'active'
-    && (!q || m.name.includes(q) || (m.dept||'').includes(q)));
-
-  const arrived = src.filter(m => rollMap[m.name]);
-  const pending = src.filter(m => !rollMap[m.name]);
-
-  document.getElementById('roll-cnt-here').textContent  = arrived.length;
-  document.getElementById('roll-cnt-left').textContent  = pending.length;
-  document.getElementById('roll-cnt-total').textContent = src.length;
-  document.getElementById('roll-arrived-cnt').textContent = arrived.length;
-  document.getElementById('roll-pending-cnt').textContent = pending.length;
-
-  document.getElementById('roll-arrived-section').style.display = arrived.length ? 'block' : 'none';
-
-  const chip = (m) => {
-    const here = rollMap[m.name];
-    const nm = m.name.replace(/'/g,"\'");
-    return `<div class="roll-chip ${here?'here':''}" onclick="toggleRoll('${nm}')" role="checkbox" aria-checked="${here}" aria-label="${m.name}">
-      <div class="rc-name">${m.name}</div>
-      <div class="rc-dept">${m.dept||''}</div>
-      <div class="rc-check">${here ? '✅' : ''}</div>
-    </div>`;
-  };
-
-  document.getElementById('roll-grid-arrived').innerHTML = arrived.map(chip).join('');
-  document.getElementById('roll-grid-pending').innerHTML = pending.map(chip).join('');
-}
-
-function toggleRoll(name) {
-  rollMap[name] = !rollMap[name];
-  renderRoll();
-}
-
-function rollReset() {
-  if (!confirm('현장 체크를 초기화할까요?')) return;
-  initRoll();
-  toast('🔄 초기화됨');
-}
-
-function rollCheckAll() {
-  members.filter(m => m.status === 'active').forEach(m => { rollMap[m.name] = true; });
-  renderRoll();
-  toast('✅ 전체 도착 체크');
-}
-
-function rollCopyMissing() {
-  const missing = members
-    .filter(m => m.status === 'active' && !rollMap[m.name])
-    .map(m => m.name);
-  if (!missing.length) { toast('미도착자 없음 🎉'); return; }
-  const text = `미도착 ${missing.length}명:\n` + missing.join(', ');
-  shareText(text, '팀퍼펙트 미도착 명단');
-  toast(`📋 미도착 ${missing.length}명 복사됨`);
-}
-
-// init
-updateLaneLbl();
-updateManualLaneLbl();
-</script>
-
-<!-- ══ 회원 수정 모달 ══ -->
-<div class="modal-bg" id="edit-modal">
+<!-- 회원 수정 모달 -->
+<div class="modal-bg2" id="edit-modal">
   <div class="modal">
     <div class="modal-title">
       <span id="edit-modal-title">회원 수정</span>
@@ -2514,44 +933,25 @@ updateManualLaneLbl();
   </div>
 </div>
 
-
-<!-- ══ 가계부 수정 모달 ══ -->
-<div class="modal-bg" id="fin-edit-modal">
+<!-- 가계부 수정 모달 -->
+<div class="modal-bg2" id="fin-edit-modal">
   <div class="modal">
     <div class="modal-title">
       <span>가계부 수정</span>
       <button class="modal-close" onclick="closeFinEdit()">✕</button>
     </div>
-    <div class="field-group">
-      <div class="field-label">날짜</div>
-      <input class="field-input" id="fin-edit-date" type="date">
-    </div>
-    <div class="field-group">
-      <div class="field-label">내용</div>
-      <input class="field-input" id="fin-edit-desc" type="text">
-    </div>
-    <div class="field-group">
-      <div class="field-label">금액 (지출은 - 붙이기)</div>
-      <input class="field-input" id="fin-edit-amount" type="number">
-    </div>
+    <div class="field-group"><div class="field-label">날짜</div><input class="field-input" id="fin-edit-date" type="date"></div>
+    <div class="field-group"><div class="field-label">내용</div><input class="field-input" id="fin-edit-desc" type="text"></div>
+    <div class="field-group"><div class="field-label">금액 (지출은 - 붙이기)</div><input class="field-input" id="fin-edit-amount" type="number"></div>
     <div class="field-group">
       <div class="field-label">카테고리</div>
       <select class="field-select" id="fin-edit-cat">
-        <option value="수입">수입</option>
-        <option value="지출">지출</option>
-        <option value="경품">경품</option>
-        <option value="이자">이자</option>
-        <option value="캐시백">캐시백</option>
-        <option value="이월">이월</option>
-        <option value="반올림">반올림</option>
-        <option value="환불">환불</option>
-        <option value="기타">기타</option>
+        <option value="수입">수입</option><option value="지출">지출</option><option value="경품">경품</option>
+        <option value="이자">이자</option><option value="캐시백">캐시백</option><option value="이월">이월</option>
+        <option value="반올림">반올림</option><option value="환불">환불</option><option value="기타">기타</option>
       </select>
     </div>
-    <div class="field-group">
-      <div class="field-label">메모</div>
-      <input class="field-input" id="fin-edit-note" type="text" placeholder="">
-    </div>
+    <div class="field-group"><div class="field-label">메모</div><input class="field-input" id="fin-edit-note" type="text" placeholder=""></div>
     <input type="hidden" id="fin-edit-rownum">
     <div class="modal-actions">
       <button class="mgmt-btn navy" onclick="submitFinEdit()">💾 수정 저장</button>
@@ -2560,5 +960,1024 @@ updateManualLaneLbl();
   </div>
 </div>
 
+<div id="toast"></div>
+
+<script>
+// ══════════════════════════════════════════════════════
+//  설정 & 상태
+// ══════════════════════════════════════════════════════
+let GAS_URL = localStorage.getItem('pf_url') || '';
+let members=[], events=[], statusMap={}, tempAvgMap={};
+let _lastSavedAt=null, _lastSaveState=null;
+let _isOnline=navigator.onLine;
+
+window.addEventListener('online',()=>{_isOnline=true;document.getElementById('offline-bar')?.classList.remove('show');toast('🌐 온라인 복구');});
+window.addEventListener('offline',()=>{_isOnline=false;document.getElementById('offline-bar')?.classList.add('show');toast('⚠️ 오프라인 상태');});
+
+let currentEventId=null, currentEventTitle='';
+let filter='all', sortMode='name', viewMode='grid';
+let laneMode='auto', autoTeamMode=2, manualTeamMode=2;
+let laneGroups=[], laneCount=0, _assignCount=0;
+let manualLanes={}, manualUnassigned=[], manualSelChip=null;
+let swapMode=false, swapSel=null, avgPopupTarget=null;
+let _isSaving=false, selectedType='';
+let dashData=null;
+
+// 현장 출석체크 상태
+let rollMap={};           // name → true/false
+let rollEventId=null;     // 현재 선택된 이벤트
+let rollFilter='all';     // all / here / pending / attend
+
+// ── 로컬 저장 ──
+function save(){
+  try{
+    localStorage.setItem('pf_url', GAS_URL);
+    const compactSM={};
+    if(currentEventId) Object.entries(statusMap).forEach(([k,v])=>{if(v==='attend')compactSM[k]=v;});
+    localStorage.setItem('pf_st', JSON.stringify(compactSM));
+    localStorage.setItem('pf_tmp', JSON.stringify(tempAvgMap));
+    localStorage.setItem('pf_evt', currentEventId||'');
+    localStorage.setItem('pf_view', viewMode);
+  }catch(e){}
+}
+function load(){
+  try{
+    GAS_URL = localStorage.getItem('pf_url')||'';
+    const s=localStorage.getItem('pf_st'); if(s) statusMap=JSON.parse(s);
+    const t=localStorage.getItem('pf_tmp'); if(t) tempAvgMap=JSON.parse(t);
+    const e=localStorage.getItem('pf_evt'); if(e) currentEventId=e;
+    const v=localStorage.getItem('pf_view'); if(v) viewMode=v;
+  }catch(e){}
+}
+
+window.addEventListener('DOMContentLoaded', ()=>{
+  load();
+  applyViewMode();
+  initDatePickers();
+  setScrHeight();
+  window.addEventListener('resize', setScrHeight);
+  const savedBank = localStorage.getItem('pf_bank');
+  if(savedBank) document.getElementById('bank-input').value = savedBank;
+  const today = new Date().toISOString().slice(0,10);
+  ['fin-date','sc-date'].forEach(id=>{const el=document.getElementById(id);if(el)el.value=today;});
+  if(GAS_URL) syncAll();
+  else{
+    setSS('err','URL 없음');
+    document.getElementById('mlist').innerHTML='<div class="err-box">⚙️ 설정에서 GAS URL을 먼저 입력하세요.</div>';
+  }
+});
+
+function setScrHeight(){
+  const h=document.getElementById('hdr').offsetHeight+document.getElementById('tabs').offsetHeight;
+  document.getElementById('scr').style.height=`calc(100dvh - ${h}px)`;
+}
+
+// ══════════════════════════════════════════════════════
+//  API
+// ══════════════════════════════════════════════════════
+async function gasGet(action, params={}){
+  const url=new URL(GAS_URL);
+  url.searchParams.set('action',action);
+  Object.entries(params).forEach(([k,v])=>url.searchParams.set(k,typeof v==='object'?JSON.stringify(v):v));
+  const ctrl=new AbortController();
+  const timer=setTimeout(()=>ctrl.abort(),20000);
+  try{
+    const r=await fetch(url.toString(),{signal:ctrl.signal});
+    clearTimeout(timer);
+    return r.json();
+  }catch(e){ clearTimeout(timer); if(e.name==='AbortError') throw new Error('서버 응답 시간 초과 (20초)'); throw e; }
+}
+async function gasPost(body){
+  const ctrl=new AbortController();
+  const timer=setTimeout(()=>ctrl.abort(),25000);
+  try{
+    const res=await fetch(GAS_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(body),signal:ctrl.signal});
+    clearTimeout(timer);
+    return JSON.parse(await res.text());
+  }catch(e){ clearTimeout(timer); if(e.name==='AbortError') throw new Error('서버 응답 시간 초과 (25초)'); throw e; }
+}
+function setSS(s,t){ document.getElementById('sdot').className='sdot '+s; document.getElementById('stxt').textContent=t; }
+
+// ══════════════════════════════════════════════════════
+//  동기화
+// ══════════════════════════════════════════════════════
+async function syncAll(){
+  setSS('spin','동기화 중...');
+  try{
+    const [mRes, eRes] = await Promise.all([gasGet('getMembers'), gasGet('getEvents')]);
+    if(mRes.error) throw new Error(mRes.error);
+    const _raw = (mRes||[]).filter(m=>m.status!=='left');
+    const _seen = new Set();
+    members = _raw.filter(m=>{ if(_seen.has(m.name)) return false; _seen.add(m.name); return true; });
+    events = Array.isArray(eRes)?eRes:[];
+
+    document.getElementById('evt-bar').style.display='block';
+    renderEvtChips();
+    renderRollEvtChips(); // 현장 탭 이벤트 칩도 갱신
+
+    if(currentEventId){
+      const ev=events.find(e=>e.eventId===currentEventId);
+      if(ev){ currentEventTitle=ev.title; setEvtBadge(ev.title); await loadAttendance(currentEventId); }
+      else autoSelectEvent();
+    }else autoSelectEvent();
+
+    setSS('ok',`${members.length}명`);
+    setScrHeight(); renderList(); save();
+    toast(`✅ ${members.length}명 동기화 완료`);
+  }catch(e){
+    setSS('err','오류');
+    document.getElementById('mlist').innerHTML=`<div class="err-box">❌ <strong>동기화 실패</strong><br><br>${e.message}<br><br>· GAS URL 확인<br>· 배포 → "모든 사용자" 확인</div>`;
+  }
+}
+
+function autoSelectEvent(){
+  if(!events.length) return;
+  const now=new Date();now.setHours(0,0,0,0);
+  const future=events.filter(e=>{const d=e.date?new Date(e.date):null;return d&&d>=now;}).sort((a,b)=>new Date(a.date)-new Date(b.date));
+  const sel=future.length?future[0]:events[events.length-1];
+  if(sel) selectEvent(sel.eventId, sel.title, false);
+}
+
+async function loadAttendance(eventId){
+  if(!GAS_URL||!eventId) return;
+  try{
+    const res=await gasGet('getAttendance',{eventId});
+    if(res.error||!res.attendees) return;
+    statusMap={};
+    res.attendees.forEach(n=>{statusMap[n]='attend';});
+    renderList();
+    toast(`📥 ${res.attendees.length}명 불러옴`);
+  }catch(e){}
+}
+
+// ══════════════════════════════════════════════════════
+//  이벤트 피커
+// ══════════════════════════════════════════════════════
+function initDatePickers(){
+  const now=new Date();
+  const mSel=document.getElementById('sel-month');
+  const dSel=document.getElementById('sel-day');
+  if(mSel.options.length>0) return;
+  for(let m=1;m<=12;m++){const o=document.createElement('option');o.value=m;o.textContent=m+'월';if(m===now.getMonth()+1)o.selected=true;mSel.add(o);}
+  for(let d=1;d<=31;d++){const o=document.createElement('option');o.value=d;o.textContent=d+'일';if(d===now.getDate())o.selected=true;dSel.add(o);}
+  mSel.onchange=dSel.onchange=updateDatePreview;
+  updateDatePreview();
+}
+function updateDatePreview(){
+  const m=document.getElementById('sel-month')?.value;
+  const d=document.getElementById('sel-day')?.value;
+  if(selectedType&&selectedType!=='직접'&&m&&d)
+    document.getElementById('date-preview').textContent=`[${selectedType}] ${m}/${d}`;
+}
+function toggleEvtPanel(){
+  const p=document.getElementById('evt-panel');
+  const a=document.getElementById('evt-arrow');
+  const isOpen=p.classList.contains('open');
+  p.classList.toggle('open',!isOpen);
+  a.textContent=isOpen?'▼':'▲';
+  setScrHeight();
+}
+function closeEvtPanel(){
+  document.getElementById('evt-panel').classList.remove('open');
+  document.getElementById('evt-arrow').textContent='▼';
+  setScrHeight();
+}
+function selType(type,el){
+  selectedType=type;
+  document.querySelectorAll('.evt-type-btn').forEach(b=>b.classList.remove('sel'));
+  el.classList.add('sel');
+  const dateRow=document.getElementById('date-row');
+  const directRow=document.getElementById('direct-row');
+  if(type==='직접'){dateRow.style.display='none';directRow.style.display='flex';}
+  else{dateRow.style.display='flex';directRow.style.display='none';}
+  updateDatePreview();
+}
+async function confirmNewEvent(){
+  let title='';
+  if(selectedType==='직접'){
+    title=document.getElementById('direct-inp').value.trim();
+    if(!title){toast('이름을 입력하세요');return;}
+  }else{
+    if(!selectedType){toast('종류를 선택하세요');return;}
+    const m=document.getElementById('sel-month').value;
+    const d=document.getElementById('sel-day').value;
+    title=`[${selectedType}] ${m}/${d}`;
+  }
+  const type=title.includes('번개')?'flash':'regular';
+  const m=document.getElementById('sel-month')?.value;
+  const d=document.getElementById('sel-day')?.value;
+  const date=(selectedType!=='직접'&&m&&d)?`2026-${String(m).padStart(2,'0')}-${String(d).padStart(2,'0')}`:'';
+  try{
+    const res=await gasPost({action:'createEvent',title,type,date});
+    if(res.error){toast('❌ '+res.error);return;}
+    const eventId=res.eventId;
+    if(!events.find(e=>e.eventId===eventId)) events.push({eventId,title,type,date});
+    renderEvtChips();
+    renderRollEvtChips();
+    statusMap={};
+    selectEvent(eventId,title,true);
+    toast(`✅ "${title}" 생성됨`);
+  }catch(e){toast('❌ 생성 실패: '+e.message);}
+}
+function renderEvtChips(){
+  const container=document.getElementById('evt-chips');
+  const wrap=document.getElementById('evt-existing');
+  if(!events.length){wrap.style.display='none';return;}
+  wrap.style.display='block';
+  const now=new Date();now.setHours(0,0,0,0);
+  const sorted=[...events].sort((a,b)=>{
+    const da=a.date?new Date(a.date):null,db=b.date?new Date(b.date):null;
+    if(!da&&!db)return 0;if(!da)return 1;if(!db)return-1;
+    const fa=da>=now,fb=db>=now;
+    if(fa&&fb)return da-db;if(fa&&!fb)return-1;if(!fa&&fb)return 1;
+    return db-da;
+  });
+  container.innerHTML=sorted.map(ev=>{
+    const isFuture=ev.date&&new Date(ev.date)>=now;
+    const isSel=ev.eventId===currentEventId;
+    return `<div class="evt-chip ${isSel?'sel':''} ${isFuture?'future':''}"
+      onclick="selectEvent('${ev.eventId}','${ev.title.replace(/'/g,"\\'")}',true)">
+      ${isFuture&&!isSel?'🔜 ':''}${ev.title}
+    </div>`;
+  }).join('');
+}
+function selectEvent(eventId, title, loadData=true){
+  currentEventId=eventId;
+  currentEventTitle=title;
+  setEvtBadge(title);
+  renderEvtChips();
+  closeEvtPanel();
+  save();
+  if(loadData){ statusMap={}; loadAttendance(eventId).then(()=>renderList()); }
+}
+function setEvtBadge(title){ document.getElementById('evt-badge-name').textContent=title||'모임 선택'; }
+
+// ══════════════════════════════════════════════════════
+//  탭
+// ══════════════════════════════════════════════════════
+function switchTab(tab){
+  ['att','lane','dash','mgmt','roll'].forEach(t=>{
+    document.getElementById(`sec-${t}`).classList.toggle('active',t===tab);
+    document.getElementById(`tab-${t}`).classList.toggle('active',t===tab);
+  });
+  document.getElementById('evt-bar').style.display=(tab==='att'&&members.length)?'block':'none';
+  if(tab==='dash') renderDash();
+  if(tab==='roll') initRollTab();
+  if(tab==='lane'){const att=getAttendees();if(att.length)checkNoAvg(att);}
+  setScrHeight();
+}
+
+// ══════════════════════════════════════════════════════
+//  뷰 토글
+// ══════════════════════════════════════════════════════
+function toggleView(){ viewMode=viewMode==='list'?'grid':'list'; applyViewMode();save();renderList(); toast(viewMode==='grid'?'⊞ 그리드 뷰':'☰ 리스트 뷰'); }
+function applyViewMode(){
+  const btn=document.getElementById('view-btn');
+  if(viewMode==='grid'){btn.textContent='⊞';btn.classList.add('on');}
+  else{btn.textContent='☰';btn.classList.remove('on');}
+}
+
+// ══════════════════════════════════════════════════════
+//  멤버 리스트 — ★ BUG FIX: 게스트도 표시
+// ══════════════════════════════════════════════════════
+function isVisibleMember(m) {
+  // active + guest 모두 표시, left만 제외
+  return m.status === 'active' || m.status === 'guest';
+}
+
+function renderList(){
+  const el=document.getElementById('mlist');
+  if(!members.length) return;
+  const q=(document.getElementById('srch')?.value||'').trim();
+
+  // ★ FIX: active + guest 모두 포함
+  let data=members.filter(m=>isVisibleMember(m));
+  if(q) data=data.filter(m=>m.name.includes(q));
+  if(filter==='attend') data=data.filter(m=>statusMap[m.name]==='attend');
+  if(filter==='pending') data=data.filter(m=>(statusMap[m.name]||'pending')==='pending');
+  data=applySort(data);
+
+  const attCnt=members.filter(m=>statusMap[m.name]==='attend').length;
+  const totalVisible=members.filter(m=>isVisibleMember(m)).length;
+  document.getElementById('cnt-all').textContent=totalVisible;
+  document.getElementById('cnt-att').textContent=attCnt;
+  document.getElementById('cnt-pnd').textContent=totalVisible-attCnt;
+  document.getElementById('float-save').classList.toggle('show', attCnt>0);
+
+  if(!data.length){el.className='mlist';el.innerHTML='<div class="empty">검색 결과 없음 🤔</div>';return;}
+
+  if(viewMode==='grid'){
+    el.className='grid-view';
+    el.innerHTML=data.map(m=>{
+      const att=statusMap[m.name]==='attend';
+      const isGuest=m.status==='guest';
+      const nm=m.name.replace(/'/g,"\\'");
+      return `<div class="gc ${att?'attend':''} ${isGuest?'gc-guest':''}" onclick="toggleMember('${nm}')">
+        <div class="gc-name">${m.name}${isGuest?' <span style="font-size:8px;background:#fcd34d;color:#92400e;padding:1px 4px;border-radius:3px;font-weight:700">G</span>':''}</div>
+        ${m.avg?`<div class="gc-avg">${m.avg}</div>`:''}
+        <div class="gc-dept">${m.dept||''}</div>
+        ${att?`<div class="gc-chk">✓</div>`:''}
+        ${m.feePaid!=='O'?`<div class="gc-fee">미납</div>`:''}
+      </div>`;
+    }).join('');
+  }else{
+    el.className='mlist';
+    el.innerHTML=data.map(m=>{
+      const att=statusMap[m.name]==='attend';
+      const isGuest=m.status==='guest';
+      const nm=m.name.replace(/'/g,"\\'");
+      return `<div class="mc ${att?'attend':''} ${isGuest?'mc-guest':''}" onclick="toggleMember('${nm}')">
+        <div class="mc-info">
+          <div class="mc-name">${m.name}
+            ${isGuest?'<span style="font-size:10px;background:#fcd34d;color:#92400e;padding:1px 5px;border-radius:4px;font-weight:700;margin-left:4px">게스트</span>':''}
+            ${m.feePaid!=='O'?' <span style="font-size:10px;color:var(--red);font-weight:700">미납</span>':''}
+          </div>
+          <div class="mc-sub">${m.avg?`<span class="avg-chip">${m.avg}</span>`:''}<span>${m.dept||''}</span></div>
+        </div>
+        <div class="chk">${att?'✓':''}</div>
+      </div>`;
+    }).join('');
+  }
+}
+
+function getEffAvg(m, inclTemp=false){ if(inclTemp&&tempAvgMap[m.name]) return tempAvgMap[m.name]; return m.avg||0; }
+function toggleMember(name){ statusMap[name]=statusMap[name]==='attend'?'pending':'attend'; renderList(); }
+function setFilter(f,el){ filter=f; document.querySelectorAll('.fp').forEach(p=>p.classList.remove('active')); el.classList.add('active'); renderList(); }
+function setSort(s,el){ sortMode=s; document.querySelectorAll('.sp').forEach(p=>p.classList.remove('active')); el.classList.add('active'); renderList(); }
+function applySort(data){
+  const ok=data.filter(m=>m.feePaid==='O');
+  const no=data.filter(m=>m.feePaid!=='O');
+  function srt(arr){
+    if(sortMode==='name') return[...arr].sort((a,b)=>a.name.localeCompare(b.name,'ko'));
+    if(sortMode==='avg-d') return[...arr].sort((a,b)=>(b.avg||0)-(a.avg||0));
+    if(sortMode==='avg-a') return[...arr].sort((a,b)=>(a.avg||0)-(b.avg||0));
+    return arr;
+  }
+  return[...srt(ok),...srt(no)];
+}
+
+// ══════════════════════════════════════════════════════
+//  저장
+// ══════════════════════════════════════════════════════
+async function saveAttendance(){
+  if(_isSaving){toast('저장 중입니다...');return;}
+  if(!currentEventId){toast('모임을 먼저 선택하세요');return;}
+  const attendees=members.filter(m=>statusMap[m.name]==='attend').map(m=>m.name);
+  if(!attendees.length){toast('참석자가 없습니다');return;}
+  _lastSaveState={eventId:currentEventId,attendees:[...attendees],statusMap:{...statusMap}};
+  _isSaving=true;
+  showOverlay('시트에 저장 중...', `${attendees.length}명 · ${currentEventTitle}`, true);
+  document.getElementById('float-save').disabled=true;
+  try{
+    let data=null;
+    try{
+      data=await gasPost({action:'saveAttendance', eventId:currentEventId, attendees});
+      if(data.error) throw new Error(data.error);
+    }catch(e1){
+      try{
+        data=await gasGet('saveAttendance',{eventId:currentEventId, attendees:JSON.stringify(attendees)});
+        if(data.error) throw new Error(data.error);
+      }catch(e2){ throw e2; }
+    }
+    _lastSavedAt=new Date();
+    updateLastSaved();
+    toast(`✅ ${attendees.length}명 저장 완료!`);
+    showOverlay('저장 완료!', `${attendees.length}명 · ${currentEventTitle}`, false);
+    setTimeout(hideOverlay, 1200);
+  }catch(e){
+    toast('❌ 저장 실패: '+e.message);
+    hideOverlay();
+  }finally{
+    _isSaving=false;
+    document.getElementById('float-save').disabled=false;
+  }
+}
+function showOverlay(title, sub, spinning){
+  document.getElementById('save-spinner').style.display=spinning?'block':'none';
+  document.getElementById('save-title').textContent=title;
+  document.getElementById('save-sub').textContent=sub;
+  document.getElementById('save-overlay').classList.add('show');
+}
+function hideOverlay(){ document.getElementById('save-overlay').classList.remove('show'); }
+
+// ══════════════════════════════════════════════════════
+//  레인 배정 — ★ FIX: getAttendees도 게스트 포함
+// ══════════════════════════════════════════════════════
+function getAttendees(){
+  // ★ FIX: active + guest 모두 포함
+  return members.filter(m=>statusMap[m.name]==='attend' && isVisibleMember(m))
+    .map(m=>({name:m.name, avg:getEffAvg(m,true)||0}));
+}
+function setLaneMode(mode){ laneMode=mode; document.getElementById('mt-auto').classList.toggle('active',mode==='auto'); document.getElementById('mt-manual').classList.toggle('active',mode==='manual'); document.getElementById('auto-cfg').style.display=mode==='auto'?'block':'none'; document.getElementById('manual-cfg').style.display=mode==='manual'?'block':'none'; document.getElementById('lane-results').innerHTML=''; cancelSwap(); }
+function setAutoTeamMode(n,el){ autoTeamMode=n; document.querySelectorAll('#tt-2,#tt-1').forEach(b=>b.classList.remove('active')); el.classList.add('active'); updateLaneLbl(); }
+function setManualTeamMode(n,el){ manualTeamMode=n; document.querySelectorAll('#mt-2,#mt-1').forEach(b=>b.classList.remove('active')); el.classList.add('active'); updateManualLaneLbl(); }
+function adjLane(d){ const inp=document.getElementById('lane-cnt'); const min=autoTeamMode===2?2:1; let v=Math.max(min,Math.min(12,parseInt(inp.value)+d)); if(autoTeamMode===2)v=Math.round(v/2)*2; inp.value=v;updateLaneLbl(); }
+function adjManualLane(d){ const inp=document.getElementById('m-lane-cnt'); const min=manualTeamMode===2?2:1; let v=Math.max(min,Math.min(12,parseInt(inp.value)+d)); if(manualTeamMode===2)v=Math.round(v/2)*2; inp.value=v;updateManualLaneLbl(); }
+function updateLaneLbl(){ const v=parseInt(document.getElementById('lane-cnt').value)||6; const teams=autoTeamMode===2?Math.floor(v/2):v; document.getElementById('lane-lbl').textContent=`= ${teams}팀`; document.getElementById('lane-hint').textContent=autoTeamMode===2?`${v}레인, ${teams}팀 (2레인씩 한팀)`:`${v}레인, ${teams}팀`; }
+function updateManualLaneLbl(){ const v=parseInt(document.getElementById('m-lane-cnt').value)||6; const teams=manualTeamMode===2?Math.floor(v/2):v; document.getElementById('m-lane-lbl').textContent=`= ${teams}팀`; }
+
+function checkNoAvg(att){
+  const noAvg=att.filter(m=>!m.avg||m.avg===0);
+  const sec=document.getElementById('noavg-sec');
+  const list=document.getElementById('noavg-list');
+  if(!noAvg.length){sec.style.display='none';return;}
+  sec.style.display='block';
+  list.innerHTML=noAvg.map(m=>{
+    const nm=m.name.replace(/'/g,"\\'");
+    const tmp=tempAvgMap[m.name]||'';
+    return `<div style="display:flex;align-items:center;gap:7px;margin-bottom:7px">
+      <span style="flex:1;font-size:13px;font-weight:700">${m.name}</span>
+      <button onclick="setNG('${nm}',100)" style="padding:4px 8px;border:1.5px solid var(--border);border-radius:7px;background:var(--bg);font-size:11px;font-weight:700;cursor:pointer">남100</button>
+      <button onclick="setNG('${nm}',80)" style="padding:4px 8px;border:1.5px solid var(--border);border-radius:7px;background:var(--bg);font-size:11px;font-weight:700;cursor:pointer">여80</button>
+      <input type="number" id="ng-${nm.replace(/[^가-힣a-zA-Z0-9]/g,'_')}" value="${tmp}" placeholder="직접"
+        min="50" max="300" style="width:65px;border:1.5px solid var(--border);border-radius:7px;padding:4px 6px;font-size:13px;font-weight:700;font-family:'Noto Sans KR',sans-serif;outline:none;text-align:center;color:var(--navy)"
+        oninput="applyNG('${nm}',this.value)">
+    </div>`;
+  }).join('');
+}
+function setNG(name,v){const inp=document.getElementById('ng-'+name.replace(/[^가-힣a-zA-Z0-9]/g,'_'));if(inp)inp.value=v;applyNG(name,v);}
+function applyNG(name,v){const n=parseInt(v);if(n>=50&&n<=300){tempAvgMap[name]=n;save();}}
+
+const TC=['#162447','#065f46','#7c2d12','#4c1d95','#1e3a5f','#1f2937'];
+let _laneAssignCount=0;
+function autoAssign(){
+  const att=getAttendees();
+  if(!att.length){toast('참석자를 먼저 체크하세요');return;}
+  checkNoAvg(att);
+  _laneAssignCount++;
+  const numLanes=parseInt(document.getElementById('lane-cnt').value)||6;
+  const numTeams=autoTeamMode===2?Math.floor(numLanes/2):numLanes;
+  const sorted=[...att].sort((a,b)=>b.avg-a.avg);
+  if(_laneAssignCount>1){ for(let i=0;i<sorted.length-1;i++){if(Math.abs((sorted[i].avg||0)-(sorted[i+1].avg||0))<=8&&Math.random()<0.5)[sorted[i],sorted[i+1]]=[sorted[i+1],sorted[i]];} }
+  const teams=Array.from({length:numTeams},(_,i)=>({teamNum:i+1,laneAN:autoTeamMode===2?i*2+1:i+1,laneBN:autoTeamMode===2?i*2+2:i+1,members:[],total:0}));
+  sorted.forEach(m=>{const t=teams.reduce((mn,t)=>t.total<mn.total?t:mn,teams[0]);t.members.push(m);t.total+=m.avg;});
+  let improved=true,iter=0;
+  while(improved&&iter<200){
+    improved=false;iter++;
+    for(let ti=0;ti<teams.length-1;ti++){
+      for(let tj=ti+1;tj<teams.length;tj++){
+        for(let mi=0;mi<teams[ti].members.length;mi++){
+          for(let mj=0;mj<teams[tj].members.length;mj++){
+            const ai=teams[ti].members[mi].avg||0,aj=teams[tj].members[mj].avg||0;
+            if(ai===aj)continue;
+            const oldS=Math.max(...teams.map(t=>t.total))-Math.min(...teams.map(t=>t.total));
+            teams[ti].total+=aj-ai;teams[tj].total+=ai-aj;
+            const newS=Math.max(...teams.map(t=>t.total))-Math.min(...teams.map(t=>t.total));
+            if(newS<oldS-0.5){const tmp=teams[ti].members[mi];teams[ti].members[mi]=teams[tj].members[mj];teams[tj].members[mj]=tmp;improved=true;}
+            else{teams[ti].total+=ai-aj;teams[tj].total+=aj-ai;}
+          }
+        }
+      }
+    }
+  }
+  function setAnchor(lane){if(lane.length<2)return lane;const maxIdx=lane.reduce((mi,m,i)=>(m.avg||0)>(lane[mi].avg||0)?i:mi,0);const anchor=lane.splice(maxIdx,1)[0];lane.push(anchor);return lane;}
+  laneGroups=teams.map(t=>{
+    if(autoTeamMode===1)return{...t,laneA:setAnchor([...t.members]),laneB:[]};
+    const s2=[...t.members].sort((a,b)=>(b.avg||0)-(a.avg||0));
+    const a=[],b=[];let sa=0,sb=0;
+    s2.forEach(m=>{if(sa<=sb){a.push(m);sa+=m.avg||0;}else{b.push(m);sb+=m.avg||0;}});
+    return{...t,laneA:setAnchor(a),laneB:setAnchor(b)};
+  });
+  const spread=Math.round(Math.max(...laneGroups.map(t=>t.total))-Math.min(...laneGroups.map(t=>t.total)));
+  cancelSwap();renderAutoResults();
+  toast(`⚡ ${numTeams}팀 배정 완료 (편차: ${spread}점)${_laneAssignCount>1?' · 재배정':''}`);
+}
+function renderAutoResults(){
+  const con=document.getElementById('lane-results');
+  if(!laneGroups.length){con.innerHTML='';return;}
+  const tots=laneGroups.map(t=>t.total),maxT=Math.max(...tots)||1;
+  const spread=Math.round(Math.max(...tots)-Math.min(...tots));
+  let html=`<div class="bal-card"><div class="bal-title">⚖️ 팀별 균형 (편차 ${spread}점)</div>`;
+  laneGroups.forEach((t,i)=>{const avg=t.members.length?Math.round(t.total/t.members.length):0;html+=`<div class="bal-row"><div class="bal-lbl">${t.laneAN}·${t.laneBN}</div><div class="bal-track"><div class="bal-fill" style="width:${(t.total/maxT*100).toFixed(0)}%;background:${TC[i%TC.length]}"></div></div><div class="bal-num">${Math.round(t.total)}</div><div class="bal-avg">avg ${avg}</div></div>`;});
+  html+='</div>';
+  html+=laneGroups.map((t,ti)=>`<div class="team-card"><div class="team-hdr" style="background:${TC[ti%TC.length]}"><div class="team-hdr-l">팀${ti+1} (${t.laneAN}·${t.laneBN}레인)</div><div class="team-hdr-r">합계 ${Math.round(t.total)} · 평균 ${t.members.length?Math.round(t.total/t.members.length):0} · ${t.members.length}명</div></div><div class="lanes-wrap"><div class="lane-col"><div class="lane-col-hdr"><span>${t.laneAN}번</span><span class="lane-avg-val">${lavg(t.laneA)}</span></div><div id="lc-${ti}-A">${t.laneA.map((m,ci)=>chp(m,ti,'A',ci)).join('')}</div></div><div class="lane-col"><div class="lane-col-hdr"><span>${t.laneBN}번</span><span class="lane-avg-val">${lavg(t.laneB)}</span></div><div id="lc-${ti}-B">${t.laneB.map((m,ci)=>chp(m,ti,'B',ci)).join('')}</div></div></div><div class="team-footer"><button class="smBtn" onclick="shuffleTeam(${ti})">🔀 섞기</button><button class="smBtn" onclick="copyTeam(${ti})">📋 복사</button></div></div>`).join('');
+  html+=`<button class="bigBtn" style="width:100%;margin-bottom:7px" onclick="startSwap()">🔄 수동 조정</button>`;
+  html+=`<button class="copy-all" onclick="copyKakao()">📤 카카오톡 공유</button>`;
+  con.innerHTML=html;
+}
+function chp(m,ti,lane,ci){ const warn=!m.avg||m.avg===0; return `<div class="mchip ${warn?'warn':''}" id="chip-${ti}-${lane}-${ci}" onclick="onChip(${ti},'${lane}',${ci})"><span class="chip-name">${m.name}</span>${m.avg?`<span class="chip-avg">${m.avg}</span>`:`<span style="font-size:10px;color:#92400e">?</span>`}</div>`; }
+function lavg(arr){ const f=arr.filter(m=>m.avg>0); return f.length?Math.round(f.reduce((s,m)=>s+m.avg,0)/f.length)+'':'—'; }
+function shuffleTeam(ti){ const t=laneGroups[ti],all=[...t.laneA,...t.laneB]; for(let i=all.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[all[i],all[j]]=[all[j],all[i]];} t.laneA=all.slice(0,Math.ceil(all.length/2));t.laneB=all.slice(Math.ceil(all.length/2));renderAutoResults();toast('🔀 섞었어요'); }
+function copyTeam(ti){ const t=laneGroups[ti]; navigator.clipboard.writeText(`[팀${t.teamNum}] ${t.laneAN}레인:${t.laneA.map(m=>m.name).join(',')} / ${t.laneBN}레인:${t.laneB.map(m=>m.name).join(',')}`).then(()=>toast('📋 복사됨!')); }
+function copyKakao(){
+  if(!laneGroups.length){toast('배정 결과가 없어요');return;}
+  const spread=Math.round(Math.max(...laneGroups.map(t=>t.total))-Math.min(...laneGroups.map(t=>t.total)));
+  const total=laneGroups.reduce((s,t)=>s+t.members.length,0);
+  let txt=`🎳 레인배정 결과\n📅 ${currentEventTitle||'미정'}\n👥 참석 ${total}명 · 편차 ${spread}점\n${'━'.repeat(20)}\n\n`;
+  laneGroups.forEach(t=>{const avg=t.members.length?Math.round(t.total/t.members.length):0;txt+=`🏆 팀${t.teamNum} (${t.laneAN}·${t.laneBN}번레인)\n   합계 ${Math.round(t.total)} / 평균 ${avg}\n   ${t.laneAN}번 🎳 ${t.laneA.map(m=>m.avg?m.name+'('+m.avg+')':m.name).join(' · ')}\n`;if(t.laneB.length)txt+=`   ${t.laneBN}번 🎳 ${t.laneB.map(m=>m.avg?m.name+'('+m.avg+')':m.name).join(' · ')}\n`;txt+='\n';});
+  txt+=`${'━'.repeat(20)}\n🎉 모두 즐거운 게임 되세요!`;
+  navigator.clipboard.writeText(txt.trim()).then(()=>toast('📤 카카오톡 형식 복사!'));
+}
+function startSwap(){ swapMode=true; document.getElementById('swap-banner').classList.add('show'); document.getElementById('swap-txt').textContent='교체할 멤버 선택'; toast('멤버를 탭해서 교체하세요'); }
+function cancelSwap(){ swapMode=false; swapSel=null; document.getElementById('swap-banner').classList.remove('show'); document.querySelectorAll('.mchip').forEach(c=>c.classList.remove('sel','tgt')); }
+function onChip(ti,lane,ci){
+  if(!swapMode)return;
+  if(!swapSel){ swapSel={ti,lane,ci}; document.getElementById(`chip-${ti}-${lane}-${ci}`).classList.add('sel'); document.querySelectorAll('.mchip').forEach(c=>{if(c.id!==`chip-${ti}-${lane}-${ci}`)c.classList.add('tgt');}); document.getElementById('swap-txt').textContent='교체할 대상 선택'; }
+  else{
+    const{ti:ti2,lane:lane2,ci:ci2}=swapSel;
+    if(ti===ti2&&lane===lane2&&ci===ci2){cancelSwap();startSwap();return;}
+    const a1=lane2==='A'?laneGroups[ti2].laneA:laneGroups[ti2].laneB;
+    const a2=lane==='A'?laneGroups[ti].laneA:laneGroups[ti].laneB;
+    [a1[ci2],a2[ci]]=[a2[ci],a1[ci2]];
+    laneGroups.forEach(t=>{t.total=[...t.laneA,...t.laneB].reduce((s,m)=>s+m.avg,0);t.members=[...t.laneA,...t.laneB];});
+    swapSel=null;renderAutoResults();toast('✅ 교체 완료!');startSwap();
+  }
+}
+function initManual(){
+  const numLanes=parseInt(document.getElementById('m-lane-cnt').value)||6;
+  const att=getAttendees();
+  if(!att.length){toast('참석자를 먼저 체크하세요');return;}
+  checkNoAvg(att);
+  manualUnassigned=[...att].sort((a,b)=>(b.avg||0)-(a.avg||0));
+  manualLanes={};
+  if(manualTeamMode===2){const t=Math.floor(numLanes/2);for(let i=0;i<t;i++){manualLanes[`${i*2+1}`]=[];manualLanes[`${i*2+2}`]=[];}}
+  else{for(let i=0;i<numLanes;i++)manualLanes[`${i+1}`]=[];}
+  manualSelChip=null;
+  renderManual();
+  toast('탭해서 선택 → 레인 탭해서 배치');
+}
+function renderManual(){
+  const con=document.getElementById('lane-results');
+  let html=`<div class="card"><div class="card-lbl">📦 미배정 (탭→선택, 레인→배치)</div><div class="pool" id="pool">${manualUnassigned.map(m=>`<div class="pool-chip ${!m.avg?'warn':''}" id="pool-${m.name.replace(/[^가-힣a-zA-Z0-9]/g,'_')}" onclick="selPool('${m.name.replace(/'/g,"\\'")}')"><span>${m.name}</span>${m.avg?`<span style="font-size:9px;color:var(--muted)">${m.avg}</span>`:`<span style="font-size:9px;color:#92400e">?</span>`}</div>`).join('')}${!manualUnassigned.length?'<span style="font-size:12px;color:var(--muted)">모두 배치됨 ✅</span>':''}</div></div>`;
+  html+=`<div class="card"><div class="card-lbl">🎳 레인 배치</div>`;
+  const keys=Object.keys(manualLanes).map(Number).sort((a,b)=>a-b);
+  if(manualTeamMode===2){
+    for(let i=0;i<keys.length;i+=2){
+      const la=keys[i],lb=keys[i+1];
+      html+=`<div class="lane-pair"><div class="lane-pair-hdr">팀${i/2+1} — ${la}·${lb}레인 <span style="float:right;color:var(--muted)">${mLaneTotal(la,lb)}</span></div><div class="lanes-grid"><div class="m-lane" id="ml-${la}" onclick="assignLane(${la})"><div class="m-lane-lbl">${la}번</div>${(manualLanes[la]||[]).map(m=>`<div class="m-chip"><span>${m.name}${m.avg?` <span style="font-size:9px;color:var(--muted)">${m.avg}</span>`:''}</span><button class="m-remove" onclick="event.stopPropagation();removeFromLane(${la},'${m.name.replace(/'/g,"\\'")}')">×</button></div>`).join('')}</div>${lb?`<div class="m-lane" id="ml-${lb}" onclick="assignLane(${lb})"><div class="m-lane-lbl">${lb}번</div>${(manualLanes[lb]||[]).map(m=>`<div class="m-chip"><span>${m.name}${m.avg?` <span style="font-size:9px;color:var(--muted)">${m.avg}</span>`:''}</span><button class="m-remove" onclick="event.stopPropagation();removeFromLane(${lb},'${m.name.replace(/'/g,"\\'")}')">×</button></div>`).join('')}</div>`:''}</div></div>`;
+    }
+  }else{
+    keys.forEach((la,pi)=>{html+=`<div class="lane-pair"><div class="lane-pair-hdr">팀${pi+1} — ${la}번레인 <span style="float:right;color:var(--muted)">${(manualLanes[la]||[]).reduce((s,m)=>s+(m.avg||0),0)||0}</span></div><div class="m-lane" id="ml-${la}" onclick="assignLane(${la})" style="padding:6px;border:2px dashed var(--border);border-radius:7px;min-height:44px;cursor:pointer"><div class="m-lane-lbl">${la}번</div>${(manualLanes[la]||[]).map(m=>`<div class="m-chip"><span>${m.name}${m.avg?` <span style="font-size:9px;color:var(--muted)">${m.avg}</span>`:''}</span><button class="m-remove" onclick="event.stopPropagation();removeFromLane(${la},'${m.name.replace(/'/g,"\\'")}')">×</button></div>`).join('')}</div></div>`;});
+  }
+  html+='</div>';
+  html+=`<div style="display:flex;gap:7px;margin-bottom:10px"><button class="bigBtn amber" onclick="finalizeManual()">✅ 배정 완료 → 결과 보기</button></div>`;
+  con.innerHTML=html;
+  if(manualSelChip){const el=document.getElementById('pool-'+manualSelChip.replace(/[^가-힣a-zA-Z0-9]/g,'_'));if(el)el.classList.add('sel');}
+}
+function mLaneTotal(la,lb){ const s=[...(manualLanes[la]||[]),...(lb?manualLanes[lb]||[]:[])]  .reduce((s,m)=>s+(m.avg||0),0); return s?Math.round(s):'0'; }
+function selPool(name){ manualSelChip=(manualSelChip===name?null:name); document.querySelectorAll('.pool-chip').forEach(c=>c.classList.remove('sel')); if(manualSelChip){const el=document.getElementById('pool-'+name.replace(/[^가-힣a-zA-Z0-9]/g,'_'));if(el)el.classList.add('sel');toast('레인을 탭해서 배치하세요');} }
+function assignLane(laneNum){ if(!manualSelChip){toast('먼저 인원을 선택하세요');return;} const member=manualUnassigned.find(m=>m.name===manualSelChip); if(!member){manualSelChip=null;return;} manualLanes[laneNum]=[...(manualLanes[laneNum]||[]),member]; manualUnassigned=manualUnassigned.filter(m=>m.name!==manualSelChip); manualSelChip=null; renderManual(); }
+function removeFromLane(laneNum,name){ const member=manualLanes[laneNum]?.find(m=>m.name===name); if(!member)return; manualLanes[laneNum]=manualLanes[laneNum].filter(m=>m.name!==name); manualUnassigned.push(member); renderManual(); }
+function finalizeManual(){
+  const keys=Object.keys(manualLanes).map(Number).sort((a,b)=>a-b);
+  if(manualTeamMode===2){ laneGroups=[]; for(let i=0;i<keys.length;i+=2){const la=keys[i],lb=keys[i+1];const laneA=manualLanes[la]||[],laneB=lb?manualLanes[lb]||[]:[];const members=[...laneA,...laneB];laneGroups.push({teamNum:laneGroups.length+1,laneAN:la,laneBN:lb||la,laneA,laneB,members,total:members.reduce((s,m)=>s+(m.avg||0),0)});} }
+  else{ laneGroups=keys.map((la,i)=>{const laneA=manualLanes[la]||[];return{teamNum:i+1,laneAN:la,laneBN:la,laneA,laneB:[],members:[...laneA],total:laneA.reduce((s,m)=>s+(m.avg||0),0)};}); }
+  renderAutoResults();toast('✅ 수동 배정 확정!');
+}
+
+// ══════════════════════════════════════════════════════
+//  대시보드
+// ══════════════════════════════════════════════════════
+async function renderDash(){
+  renderDashSummary();
+  try{
+    const res=await gasGet('getDashboard');
+    if(res.error){toast('대시보드 로드 실패');return;}
+    dashData=res;
+    document.getElementById('d-total').textContent=res.totalMembers||'-';
+    document.getElementById('d-att').textContent='-';
+    document.getElementById('d-fee-rate').textContent=(res.feeRate||0)+'%';
+    document.getElementById('d-fee-sub').textContent=`${res.paidCount||0}/${res.totalMembers||0}명 납부`;
+    document.getElementById('d-unpaid').textContent=res.unpaidCount||'0';
+    const trendEl=document.getElementById('evt-trend');
+    if(res.events&&res.events.length){ trendEl.innerHTML=[...res.events].sort((a,b)=>(a.date||'').localeCompare(b.date||'')).map(ev=>`<div class="trend-item"><div class="trend-cnt">${ev.attendeeCount}</div><div class="trend-name">${ev.title.replace(/\[|\]/g,'').trim()}</div></div>`).join(''); }
+    drawDistChart(members.filter(m=>m.avg>0));
+    document.getElementById('rank-avg').innerHTML=(res.topAvg||[]).map((m,i)=>`<div class="rank-item"><div class="rnum ${i===0?'g':i===1?'s':i===2?'b':''}">${i+1}</div><div class="rname">${m.name}</div><div class="rval">${m.avg}</div></div>`).join('')||'<div class="empty">없음</div>';
+    const maxAtt=(res.topAtt||[])[0]?.count||1;
+    document.getElementById('rank-att').innerHTML=(res.topAtt||[]).map((m,i)=>`<div class="rank-item"><div class="rnum ${i===0?'g':i===1?'s':i===2?'b':''}">${i+1}</div><div class="rname">${m.name}</div><div class="bar-wrap"><div class="bar-fill" style="width:${Math.round(m.count/maxAtt*100)}%"></div></div><div class="rval">${m.count}회</div></div>`).join('')||'<div class="empty">없음</div>';
+  }catch(e){toast('대시보드 오류: '+e.message);}
+}
+function drawDistChart(all){
+  const cv=document.getElementById('dist-chart');
+  const W=cv.offsetWidth||360,H=90;
+  cv.width=W*devicePixelRatio;cv.height=H*devicePixelRatio;cv.style.width=W+'px';cv.style.height=H+'px';
+  const ctx=cv.getContext('2d');ctx.scale(devicePixelRatio,devicePixelRatio);
+  const labels=['<80','80','100','120','140','160','180','200+'],counts=new Array(8).fill(0);
+  all.forEach(m=>{const v=m.avg;if(v<80)counts[0]++;else if(v<100)counts[1]++;else if(v<120)counts[2]++;else if(v<140)counts[3]++;else if(v<160)counts[4]++;else if(v<180)counts[5]++;else if(v<200)counts[6]++;else counts[7]++;});
+  const p={t:8,r:4,b:20,l:16},w=W-p.l-p.r,h=H-p.t-p.b,maxC=Math.max(...counts)||1;
+  counts.forEach((c,i)=>{const bw=w/8*.72,x=p.l+(i+.5)*(w/8)-bw/2,bh=(c/maxC)*h,y=p.t+h-bh;ctx.fillStyle='#1f3a6e';rr(ctx,x,y,bw,bh,3);ctx.fill();if(c>0){ctx.fillStyle='#fff';ctx.font='bold 9px sans-serif';ctx.textAlign='center';ctx.fillText(c,x+bw/2,y-2);}ctx.fillStyle='#64748b';ctx.font='8px sans-serif';ctx.fillText(labels[i],x+bw/2,p.t+h+13);});
+}
+function rr(ctx,x,y,w,h,r){if(h<=0)return;ctx.beginPath();ctx.moveTo(x+r,y);ctx.lineTo(x+w-r,y);ctx.arcTo(x+w,y,x+w,y+r,r);ctx.lineTo(x+w,y+h);ctx.lineTo(x,y+h);ctx.lineTo(x,y+r);ctx.arcTo(x,y,x+r,y,r);ctx.closePath();}
+
+// ══════════════════════════════════════════════════════
+//  에버리지 팝업
+// ══════════════════════════════════════════════════════
+function openAvgPopup(name){avgPopupTarget=name;document.getElementById('avg-popup-name').textContent=name+' 에버리지 입력';document.getElementById('avg-inp').value=tempAvgMap[name]||'';document.getElementById('avg-popup').classList.add('show');}
+function closeAvgPopup(){document.getElementById('avg-popup').classList.remove('show');avgPopupTarget=null;}
+function setAvgGuide(v){document.getElementById('avg-inp').value=v;}
+function applyAvg(){const v=parseInt(document.getElementById('avg-inp').value);if(!v||v<50||v>300){toast('50~300 사이 값을 입력하세요');return;}if(avgPopupTarget){tempAvgMap[avgPopupTarget]=v;save();}closeAvgPopup();renderList();toast(`✅ ${avgPopupTarget} 에버리지 ${v} 적용`);}
+
+// ══════════════════════════════════════════════════════
+//  설정
+// ══════════════════════════════════════════════════════
+function openCfg(){document.getElementById('c-url').value=GAS_URL;document.getElementById('cfg-modal').classList.add('show');}
+function closeCfg(e){if(!e||e.target===document.getElementById('cfg-modal'))document.getElementById('cfg-modal').classList.remove('show');}
+function saveCfg(){GAS_URL=document.getElementById('c-url').value.trim()||GAS_URL;document.getElementById('cfg-modal').classList.remove('show');save();syncAll();}
+
+// ══════════════════════════════════════════════════════
+//  토스트
+// ══════════════════════════════════════════════════════
+let _tt;
+function toast(msg){ const t=document.getElementById('toast'); t.textContent=msg;t.style.opacity='1';t.style.transform='translateX(-50%) translateY(0)'; clearTimeout(_tt);_tt=setTimeout(()=>{t.style.opacity='0';},2400); }
+
+// ══════════════════════════════════════════════════════
+//  관리 탭
+// ══════════════════════════════════════════════════════
+let currentMgmtTab = 'member';
+let finances = [];
+let memFilter = 'all';
+
+function setMgmtTab(tab, el) {
+  currentMgmtTab = tab;
+  document.querySelectorAll('.tab-pill').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  ['member','finance','score'].forEach(t => { document.getElementById('msec-' + t).style.display = t === tab ? 'block' : 'none'; });
+  if (tab === 'finance') loadFinances();
+  if (tab === 'score') { const today = new Date().toISOString().slice(0,10); if(document.getElementById('sc-date')) document.getElementById('sc-date').value = today; loadRecentScores(); }
+  if (tab === 'member') renderMemberList();
+}
+function setMemFilter(f, el) { memFilter = f; document.querySelectorAll('#msec-member .tab-pill').forEach(b => b.classList.remove('active')); el.classList.add('active'); renderMemberList(); }
+function renderMemberList() {
+  const el = document.getElementById('m-list');
+  if (!el) return;
+  const q = (document.getElementById('m-search')?.value || '').trim();
+  let data = [...members];
+  if (q) data = data.filter(m => m.name.includes(q));
+  if (memFilter === 'active') data = data.filter(m => m.status === 'active');
+  if (memFilter === 'unpaid') data = data.filter(m => m.feePaid !== 'O' && m.status === 'active');
+  if (memFilter === 'left')   data = data.filter(m => m.status === 'left');
+  if (!data.length) { el.innerHTML = '<div class="empty">없음</div>'; return; }
+  el.innerHTML = data.map(m => {
+    const nm = m.name.replace(/'/g, "\'");
+    const statusLabel = m.status === 'active' ? '활성' : m.status === 'guest' ? '게스트' : '탈퇴';
+    const feeLabel    = m.feePaid === 'O' ? '납부' : '미납';
+    return `<div class="member-item"><div class="member-item-info"><div class="member-item-name">${m.name} <span class="badge ${m.status}">${statusLabel}</span> <span class="badge ${m.feePaid==='O'?'paid':'unpaid'}">${feeLabel}</span></div><div class="member-item-sub">${m.dept||'-'} · ${m.grade||'-'}학번${m.avg?' · 에버 '+m.avg:''}</div></div><div style="display:flex;gap:4px;flex-shrink:0"><button class="mgmt-btn" style="font-size:10px;padding:5px 8px;border-radius:7px;background:var(--border);color:var(--text)" onclick="openEditModal('${nm}')">✏️</button><button class="mgmt-btn ${m.feePaid==='O'?'amber':'green'}" style="font-size:10px;padding:5px 8px;border-radius:7px" onclick="toggleFee('${nm}','${m.feePaid}')">${m.feePaid==='O'?'💸':'💰'}</button>${m.status !== 'left'?`<button class="mgmt-btn red" style="font-size:10px;padding:5px 8px;border-radius:7px" onclick="setLeft('${nm}')">탈퇴</button>`:`<button class="mgmt-btn green" style="font-size:10px;padding:5px 8px;border-radius:7px" onclick="setActive('${nm}')">복귀</button>`}</div></div>`;
+  }).join('');
+}
+async function toggleFee(name, current) { const newFee = current === 'O' ? 'X' : 'O'; const msg = newFee==='O'?`"${name}" 납부 처리할까요?`:`"${name}" 납부 취소할까요?`; if(!confirm(msg)) return; const res = await callGAS({ action:'updateMember', name, feePaid: newFee }); if (res.ok) { const m = members.find(m => m.name === name); if (m) m.feePaid = newFee; toast(`✅ ${name} 회비 ${newFee==='O'?'납부':'미납'} 처리`); renderMemberList(); renderList(); renderDashSummary(); } else toast('❌ ' + (res.error || '실패')); }
+async function setLeft(name) { if (!confirm(`"${name}"을 탈퇴 처리할까요?`)) return; const res = await callGAS({ action:'updateMember', name, status:'left' }); if (res.ok) { const m = members.find(m => m.name === name); if (m) m.status = 'left'; toast(`✅ ${name} 탈퇴 처리됨`); renderMemberList(); renderList(); } else toast('❌ ' + (res.error || '실패')); }
+async function setActive(name) { const res = await callGAS({ action:'updateMember', name, status:'active' }); if (res.ok) { const m = members.find(m => m.name === name); if (m) m.status = 'active'; toast(`✅ ${name} 복귀 처리됨`); renderMemberList(); renderList(); } else toast('❌ ' + (res.error || '실패')); }
+async function addNewMember() {
+  const name   = document.getElementById('new-name').value.trim();
+  const dept   = document.getElementById('new-dept').value.trim();
+  const grade  = document.getElementById('new-grade').value.trim();
+  const status = document.getElementById('new-status').value;
+  if (!name) { toast('이름을 입력하세요'); return; }
+  const res = await callGAS({ action:'addMember', name, dept, grade, avg:0, feePaid:'X', status });
+  if (res.ok) {
+    members.push({ name, dept, grade, avg:0, feePaid:'X', status });
+    toast(`✅ ${name} 추가됨`);
+    ['new-name','new-dept','new-grade'].forEach(id => document.getElementById(id).value = '');
+    renderMemberList(); renderList(); updateDeptDatalist();
+  } else toast('❌ ' + (res.message || res.error));
+}
+function updateDeptDatalist() {
+  const dl = document.getElementById('dept-list');
+  if (!dl) return;
+  const KNOWN_NAMES = new Set(members.map(m => m.name));
+  const depts = [...new Set(members.map(m => (m.dept || '').trim()).filter(d => d && d.length > 2 && !KNOWN_NAMES.has(d) && !d.includes('★')))].sort();
+  dl.innerHTML = depts.map(d => `<option value="${d}">`).join('');
+}
+
+// ── 가계부 ──
+async function loadFinances() {
+  document.getElementById('fin-list').innerHTML = '<div class="loading"><div class="spinner"></div>불러오는 중...</div>';
+  try { const res = await gasGet('getFinances'); if (res.error) throw new Error(res.error); finances = res; renderFinances(); updateBalanceDisplay(); }
+  catch(e) { toast('가계부 로드 실패: ' + e.message); }
+}
+function updateBalanceDisplay() {
+  const paidCnt = members.filter(m => m.feePaid === 'O').length;
+  const feeIncome = paidCnt * 20000;
+  const finSum  = finances.reduce((s,f) => s + f.amount, 0);
+  const balance = feeIncome + finSum;
+  const income  = feeIncome + finances.filter(f => f.amount > 0).reduce((s,f) => s + f.amount, 0);
+  const expense = finances.filter(f => f.amount < 0).reduce((s,f) => s + f.amount, 0);
+  const bv = document.getElementById('balance-val'); const bi = document.getElementById('balance-income'); const be = document.getElementById('balance-expense');
+  if (bv) bv.textContent = fmt(balance) + '원';
+  if (bi) bi.textContent = '+' + fmt(income) + '원';
+  if (be) be.textContent = '-' + fmt(Math.abs(expense)) + '원';
+  const db = document.getElementById('d-balance'); const di = document.getElementById('d-income'); const de = document.getElementById('d-expense');
+  if (db) { db.textContent = fmt(balance) + '원'; const bankSaved = parseFloat(localStorage.getItem('pf_bank')); const diffEl = document.getElementById('d-bank-diff'); if (diffEl && !isNaN(bankSaved)) { const diff = bankSaved - balance; if (Math.abs(diff) <= 100) { diffEl.textContent = '✅ 통장 일치'; diffEl.style.color = 'var(--green)'; } else { diffEl.textContent = `⚠️ 빵구 ${diff>0?'+':''}${fmt(diff)}원`; diffEl.style.color = 'var(--red)'; } diffEl.style.display = 'block'; } }
+  if (di) di.textContent = '+' + fmt(income) + '원';
+  if (de) de.textContent = '-' + fmt(Math.abs(expense)) + '원';
+}
+function renderFinances() { const el = document.getElementById('fin-list'); if (!el) return; renderRoundingHistory(); if (!finances.length) { el.innerHTML = '<div class="empty">내역 없음</div>'; return; } const sorted = [...finances].sort((a,b) => b.date.localeCompare(a.date)); el.innerHTML = sorted.map(f => `<div class="fin-item" id="fin-row-${f.rowNum}"><div class="fin-item-info"><div class="fin-item-desc">${f.desc}</div><div class="fin-item-sub">${f.date} · ${f.category}${f.note?' · '+f.note:''}</div></div><div class="fin-item-amt ${f.amount>=0?'plus':'minus'}">${f.amount>=0?'+':''}${fmt(f.amount)}원</div><button class="fin-del" style="font-size:14px" onclick="openFinEdit(${JSON.stringify(f).replace(/"/g,'&quot;')})">✏️</button><button class="fin-del" onclick="deleteFinEntry(${f.rowNum})">🗑</button></div>`).join(''); }
+function calcRounding() { const total = parseFloat(document.getElementById('rd-total').value) || 0; const cnt = parseInt(document.getElementById('rd-cnt').value) || 0; const el = document.getElementById('rd-result'); if (!total || !cnt) { el.style.display='none'; return; } const perPerson = Math.ceil(total / cnt); const rounding = (perPerson * cnt) - total; el.style.display = 'block'; document.getElementById('rd-per').textContent = fmt(perPerson) + '원'; const remEl = document.getElementById('rd-remain'); remEl.textContent = (rounding >= 0 ? '+' : '') + fmt(rounding) + '원'; remEl.style.color = rounding >= 0 ? 'var(--green)' : 'var(--red)'; }
+async function submitRounding() { const eventTitle = document.getElementById('rd-event').value.trim(); const totalExpense = parseFloat(document.getElementById('rd-total').value); const attendees = parseInt(document.getElementById('rd-cnt').value); if (!eventTitle) { toast('모임명을 입력하세요'); return; } if (!totalExpense || isNaN(totalExpense)) { toast('총액을 입력하세요'); return; } if (!attendees || isNaN(attendees)) { toast('인원수를 입력하세요'); return; } const res = await callGAS({ action:'addRounding', eventTitle, totalExpense, attendees }); if (res.ok) { toast(`✅ 1인당 ${fmt(res.perPerson)}원 · 잔돈 ${res.rounding >= 0 ? '+' : ''}${res.rounding}원 기록됨`); document.getElementById('rd-event').value = ''; document.getElementById('rd-total').value = ''; document.getElementById('rd-cnt').value = ''; document.getElementById('rd-result').style.display = 'none'; loadFinances(); } else toast('❌ ' + (res.error || '실패')); }
+function renderRoundingHistory() { const el = document.getElementById('rounding-list'); const total = document.getElementById('rounding-total'); if (!el) return; const items = finances.filter(f => f.category === '반올림'); if (!items.length) { el.innerHTML = '<div class="empty">반올림 기록 없음</div>'; if (total) total.textContent = ''; return; } const sum = items.reduce((s, f) => s + f.amount, 0); if (total) total.textContent = `합계: ${sum >= 0 ? '+' : ''}${fmt(sum)}원`; const dr = document.getElementById('d-rounding'); if (dr) dr.textContent = (sum >= 0 ? '+' : '') + fmt(sum) + '원'; el.innerHTML = items.sort((a,b) => b.date.localeCompare(a.date)).map(f => `<div class="fin-item"><div class="fin-item-info"><div class="fin-item-desc">${f.desc}</div><div class="fin-item-sub">${f.date} · ${f.note || ''}</div></div><div class="fin-item-amt ${f.amount>=0?'plus':'minus'}">${f.amount>=0?'+':''}${fmt(f.amount)}원</div><button class="fin-del" onclick="deleteFinEntry(${f.rowNum})">🗑</button></div>`).join(''); }
+async function addFinanceEntry() { const date = document.getElementById('fin-date').value; const desc = document.getElementById('fin-desc').value.trim(); const amount = parseFloat(document.getElementById('fin-amount').value); const cat = document.getElementById('fin-cat').value; const note = document.getElementById('fin-note').value.trim(); if (!desc) { toast('내용을 입력하세요'); return; } if (isNaN(amount)) { toast('금액을 입력하세요'); return; } const res = await callGAS({ action:'addFinance', date, desc, amount, category:cat, note }); if (res.ok) { toast('✅ 추가됨'); document.getElementById('fin-desc').value = ''; document.getElementById('fin-amount').value = ''; document.getElementById('fin-note').value = ''; loadFinances(); } else toast('❌ ' + res.error); }
+async function deleteFinEntry(rowNum) { if (!confirm('삭제할까요?')) return; const res = await callGAS({ action:'deleteFinance', rowNum }); if (res.ok) { toast('🗑 삭제됨'); loadFinances(); } }
+
+// ── 점수 ──
+function previewScores() { const text = document.getElementById('sc-paste').value; const el = document.getElementById('sc-preview'); if (!text.trim()) { el.innerHTML = ''; return; } const parsed = parseScoreText(text); if (!parsed.length) { el.innerHTML = '<div style="color:var(--red);font-size:12px">파싱 실패 — 형식 확인</div>'; return; } el.innerHTML = `<div style="background:var(--bg);border-radius:9px;padding:10px;font-size:12px"><div style="font-weight:700;margin-bottom:6px;color:var(--navy)">미리보기 (${parsed.length}명)</div>${parsed.map(r => { const found = members.find(m => m.name === r.name); const warn = !found ? '⚠️ 미등록' : ''; return `<div style="display:flex;gap:8px;padding:3px 0;border-bottom:1px solid #e2e8f0"><span style="flex:1;font-weight:700">${r.name} ${warn}</span><span style="color:var(--muted)">총점 ${r.total}</span><span style="color:var(--muted)">${r.games}게임</span><span style="color:var(--navy);font-weight:700">avg ${Math.round(r.total/r.games*10)/10}</span></div>`; }).join('')}</div>`; }
+function parseScoreText(text) { const lines = text.trim().split('\n').filter(l => l.trim()); const result = []; lines.forEach(line => { const parts = line.includes('\t') ? line.split('\t').map(p => p.trim()) : line.split(',').map(p => p.trim()); if (parts.length >= 2) { const name = parts[0]; const total = parseFloat(parts[1]); const games = parts[2] ? parseInt(parts[2]) : 3; if (name && !isNaN(total) && total > 0) { result.push({ name, total, games: games || 3 }); } } }); return result; }
+async function submitBulkScore() { const date = document.getElementById('sc-date').value; const text = document.getElementById('sc-paste').value; const parsed = parseScoreText(text); if (!parsed.length) { toast('입력된 점수가 없어요'); return; } if (!date) { toast('날짜를 선택하세요'); return; } const btn = document.querySelector('[onclick="submitBulkScore()"]'); if (btn) { btn.textContent = '⏳ 저장 중...'; btn.disabled = true; } const scores = parsed.map(r => ({ name:r.name, date, totalScore:r.total, games:r.games })); let res; try { res = await gasPost({ action:'bulkAddScores', scores }); } catch(e) { if(btn){btn.textContent='✅ 일괄 저장';btn.disabled=false;} toast('❌ 저장 실패: '+e.message); return; } if (btn) { btn.textContent = '✅ 일괄 저장'; btn.disabled = false; } if (res.ok) { if (res.avgs) { Object.entries(res.avgs).forEach(([name, avg]) => { const m = members.find(m => m.name === name); if (m) m.avg = avg; }); } toast(`✅ ${res.count}명 저장 완료!`); document.getElementById('sc-paste').value = ''; document.getElementById('sc-preview').innerHTML = ''; loadRecentScores(); renderList(); } else { toast('❌ 저장 실패: ' + (res.error || '')); } }
+async function loadRecentScores() { const el = document.getElementById('recent-scores'); if (!el) return; try { const res = await gasGet('getScores'); if (res.error) throw new Error(res.error); const recent = [...res].sort((a,b) => b.date.localeCompare(a.date)).slice(0, 20); el.innerHTML = recent.map(s => `<div class="fin-item"><div class="fin-item-info"><div class="fin-item-desc">${s.name}</div><div class="fin-item-sub">${s.date} · ${s.games}게임 · 총 ${Math.round(s.totalScore)}</div></div><div class="fin-item-amt plus">avg ${s.avg}</div></div>`).join('') || '<div class="empty">없음</div>'; } catch(e) { el.innerHTML = '<div class="empty">로드 실패</div>'; } }
+
+// ── 대시보드 요약 ──
+function renderDashSummary() {
+  const active  = members.filter(m => m.status === 'active');
+  const paid    = members.filter(m => m.feePaid === 'O');
+  const unpaid  = active.filter(m => m.feePaid !== 'O');
+  const guest   = members.filter(m => m.status === 'guest');
+  const dTotal=document.getElementById('d-total'); const dFeeR=document.getElementById('d-fee-rate'); const dFeeR2=document.getElementById('d-fee-rate2'); const dFeeSub=document.getElementById('d-fee-sub'); const dFeeSub2=document.getElementById('d-fee-sub2'); const dUnpaid=document.getElementById('d-unpaid'); const dGuest=document.getElementById('d-guest');
+  if (dTotal)   dTotal.textContent   = active.length;
+  const rate = active.length ? Math.round(paid.length/active.length*100) : 0;
+  if (dFeeR)    dFeeR.textContent    = rate + '%';
+  if (dFeeR2)   dFeeR2.textContent   = rate + '%';
+  if (dFeeSub)  dFeeSub.textContent  = paid.length + '/' + active.length + '명 납부';
+  if (dFeeSub2) dFeeSub2.textContent = paid.length + '/' + active.length + '명 납부';
+  if (dUnpaid)  dUnpaid.textContent  = unpaid.length;
+  if (dGuest)   dGuest.textContent   = guest.length;
+  const ul = document.getElementById('unpaid-list'); const uc = document.getElementById('unpaid-cnt');
+  if (ul) { ul.innerHTML = unpaid.length ? unpaid.map(m => `<div class="fin-item" style="padding:7px 10px"><div class="fin-item-info"><div class="fin-item-desc">${m.name}</div><div class="fin-item-sub">${m.dept||'-'} · ${m.grade||'-'}학번</div></div><button class="mgmt-btn green" style="font-size:10px;padding:4px 8px;border-radius:7px" onclick="toggleFee('${m.name.replace(/'/g,"\\'")}','X')">납부처리</button></div>`).join('') : '<div class="empty">미납자 없음 🎉</div>'; }
+  if (uc) uc.textContent = unpaid.length + '명';
+  updateBalanceDisplay();
+}
+
+// ── 가계부 수정 ──
+let _editingFin = null;
+function openFinEdit(f) { if (typeof f === 'string') f = JSON.parse(f.replace(/&quot;/g,'"')); _editingFin = f; document.getElementById('fin-edit-date').value = f.date || ''; document.getElementById('fin-edit-desc').value = f.desc || ''; document.getElementById('fin-edit-amount').value = f.amount || 0; document.getElementById('fin-edit-cat').value = f.category || '기타'; document.getElementById('fin-edit-note').value = f.note || ''; document.getElementById('fin-edit-rownum').value = f.rowNum; document.getElementById('fin-edit-modal').classList.add('show'); }
+function closeFinEdit() { document.getElementById('fin-edit-modal').classList.remove('show'); _editingFin = null; }
+async function submitFinEdit() { const rowNum = parseInt(document.getElementById('fin-edit-rownum').value); const date = document.getElementById('fin-edit-date').value; const desc = document.getElementById('fin-edit-desc').value.trim(); const amount = parseFloat(document.getElementById('fin-edit-amount').value); const cat = document.getElementById('fin-edit-cat').value; const note = document.getElementById('fin-edit-note').value.trim(); if (!desc) { toast('내용을 입력하세요'); return; } if (isNaN(amount)) { toast('금액을 입력하세요'); return; } const delRes = await callGAS({ action:'deleteFinance', rowNum }); if (!delRes.ok) { toast('❌ 수정 실패 (삭제 단계)'); return; } const addRes = await callGAS({ action:'addFinance', date, desc, amount, category:cat, note }); if (addRes.ok) { toast('✅ 수정 완료'); closeFinEdit(); loadFinances(); } else { toast('❌ 수정 실패: ' + (addRes.error||'')); } }
+
+// ── 통장 빵구 체크 ──
+function checkBankBalance() {
+  const bankInput = parseFloat(document.getElementById('bank-input').value);
+  if (isNaN(bankInput)) { toast('잔액을 입력하세요'); return; }
+  const paidCnt = members.filter(m => m.feePaid === 'O').length;
+  const feeIncome = paidCnt * 20000;
+  const finSum = finances.reduce((s, f) => s + f.amount, 0);
+  const calcBalance = feeIncome + finSum;
+  const diff = bankInput - calcBalance;
+  const el = document.getElementById('bank-result'); const inner = document.getElementById('bank-result-inner');
+  el.style.display = 'block';
+  if (Math.abs(diff) <= 100) { inner.innerHTML = `<div style="background:#dcfce7;border-radius:9px;padding:12px;text-align:center"><div style="font-size:20px;margin-bottom:4px">✅</div><div style="font-weight:900;color:#065f46;font-size:14px">일치!</div><div style="font-size:11px;color:#166534;margin-top:3px">통장 ${fmt(bankInput)}원 = 회계 ${fmt(calcBalance)}원 (차이 ${diff}원)</div></div>`; }
+  else { const sign = diff > 0 ? '통장이' : '회계가'; const absD = Math.abs(diff); inner.innerHTML = `<div style="background:#fee2e2;border-radius:9px;padding:12px"><div style="font-weight:900;color:#991b1b;font-size:14px;margin-bottom:8px">⚠️ 차이 발생!</div><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px"><span style="color:#64748b">실제 통장</span><strong>${fmt(bankInput)}원</strong></div><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px"><span style="color:#64748b">회계상 잔액</span><strong>${fmt(calcBalance)}원</strong></div><div style="display:flex;justify-content:space-between;font-size:13px;margin-top:8px;padding-top:8px;border-top:1px solid #fca5a5"><span style="color:#991b1b;font-weight:700">빵구 (${sign} ${fmt(absD)}원 ${diff>0?'더 많음':'부족'})</span><strong style="color:#ef4444;font-size:15px">${diff>0?'+':''}${fmt(diff)}원</strong></div><div style="font-size:10px;color:#b91c1c;margin-top:6px">가계부 누락 항목 또는 지출 미기록을 확인하세요</div></div>`; }
+  localStorage.setItem('pf_bank', bankInput.toString());
+}
+
+// ── 공통 유틸 ──
+function fmt(n) { return Math.round(n).toLocaleString('ko-KR'); }
+function updateLastSaved(){ const el=document.getElementById('last-saved'); if(!el||!_lastSavedAt) return; const h=String(_lastSavedAt.getHours()).padStart(2,'0'); const m=String(_lastSavedAt.getMinutes()).padStart(2,'0'); el.textContent=`마지막 저장 ${h}:${m}`; el.style.display='inline'; }
+function shareText(text, title='팀퍼펙트'){ if(navigator.share){ navigator.share({title,text}).catch(()=>{}); }else{ navigator.clipboard.writeText(text).then(()=>toast('📋 복사됨!')); } }
+async function callGAS(body) { try { return await gasPost(body); } catch(e) { try { return await gasGet(body.action, body); } catch(e2) { return { error: e2.message }; } } }
+
+// ══════════════════════════════════════════════════════
+//  회원 수정 모달
+// ══════════════════════════════════════════════════════
+let _editingMember = null;
+function openEditModal(name) {
+  const m = members.find(m => m.name === name);
+  if (!m) { toast('회원을 찾을 수 없습니다'); return; }
+  _editingMember = m;
+  document.getElementById('edit-name').value = m.name;
+  document.getElementById('edit-dept').value = m.dept || '';
+  document.getElementById('edit-grade').value = m.grade || '';
+  document.getElementById('edit-avg').value = m.avg || 0;
+  document.getElementById('edit-fee').value = m.feePaid || 'X';
+  document.getElementById('edit-status').value = m.status || 'active';
+  document.getElementById('edit-modal-title').textContent = `${m.name} 수정`;
+  const dl = document.getElementById('dept-list-edit');
+  const depts = [...new Set(members.map(m=>(m.dept||'').trim()).filter(d=>d&&d.length>2))].sort();
+  dl.innerHTML = depts.map(d=>`<option value="${d}">`).join('');
+  document.getElementById('edit-modal').classList.add('show');
+}
+function closeEditModal() { document.getElementById('edit-modal').classList.remove('show'); _editingMember = null; }
+async function submitEdit() {
+  if (!_editingMember) return;
+  const name   = _editingMember.name;
+  const dept   = document.getElementById('edit-dept').value.trim();
+  const grade  = document.getElementById('edit-grade').value.trim();
+  const avg    = parseFloat(document.getElementById('edit-avg').value) || 0;
+  const fee    = document.getElementById('edit-fee').value;
+  const status = document.getElementById('edit-status').value;
+  const res = await callGAS({ action:'updateMember', name, dept, grade, avg, feePaid:fee, status });
+  if (res.ok) { const m = members.find(m => m.name === name); if (m) { m.dept=dept; m.grade=grade; m.avg=avg; m.feePaid=fee; m.status=status; } toast(`✅ ${name} 수정 완료`); closeEditModal(); renderMemberList(); renderList(); renderDashSummary(); }
+  else { toast('❌ 수정 실패: ' + (res.error || '')); }
+}
+async function deleteCurrentMember() {
+  if (!_editingMember) return;
+  const name = _editingMember.name;
+  if (!confirm(`⚠️ "${name}"을 완전 삭제합니다.\n\n정말 삭제할까요?`)) return;
+  if (!confirm(`마지막 확인: "${name}" 삭제합니다.`)) return;
+  const res = await callGAS({ action:'deleteMember', name });
+  if (res.ok) { members = members.filter(m => m.name !== name); toast(`🗑 ${name} 삭제됨`); closeEditModal(); renderMemberList(); renderList(); renderDashSummary(); }
+  else { toast('❌ 삭제 실패: ' + (res.error || '')); }
+}
+
+// ══════════════════════════════════════════════════════
+//  현장 출석체크 — 전면 리뉴얼
+//  ★ 핵심 변경:
+//  1) 이벤트 선택으로 참석 예정자만 불러옴
+//  2) 전체 멤버도 추가 가능 (필터: 참석예정 / 전체)
+//  3) 카드형 그리드로 UX 개선
+// ══════════════════════════════════════════════════════
+
+// 현장 탭 초기화
+function initRollTab() {
+  renderRollEvtChips();
+  renderRoll();
+}
+
+// 현장용 이벤트 칩 렌더링
+function renderRollEvtChips() {
+  const el = document.getElementById('roll-evt-chips');
+  if (!el) return;
+  if (!events.length) {
+    el.innerHTML = '<div style="color:rgba(255,255,255,.4);font-size:12px;padding:6px 0">동기화 후 모임이 표시됩니다</div>';
+    return;
+  }
+  const now = new Date(); now.setHours(0,0,0,0);
+  const sorted = [...events].sort((a,b) => {
+    const da = a.date ? new Date(a.date) : null, db = b.date ? new Date(b.date) : null;
+    if (!da && !db) return 0; if (!da) return 1; if (!db) return -1;
+    const fa = da >= now, fb = db >= now;
+    if (fa && fb) return da - db;
+    if (fa && !fb) return -1;
+    if (!fa && fb) return 1;
+    return db - da;
+  });
+  el.innerHTML = sorted.map(ev => {
+    const isFuture = ev.date && new Date(ev.date) >= now;
+    const isSel = ev.eventId === rollEventId;
+    return `<div class="roll-evt-chip ${isSel ? 'active' : ''} ${isFuture && !isSel ? 'future-evt' : ''}"
+      onclick="selectRollEvent('${ev.eventId}', '${ev.title.replace(/'/g,"\\'")}')">
+      ${isFuture && !isSel ? '🔜 ' : ''}${ev.title}
+    </div>`;
+  }).join('');
+}
+
+// 현장 이벤트 선택 → 참석 예정자를 rollMap 초기값으로
+async function selectRollEvent(eventId, title) {
+  rollEventId = eventId;
+  renderRollEvtChips();
+
+  // 서버에서 참석 예정자 불러오기
+  rollMap = {};
+  if (GAS_URL && eventId) {
+    try {
+      const res = await gasGet('getAttendance', { eventId });
+      if (res.attendees) {
+        // 참석 예정 명단 세팅 (기본은 미도착)
+        res.attendees.forEach(n => { rollMap[n] = false; });
+        toast(`📋 ${res.attendees.length}명 참석 예정 불러옴`);
+      }
+    } catch(e) {
+      toast('불러오기 실패, 로컬 데이터 사용');
+      // 로컬 statusMap 기반으로 초기화
+      members.filter(m => isVisibleMember(m) && statusMap[m.name] === 'attend')
+        .forEach(m => { rollMap[m.name] = false; });
+    }
+  } else {
+    // GAS 없으면 로컬 기준
+    members.filter(m => isVisibleMember(m) && statusMap[m.name] === 'attend')
+      .forEach(m => { rollMap[m.name] = false; });
+  }
+
+  renderRoll();
+}
+
+// rollFilter 설정
+function setRollFilter(f, el) {
+  rollFilter = f;
+  document.querySelectorAll('.roll-fp').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  renderRoll();
+}
+
+// 현장 출석 렌더링
+function renderRoll() {
+  const q = (document.getElementById('roll-search')?.value || '').toLowerCase();
+  const content = document.getElementById('roll-content');
+
+  // 이벤트 미선택
+  if (!rollEventId) {
+    content.innerHTML = `<div class="roll-no-event"><div class="roll-no-event-icon">📅</div><div class="roll-no-event-txt">모임을 먼저 선택하세요</div><div class="roll-no-event-sub">위에서 오늘 모임을 탭하면<br>참석 예정 인원이 표시됩니다</div></div>`;
+    document.getElementById('roll-cnt-here').textContent = '0';
+    document.getElementById('roll-cnt-left').textContent = '0';
+    document.getElementById('roll-cnt-total').textContent = '0';
+    return;
+  }
+
+  // 대상자 결정
+  // rollFilter === 'attend': 참석예정자(rollMap에 있는 사람)만
+  // rollFilter === 'all': 전체 멤버
+  // rollFilter === 'here': 도착한 사람
+  // rollFilter === 'pending': 미도착
+
+  const rollNames = new Set(Object.keys(rollMap)); // 참석 예정자
+
+  // 전체 대상 (롤맵에 등록된 사람 기준)
+  let allTarget = members.filter(m => isVisibleMember(m) && rollNames.has(m.name));
+
+  const arrived = allTarget.filter(m => rollMap[m.name] === true);
+  const pending = allTarget.filter(m => rollMap[m.name] === false);
+
+  // 카운터 업데이트
+  document.getElementById('roll-cnt-here').textContent = arrived.length;
+  document.getElementById('roll-cnt-left').textContent = pending.length;
+  document.getElementById('roll-cnt-total').textContent = allTarget.length;
+
+  // 필터 적용
+  let filtered;
+  if (rollFilter === 'here')    filtered = arrived;
+  else if (rollFilter === 'pending') filtered = pending;
+  else if (rollFilter === 'attend') {
+    // 참석예정 = rollMap에 있는 사람 (전체 보기와 같음)
+    filtered = allTarget;
+  }
+  else {
+    // 'all' = 전체 멤버 (예정 + 예정 외)
+    filtered = members.filter(m => isVisibleMember(m));
+  }
+
+  // 검색 필터
+  if (q) filtered = filtered.filter(m => m.name.includes(q) || (m.dept||'').includes(q));
+
+  if (!filtered.length) {
+    content.innerHTML = `<div class="roll-empty"><div class="roll-empty-icon">${rollFilter === 'here' ? '🎳' : '⏳'}</div><div class="roll-empty-txt">${rollFilter === 'here' ? '아직 도착자 없음' : '모두 도착했어요!'}</div><div class="roll-empty-sub">탭해서 도착 체크</div></div>`;
+    return;
+  }
+
+  // 이름 첫 글자로 아바타
+  const avatarChar = (name) => name.charAt(0);
+
+  // 도착/미도착 섹션 분리 렌더링
+  const arrivedInFilter = filtered.filter(m => rollMap[m.name] === true);
+  const pendingInFilter  = filtered.filter(m => rollMap[m.name] !== true);
+
+  let html = '';
+
+  if (arrivedInFilter.length > 0) {
+    html += `<div class="roll-section-lbl">✅ 도착 <span class="roll-section-cnt green">${arrivedInFilter.length}명</span></div>`;
+    html += `<div class="roll-grid">`;
+    html += arrivedInFilter.map(m => rollChip(m)).join('');
+    html += '</div>';
+  }
+
+  if (pendingInFilter.length > 0) {
+    html += `<div class="roll-section-lbl">⏳ 미도착 <span class="roll-section-cnt">${pendingInFilter.length}명</span></div>`;
+    html += `<div class="roll-grid">`;
+    html += pendingInFilter.map(m => rollChip(m)).join('');
+    html += '</div>';
+  }
+
+  content.innerHTML = html;
+}
+
+// 현장 체크 칩 렌더링
+function rollChip(m) {
+  const here = rollMap[m.name] === true;
+  const isGuest = m.status === 'guest';
+  const nm = m.name.replace(/'/g, "\\'");
+  const initials = m.name.charAt(0);
+  return `<div class="roll-chip ${here ? 'here' : ''} ${isGuest ? 'guest-chip' : ''}"
+    onclick="toggleRoll('${nm}')" role="checkbox" aria-checked="${here}">
+    ${isGuest ? `<div class="rc-guest-tag">G</div>` : ''}
+    <div class="rc-avatar">${here ? '✓' : initials}</div>
+    <div class="rc-name">${m.name}</div>
+    <div class="rc-dept">${m.dept||''}</div>
+    ${m.avg ? `<div class="rc-avg">${m.avg}</div>` : ''}
+    <div class="rc-badge">✓</div>
+  </div>`;
+}
+
+function toggleRoll(name) {
+  // rollMap에 없으면 추가 (전체 탭에서 예정 외 인원 체크 시)
+  if (!(name in rollMap)) rollMap[name] = false;
+  rollMap[name] = !rollMap[name];
+  renderRoll();
+}
+
+function rollReset() {
+  if (!confirm('현장 체크를 초기화할까요?')) return;
+  Object.keys(rollMap).forEach(k => { rollMap[k] = false; });
+  renderRoll();
+  toast('🔄 초기화됨');
+}
+
+function rollCheckAll() {
+  const filtered = members.filter(m => isVisibleMember(m));
+  filtered.forEach(m => { rollMap[m.name] = true; });
+  renderRoll();
+  toast('✅ 전체 도착 체크');
+}
+
+function rollCopyMissing() {
+  const rollNames = new Set(Object.keys(rollMap));
+  const missing = members
+    .filter(m => isVisibleMember(m) && rollNames.has(m.name) && !rollMap[m.name])
+    .map(m => m.name);
+  if (!missing.length) { toast('미도착자 없음 🎉'); return; }
+  const text = `미도착 ${missing.length}명:\n` + missing.join(', ');
+  shareText(text, '팀퍼펙트 미도착 명단');
+  toast(`📋 미도착 ${missing.length}명 복사됨`);
+}
+
+// init
+updateLaneLbl();
+updateManualLaneLbl();
+</script>
 </body>
 </html>
