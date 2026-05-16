@@ -879,34 +879,38 @@ async function gasGet(action, params={}){
   const url=new URL(GAS_URL);
   url.searchParams.set('action',action);
   Object.entries(params).forEach(([k,v])=>url.searchParams.set(k,typeof v==='object'?JSON.stringify(v):v));
-  const ctrl=new AbortController();
-  const timer=setTimeout(()=>ctrl.abort(),20000);
-  try{
-    const r=await fetch(url.toString(),{signal:ctrl.signal});
-    clearTimeout(timer);
-    return r.json();
-  }catch(e){
-    clearTimeout(timer);
-    if(e.name==='AbortError') throw new Error('서버 응답 시간 초과 (20초)');
-    throw e;
+  for(let attempt=0; attempt<2; attempt++){
+    const ctrl=new AbortController();
+    const ms = attempt===0 ? 25000 : 40000;
+    const timer=setTimeout(()=>ctrl.abort(), ms);
+    try{
+      const r=await fetch(url.toString(),{signal:ctrl.signal});
+      clearTimeout(timer);
+      return r.json();
+    }catch(e){
+      clearTimeout(timer);
+      if(e.name==='AbortError' && attempt===0){ continue; }
+      if(e.name==='AbortError') throw new Error('서버 응답 시간 초과 — GAS 배포 후 30초 대기 후 재시도');
+      throw e;
+    }
   }
 }
+
 async function gasPost(body){
-  const ctrl=new AbortController();
-  const timer=setTimeout(()=>ctrl.abort(),25000);
-  try{
-    const res=await fetch(GAS_URL,{
-      method:'POST',
-      headers:{'Content-Type':'text/plain;charset=utf-8'},
-      body:JSON.stringify(body),
-      signal:ctrl.signal
-    });
-    clearTimeout(timer);
-    return JSON.parse(await res.text());
-  }catch(e){
-    clearTimeout(timer);
-    if(e.name==='AbortError') throw new Error('서버 응답 시간 초과 (25초)');
-    throw e;
+  for(let attempt=0; attempt<2; attempt++){
+    const ctrl=new AbortController();
+    const ms = attempt===0 ? 25000 : 40000;
+    const timer=setTimeout(()=>ctrl.abort(), ms);
+    try{
+      const res=await fetch(GAS_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(body),signal:ctrl.signal});
+      clearTimeout(timer);
+      return JSON.parse(await res.text());
+    }catch(e){
+      clearTimeout(timer);
+      if(e.name==='AbortError' && attempt===0){ continue; }
+      if(e.name==='AbortError') throw new Error('서버 응답 시간 초과 — GAS 배포 후 30초 대기 후 재시도');
+      throw e;
+    }
   }
 }
 
@@ -969,7 +973,7 @@ async function syncAll(){
     renderDashSummary();
   }catch(e){
     setSS('err','오류');
-    document.getElementById('mlist').innerHTML=`<div class="err-box">❌ <strong>동기화 실패</strong><br><br>${e.message}<br><br>· GAS URL 확인<br>· 배포 → "모든 사용자" 확인<br>· 시트명 확인 (members/events)</div>`;
+    document.getElementById('mlist').innerHTML=`<div class="err-box">❌ <strong>동기화 실패</strong><br><br>${e.message}<br><br>· GAS 배포 직후라면 30초 후 재시도<br>· GAS URL 확인 (⚙️ 설정)<br>· 배포 → "모든 사용자" 권한 확인</div>`;
   }
 }
 
@@ -2108,9 +2112,6 @@ function renderDashSummary() {
 // ══════════════════════════════════════════════════════
 //  가계부 수정 (UPDATE)
 // ══════════════════════════════════════════════════════
-let _finFilter = 'all';
-
-
 // ── 가계부 필터 ──
 let _finFilter = 'all';
 function setFinFilter(f, el) {
