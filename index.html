@@ -594,100 +594,79 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
 
     <!-- 가계부 -->
     <div id="msec-finance" style="display:none">
-      <!-- 통장 잔액 입력 + 빵구 체크 -->
-      <div class="mgmt-card" id="bank-check-card">
-        <div class="mgmt-title">🏦 실제 통장 잔액 입력 (빵구 확인)</div>
-        <div class="mgmt-row">
-          <input class="mgmt-inp" id="bank-input" type="number" placeholder="실제 통장 잔액 입력 (원)">
-          <button class="mgmt-btn navy" onclick="checkBankBalance()">확인</button>
+
+      <!-- 잔액 배너 -->
+      <div style="background:linear-gradient(135deg,#0d1b35,#1e3a8a);border-radius:16px;padding:18px;margin-bottom:10px">
+        <div style="font-size:10px;color:rgba(255,255,255,.5);font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">💰 회계 잔액</div>
+        <div style="font-size:34px;font-weight:900;color:#fff;line-height:1" id="balance-val">-</div>
+        <div style="display:flex;gap:16px;margin-top:8px;font-size:11px">
+          <span style="color:rgba(255,255,255,.6)">수입 <strong style="color:#34d399" id="balance-income">-</strong></span>
+          <span style="color:rgba(255,255,255,.6)">지출 <strong style="color:#f87171" id="balance-expense">-</strong></span>
         </div>
-        <div id="bank-result" style="margin-top:8px;display:none">
-          <div id="bank-result-inner"></div>
+        <div style="margin-top:12px;background:rgba(255,255,255,.08);border-radius:10px;padding:10px 12px">
+          <div style="font-size:10px;color:rgba(255,255,255,.4);font-weight:700;margin-bottom:6px">🏦 실제 통장 잔액으로 빵구 확인</div>
+          <div style="display:flex;gap:7px">
+            <input type="number" id="bank-input" placeholder="통장 잔액 입력"
+              style="flex:1;background:rgba(255,255,255,.1);border:1.5px solid rgba(255,255,255,.15);border-radius:8px;padding:7px 10px;font-size:13px;color:#fff;font-family:'Noto Sans KR',sans-serif;outline:none">
+            <button onclick="checkBankBalance()"
+              style="background:var(--amber);border:none;color:var(--navy);font-size:12px;font-weight:700;font-family:'Noto Sans KR',sans-serif;padding:0 16px;border-radius:8px;cursor:pointer;flex-shrink:0">확인</button>
+          </div>
+          <div id="bank-result" style="margin-top:8px;display:none"><div id="bank-result-inner"></div></div>
         </div>
       </div>
 
-      <!-- 잔액 카드 -->
-      <div class="balance-card">
-        <div class="balance-lbl">💰 현재 잔액</div>
-        <div class="balance-val" id="balance-val">-</div>
-        <div class="balance-sub">
-          <span>수입 <strong id="balance-income">-</strong></span>
-          <span>지출 <strong id="balance-expense">-</strong></span>
-        </div>
-      </div>
-
-      <!-- 뒷풀이 반올림 계산기 -->
+      <!-- 내역 추가 -->
       <div class="mgmt-card">
-        <div class="mgmt-title">🔢 뒷풀이 반올림 계산기</div>
-        <div style="font-size:11px;color:var(--muted);margin-bottom:10px;line-height:1.6">
-          총액 ÷ 인원수 = 1인당 금액(올림) → 잔돈 자동 계산 후 가계부 기록
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+          <div class="mgmt-title" style="margin-bottom:0">➕ 내역 추가</div>
         </div>
-        <div class="mgmt-lbl">모임 (ex: [정기] 5/14)</div>
-        <div class="mgmt-row"><input class="mgmt-inp" id="rd-event" type="text" placeholder="[정기] 5/14" list="event-list-rd">
-          <datalist id="event-list-rd"></datalist>
-        </div>
-        <div style="display:flex;gap:8px">
-          <div style="flex:1">
-            <div class="mgmt-lbl">뒷풀이 총액</div>
-            <input class="mgmt-inp" id="rd-total" type="number" placeholder="150000" oninput="calcRounding()">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
+          <div>
+            <div class="mgmt-lbl">날짜</div>
+            <input class="mgmt-inp" id="fin-date" type="date">
           </div>
-          <div style="flex:1">
-            <div class="mgmt-lbl">참석 인원수</div>
-            <input class="mgmt-inp" id="rd-cnt" type="number" placeholder="12" oninput="calcRounding()">
-          </div>
-        </div>
-        <div id="rd-result" style="background:var(--bg);border-radius:9px;padding:10px;margin:8px 0;display:none">
-          <div style="display:flex;justify-content:space-between;margin-bottom:4px">
-            <span style="font-size:12px;color:var(--muted)">1인당 금액</span>
-            <span style="font-size:15px;font-weight:900;color:var(--navy)" id="rd-per">-</span>
-          </div>
-          <div style="display:flex;justify-content:space-between">
-            <span style="font-size:12px;color:var(--muted)">잔돈 (가계부 반영)</span>
-            <span style="font-size:15px;font-weight:900" id="rd-remain">-</span>
+          <div>
+            <div class="mgmt-lbl">카테고리</div>
+            <select class="mgmt-sel" id="fin-cat" style="width:100%">
+              <option value="수입">💚 수입</option>
+              <option value="지출">❤️ 지출</option>
+              <option value="경품">🎁 경품</option>
+              <option value="이자">🏦 이자</option>
+              <option value="캐시백">💳 캐시백</option>
+              <option value="이월">📦 이월</option>
+              <option value="기타">⚙️ 기타</option>
+            </select>
           </div>
         </div>
-        <button class="mgmt-btn navy" style="width:100%;height:38px" onclick="submitRounding()">💾 가계부에 기록</button>
-      </div>
-
-      <!-- 반올림 이력 -->
-      <div class="mgmt-card">
-        <div class="mgmt-title">📋 반올림 이력 <span id="rounding-total" style="font-size:11px;color:var(--muted);font-weight:400"></span></div>
-        <div id="rounding-list"></div>
-      </div>
-
-      <!-- 수입/지출 입력 -->
-      <div class="mgmt-card">
-        <div class="mgmt-title">➕ 내역 추가</div>
-        <div class="mgmt-lbl">날짜</div>
-        <div class="mgmt-row"><input class="mgmt-inp" id="fin-date" type="date"></div>
         <div class="mgmt-lbl">내용</div>
-        <div class="mgmt-row"><input class="mgmt-inp" id="fin-desc" type="text" placeholder="팀퍼펙트 경품 지급"></div>
-        <div class="mgmt-lbl">금액 (지출은 - 붙이기)</div>
-        <div class="mgmt-row">
-          <input class="mgmt-inp" id="fin-amount" type="number" placeholder="-50000">
-          <select class="mgmt-sel" id="fin-cat" style="max-width:100px">
-            <option value="수입">수입</option>
-            <option value="지출">지출</option>
-            <option value="경품">경품</option>
-            <option value="이자">이자</option>
-            <option value="캐시백">캐시백</option>
-            <option value="이월">이월</option>
-            <option value="기타">기타</option>
-          </select>
+        <input class="mgmt-inp" id="fin-desc" type="text" placeholder="예: 5/14 경품 지급" style="margin-bottom:8px">
+        <div style="display:flex;gap:8px;margin-bottom:10px">
+          <div style="flex:1">
+            <div class="mgmt-lbl">금액 (지출은 - 붙이기)</div>
+            <input class="mgmt-inp" id="fin-amount" type="number" placeholder="-50000">
+          </div>
+          <div style="flex:1">
+            <div class="mgmt-lbl">메모 (선택)</div>
+            <input class="mgmt-inp" id="fin-note" type="text">
+          </div>
         </div>
-        <div class="mgmt-lbl">메모 (선택)</div>
-        <div class="mgmt-row"><input class="mgmt-inp" id="fin-note" type="text" placeholder=""></div>
-        <button class="mgmt-btn navy" style="width:100%;height:40px" onclick="addFinanceEntry()">✅ 추가</button>
+        <button class="mgmt-btn navy" style="width:100%;height:42px;font-size:13px;border-radius:10px" onclick="addFinanceEntry()">✅ 추가</button>
       </div>
 
       <!-- 내역 목록 -->
       <div class="mgmt-card">
-        <div class="mgmt-title">📋 내역 목록</div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+          <div class="mgmt-title" style="margin-bottom:0">📋 내역</div>
+          <div style="display:flex;gap:4px">
+            <button onclick="setFinFilter('all',this)" id="ff-all" class="tab-pill active" style="padding:4px 8px;font-size:10px">전체</button>
+            <button onclick="setFinFilter('in',this)" id="ff-in" class="tab-pill" style="padding:4px 8px;font-size:10px">수입</button>
+            <button onclick="setFinFilter('out',this)" id="ff-out" class="tab-pill" style="padding:4px 8px;font-size:10px">지출</button>
+          </div>
+        </div>
         <div id="fin-list"><div class="loading"><div class="spinner"></div>불러오는 중...</div></div>
       </div>
-    </div>
 
-    <!-- 점수 입력 -->
+    </div>
     <div id="msec-score" style="display:none">
       <div class="mgmt-card">
         <div class="mgmt-title">🎳 점수 일괄 입력</div>
@@ -982,8 +961,12 @@ async function syncAll(){
     setSS('ok',`${members.length}명`);
     setScrHeight(); renderList(); save();
     toast(`✅ ${members.length}명 동기화 완료`);
-    // ★ 서버 paidCount 확보 (left 포함)
-    try{ const d=await gasGet('getDashboard'); if(d.paidCount) _serverPaidCount=d.paidCount; }catch(e){}
+    // ★ FIX: 서버 paidCount 즉시 확보 → 잔액 계산에 반영
+    try{
+      const d=await gasGet('getDashboard');
+      if(d.paidCount){ _serverPaidCount=d.paidCount; }
+    }catch(e){}
+    renderDashSummary();
   }catch(e){
     setSS('err','오류');
     document.getElementById('mlist').innerHTML=`<div class="err-box">❌ <strong>동기화 실패</strong><br><br>${e.message}<br><br>· GAS URL 확인<br>· 배포 → "모든 사용자" 확인<br>· 시트명 확인 (members/events)</div>`;
@@ -1610,7 +1593,7 @@ async function renderDash(){
     _serverPaidCount=res.paidCount||null; // left 포함 전체 납부자
 
     document.getElementById('d-total').textContent=res.totalMembers||'-';
-    document.getElementById('d-att').textContent='-'; // B9: 세션 데이터 미사용
+    const dAttEl=document.getElementById('d-att'); if(dAttEl) dAttEl.textContent=members.filter(m=>statusMap[m.name]==='attend').length||'-';
     document.getElementById('d-fee-rate').textContent=(res.feeRate||0)+'%';
     document.getElementById('d-fee-sub').textContent=`${res.paidCount||0}/${res.totalMembers||0}명 납부`;
     document.getElementById('d-unpaid').textContent=res.unpaidCount||'0';
@@ -1891,56 +1874,28 @@ function renderFinances() {
   if (!el) return;
   renderRoundingHistory();
   if (!finances.length) { el.innerHTML = '<div class="empty">내역 없음</div>'; return; }
-  const sorted = [...finances].sort((a,b) => b.date.localeCompare(a.date));
-  el.innerHTML = sorted.map(f => `
-    <div class="fin-item" id="fin-row-${f.rowNum}">
+
+  let filtered = [...finances];
+  if (_finFilter === 'in')  filtered = filtered.filter(f => f.amount > 0);
+  if (_finFilter === 'out') filtered = filtered.filter(f => f.amount < 0);
+  filtered.sort((a,b) => b.date.localeCompare(a.date));
+
+  const CAT_COLOR = {수입:'#10b981',지출:'#ef4444',경품:'#f59e0b',이자:'#3b82f6',캐시백:'#8b5cf6',이월:'#64748b',반올림:'#92400e',환불:'#dc2626',기타:'#64748b'};
+
+  el.innerHTML = filtered.map(f => {
+    const color = CAT_COLOR[f.category] || '#64748b';
+    return `<div class="fin-item" id="fin-row-${f.rowNum}" style="border-left:3px solid ${color}">
       <div class="fin-item-info">
         <div class="fin-item-desc">${f.desc}</div>
-        <div class="fin-item-sub">${f.date} · ${f.category}${f.note?' · '+f.note:''}</div>
+        <div class="fin-item-sub">${f.date} · <span style="color:${color};font-weight:700">${f.category}</span>${f.note?' · '+f.note:''}</div>
       </div>
       <div class="fin-item-amt ${f.amount>=0?'plus':'minus'}">${f.amount>=0?'+':''}${fmt(f.amount)}원</div>
       <button class="fin-del" style="font-size:14px" onclick="openFinEdit(${JSON.stringify(f).replace(/"/g,'&quot;')})">✏️</button>
       <button class="fin-del" onclick="deleteFinEntry(${f.rowNum})">🗑</button>
-    </div>`).join('');
+    </div>`;
+  }).join('') || '<div class="empty">내역 없음</div>';
 }
 
-
-// ── 반올림 계산기 ──
-function calcRounding() {
-  const total = parseFloat(document.getElementById('rd-total').value) || 0;
-  const cnt   = parseInt(document.getElementById('rd-cnt').value) || 0;
-  const el    = document.getElementById('rd-result');
-  if (!total || !cnt) { el.style.display='none'; return; }
-
-  const perPerson = Math.ceil(total / cnt);
-  const rounding  = (perPerson * cnt) - total; // 양수 = 동아리 이득
-
-  el.style.display = 'block';
-  document.getElementById('rd-per').textContent = fmt(perPerson) + '원';
-  const remEl = document.getElementById('rd-remain');
-  remEl.textContent = (rounding >= 0 ? '+' : '') + fmt(rounding) + '원';
-  remEl.style.color = rounding >= 0 ? 'var(--green)' : 'var(--red)';
-}
-
-async function submitRounding() {
-  const eventTitle    = document.getElementById('rd-event').value.trim();
-  const totalExpense  = parseFloat(document.getElementById('rd-total').value);
-  const attendees     = parseInt(document.getElementById('rd-cnt').value);
-
-  if (!eventTitle) { toast('모임명을 입력하세요'); return; }
-  if (!totalExpense || isNaN(totalExpense)) { toast('총액을 입력하세요'); return; }
-  if (!attendees || isNaN(attendees)) { toast('인원수를 입력하세요'); return; }
-
-  const res = await callGAS({ action:'addRounding', eventTitle, totalExpense, attendees });
-  if (res.ok) {
-    toast(`✅ 1인당 ${fmt(res.perPerson)}원 · 잔돈 ${res.rounding >= 0 ? '+' : ''}${res.rounding}원 기록됨`);
-    document.getElementById('rd-event').value = '';
-    document.getElementById('rd-total').value = '';
-    document.getElementById('rd-cnt').value = '';
-    document.getElementById('rd-result').style.display = 'none';
-    loadFinances();
-  } else toast('❌ ' + (res.error || '실패'));
-}
 
 function renderRoundingHistory() {
   const el    = document.getElementById('rounding-list');
@@ -1973,11 +1928,7 @@ function renderRoundingHistory() {
 }
 
 // ── 이벤트 datalist 갱신 (반올림 계산기용) ──
-function updateEventDatalist() {
-  const dl = document.getElementById('event-list-rd');
-  if (!dl) return;
-  dl.innerHTML = events.map(e => `<option value="${e.title}">`).join('');
-}
+function updateEventDatalist() { /* 이벤트 datalist 제거됨 */ }
 
 async function addFinanceEntry() {
   const date   = document.getElementById('fin-date').value;
@@ -2157,6 +2108,18 @@ function renderDashSummary() {
 // ══════════════════════════════════════════════════════
 //  가계부 수정 (UPDATE)
 // ══════════════════════════════════════════════════════
+let _finFilter = 'all';
+
+
+// ── 가계부 필터 ──
+let _finFilter = 'all';
+function setFinFilter(f, el) {
+  _finFilter = f;
+  document.querySelectorAll('#msec-finance .tab-pill').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  renderFinances();
+}
+
 let _editingFin = null;
 
 function openFinEdit(f) {
