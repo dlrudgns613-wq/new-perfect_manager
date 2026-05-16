@@ -287,49 +287,32 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
 
 
 
-/* ── ROLL CALL ── */
-.roll-sec{padding:10px 11px 100px}
-.roll-header{background:var(--navy);border-radius:var(--r);padding:14px;margin-bottom:10px;color:#fff}
-.roll-header-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
-.roll-title{font-size:14px;font-weight:900;color:var(--amber)}
-.roll-counts{display:flex;gap:8px}
-.roll-count-box{flex:1;background:rgba(255,255,255,.1);border-radius:8px;padding:8px;text-align:center}
-.roll-count-num{font-size:22px;font-weight:900;line-height:1}
-.roll-count-lbl{font-size:10px;opacity:.7;margin-top:2px}
-.roll-count-num.arrived{color:#34d399}
-.roll-count-num.pending{color:#fbbf24}
-.roll-search{width:100%;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);border-radius:9px;padding:8px 12px;font-size:13px;color:#fff;outline:none;font-family:'Noto Sans KR',sans-serif}
-.roll-search::placeholder{color:rgba(255,255,255,.4)}
-.roll-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;margin-bottom:8px}
-.roll-chip{background:var(--card);border-radius:10px;padding:10px 6px;text-align:center;cursor:pointer;transition:.12s;border:2px solid transparent;user-select:none;-webkit-user-select:none}
-.roll-chip.here{background:#ecfdf5;border-color:#10b981}
-.roll-chip .rc-name{font-size:12px;font-weight:700;margin-bottom:2px}
-.roll-chip .rc-dept{font-size:9px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.roll-chip .rc-check{font-size:14px;margin-top:3px;min-height:16px}
-.roll-chip.here .rc-name{color:#065f46}
-.roll-chip.here .rc-check{color:#10b981}
-.roll-actions{display:flex;gap:6px;margin-bottom:10px}
-.roll-section-lbl{font-size:11px;font-weight:700;color:var(--muted);margin:10px 0 6px;padding:0 2px}
 
-/* ── MEMBER EDIT MODAL ── */
-.modal-bg{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.5);z-index:500;display:none;align-items:center;justify-content:center;padding:20px}
-.modal-bg.show{display:flex}
-.modal{background:var(--card);border-radius:16px;width:100%;max-width:400px;padding:20px;box-shadow:0 20px 60px rgba(0,0,0,.3);max-height:85vh;overflow-y:auto}
-.modal-title{font-size:15px;font-weight:900;color:var(--navy);margin-bottom:14px;display:flex;justify-content:space-between;align-items:center}
-.modal-close{background:none;border:none;font-size:20px;cursor:pointer;color:var(--muted);padding:4px}
-.field-group{margin-bottom:10px}
-.field-label{font-size:11px;font-weight:700;color:var(--muted);margin-bottom:4px}
-.field-input{width:100%;border:1.5px solid var(--border);border-radius:9px;padding:9px 12px;font-size:13px;font-family:'Noto Sans KR',sans-serif;outline:none;color:var(--text);background:var(--bg)}
-.field-input:focus{border-color:var(--navy);background:#fff}
-.field-select{width:100%;border:1.5px solid var(--border);border-radius:9px;padding:9px 12px;font-size:13px;font-family:'Noto Sans KR',sans-serif;outline:none;color:var(--text);background:var(--bg);appearance:none}
-.modal-actions{display:flex;gap:8px;margin-top:16px}
-.modal-actions .mgmt-btn{flex:1;height:42px;font-size:13px;border-radius:10px}
-.danger-zone{margin-top:16px;padding-top:12px;border-top:1px solid #fee2e2}
-.danger-zone-title{font-size:11px;font-weight:700;color:var(--red);margin-bottom:8px}
-
-/* ── ACCESSIBILITY ── */
-.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);border:0}
-:focus-visible{outline:2px solid var(--amber);outline-offset:2px}
+/* ── ROLL CALL v2 ── */
+.roll-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:5px}
+.roll-chip{
+  background:var(--card);border-radius:12px;padding:10px 6px;text-align:center;
+  cursor:pointer;transition:all .15s;border:2px solid var(--border);
+  user-select:none;-webkit-user-select:none;position:relative;
+  box-shadow:0 1px 4px rgba(0,0,0,.05);
+}
+.roll-chip:active{transform:scale(.95)}
+.roll-chip.here{background:#ecfdf5;border-color:#10b981;box-shadow:0 2px 8px rgba(16,185,129,.18)}
+.roll-chip .rc-av{
+  width:34px;height:34px;border-radius:50%;background:var(--bg);
+  display:flex;align-items:center;justify-content:center;
+  font-size:13px;font-weight:900;color:var(--navy);
+  margin:0 auto 5px;border:2px solid var(--border);transition:.15s;
+}
+.roll-chip.here .rc-av{background:var(--green);color:#fff;border-color:var(--green)}
+.roll-chip .rc-nm{font-size:12px;font-weight:700;line-height:1.3}
+.roll-chip.here .rc-nm{color:#065f46}
+.roll-chip .rc-dp{font-size:9px;color:var(--muted);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.roll-chip .rc-ag{display:inline-block;margin-top:3px;background:var(--navy);color:var(--amber);font-size:8px;font-weight:700;padding:1px 5px;border-radius:4px}
+.roll-chip.here .rc-ag{background:#065f46;color:#6ee7b7}
+.roll-section-hdr{font-size:11px;font-weight:700;color:var(--muted);padding:10px 2px 6px;display:flex;align-items:center;gap:6px}
+.roll-section-cnt{background:var(--navy);color:#fff;font-size:9px;font-weight:700;padding:2px 7px;border-radius:99px}
+.roll-section-cnt.green{background:var(--green)}
 
 /* ── MISC ── */
 .empty{text-align:center;padding:28px 20px;color:var(--muted);font-size:14px}
@@ -735,49 +718,59 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
 </div>
 
 
-<!-- ══ 현장 출석 체크 ══ -->
+<!-- ══ 현장 출석 체크 — v2 ══ -->
 <div class="sec" id="sec-roll">
-  <div class="roll-sec">
 
-    <div class="roll-header">
-      <div class="roll-header-top">
-        <span class="roll-title">📋 현장 출석 체크</span>
-        <span style="font-size:10px;opacity:.5">저장 안 됨 · 현장 전용</span>
+  <!-- 상단: 카운터 -->
+  <div style="background:var(--navy);padding:16px 14px 12px">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+      <div style="font-size:15px;font-weight:900;color:var(--amber)">📋 현장 출석</div>
+      <div style="font-size:10px;color:rgba(255,255,255,.4)">현장 전용 · 저장 안 됨</div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0;background:rgba(255,255,255,.06);border-radius:12px;overflow:hidden">
+      <div style="padding:12px 8px;text-align:center;border-right:1px solid rgba(255,255,255,.08)">
+        <div style="font-size:26px;font-weight:900;color:#34d399;line-height:1" id="roll-cnt-here">0</div>
+        <div style="font-size:9px;color:rgba(255,255,255,.5);margin-top:4px">✅ 도착</div>
       </div>
-      <div class="roll-counts" style="margin-bottom:10px">
-        <div class="roll-count-box">
-          <div class="roll-count-num arrived" id="roll-cnt-here">0</div>
-          <div class="roll-count-lbl">✅ 도착</div>
-        </div>
-        <div class="roll-count-box">
-          <div class="roll-count-num pending" id="roll-cnt-left">0</div>
-          <div class="roll-count-lbl">⏳ 미도착</div>
-        </div>
-        <div class="roll-count-box">
-          <div class="roll-count-num" style="color:#fff" id="roll-cnt-total">0</div>
-          <div class="roll-count-lbl">👥 전체</div>
-        </div>
+      <div style="padding:12px 8px;text-align:center;border-right:1px solid rgba(255,255,255,.08)">
+        <div style="font-size:26px;font-weight:900;color:#fbbf24;line-height:1" id="roll-cnt-left">0</div>
+        <div style="font-size:9px;color:rgba(255,255,255,.5);margin-top:4px">⏳ 미도착</div>
       </div>
-      <input class="roll-search" id="roll-search" type="search" placeholder="이름 검색..." oninput="renderRoll()">
+      <div style="padding:12px 8px;text-align:center">
+        <div style="font-size:26px;font-weight:900;color:#fff;line-height:1" id="roll-cnt-total">0</div>
+        <div style="font-size:9px;color:rgba(255,255,255,.5);margin-top:4px">👥 참석 예정</div>
+      </div>
     </div>
-
-    <div class="roll-actions">
-      <button class="mgmt-btn navy" style="flex:1;height:36px;font-size:12px" onclick="rollCheckAll()">✅ 전체 도착</button>
-      <button class="mgmt-btn" style="flex:1;height:36px;font-size:12px;background:var(--border);color:var(--text)" onclick="rollReset()">🔄 초기화</button>
-      <button class="mgmt-btn amber" style="flex:1;height:36px;font-size:12px;color:var(--navy)" onclick="rollCopyMissing()">📋 미도착 복사</button>
-    </div>
-
-    <div id="roll-arrived-section" style="display:none">
-      <div class="roll-section-lbl">✅ 도착 (<span id="roll-arrived-cnt">0</span>명)</div>
-      <div class="roll-grid" id="roll-grid-arrived"></div>
-    </div>
-
-    <div id="roll-pending-section">
-      <div class="roll-section-lbl">⏳ 미도착 (<span id="roll-pending-cnt">0</span>명)</div>
-      <div class="roll-grid" id="roll-grid-pending"></div>
-    </div>
-
   </div>
+
+  <!-- 검색 + 필터 + 액션 -->
+  <div style="background:var(--card);padding:9px 12px;border-bottom:1px solid var(--border);display:flex;gap:7px;align-items:center">
+    <div style="flex:1;position:relative">
+      <span style="position:absolute;left:9px;top:50%;transform:translateY(-50%);font-size:12px;color:var(--muted);pointer-events:none">🔍</span>
+      <input type="search" id="roll-search" placeholder="이름 검색..." oninput="renderRoll()"
+        style="width:100%;background:var(--bg);border:1.5px solid var(--border);border-radius:10px;padding:7px 11px 7px 30px;font-size:13px;font-family:'Noto Sans KR',sans-serif;outline:none;color:var(--text)">
+    </div>
+  </div>
+  <div style="display:flex;gap:5px;padding:7px 12px;background:var(--card);border-bottom:1px solid var(--border);overflow-x:auto">
+    <button class="fp active" id="rf-all" onclick="setRollFilter('all',this)">전체</button>
+    <button class="fp" id="rf-pending" onclick="setRollFilter('pending',this)">⏳ 미도착</button>
+    <button class="fp ga" id="rf-here" onclick="setRollFilter('here',this)">✅ 도착</button>
+  </div>
+  <div style="display:flex;gap:5px;padding:8px 12px;background:var(--card);border-bottom:1px solid var(--border)">
+    <button class="mgmt-btn navy" style="flex:1;height:34px;font-size:11px;border-radius:8px" onclick="rollCheckAll()">✅ 전체 도착</button>
+    <button class="mgmt-btn" style="flex:1;height:34px;font-size:11px;border-radius:8px;background:var(--bg);color:var(--text)" onclick="rollReset()">🔄 초기화</button>
+    <button class="mgmt-btn amber" style="flex:1;height:34px;font-size:11px;border-radius:8px;color:var(--navy)" onclick="rollCopyMissing()">📋 미도착</button>
+  </div>
+
+  <!-- 콘텐츠 -->
+  <div id="roll-content" style="padding:6px 10px 100px">
+    <div class="empty" style="padding:40px 20px">
+      <div style="font-size:36px;margin-bottom:8px">📋</div>
+      <div style="font-size:14px;font-weight:700;color:var(--navy);margin-bottom:6px">참석여부 탭에서 먼저 체크하세요</div>
+      <div style="font-size:12px;color:var(--muted);line-height:1.6">참석 체크된 인원만 여기에 표시됩니다</div>
+    </div>
+  </div>
+
 </div>
 
 </div><!-- /scr -->
@@ -852,6 +845,7 @@ let manualLanes={}, manualUnassigned=[], manualSelChip=null;
 let swapMode=false, swapSel=null, avgPopupTarget=null;
 let _isSaving=false, selectedType='';
 let dashData=null;
+let _serverPaidCount=null; // GAS에서 받은 전체 납부자 수 (left 포함)
 
 // ── 로컬 저장 ──
 function save(){
@@ -988,6 +982,8 @@ async function syncAll(){
     setSS('ok',`${members.length}명`);
     setScrHeight(); renderList(); save();
     toast(`✅ ${members.length}명 동기화 완료`);
+    // ★ 서버 paidCount 확보 (left 포함)
+    try{ const d=await gasGet('getDashboard'); if(d.paidCount) _serverPaidCount=d.paidCount; }catch(e){}
   }catch(e){
     setSS('err','오류');
     document.getElementById('mlist').innerHTML=`<div class="err-box">❌ <strong>동기화 실패</strong><br><br>${e.message}<br><br>· GAS URL 확인<br>· 배포 → "모든 사용자" 확인<br>· 시트명 확인 (members/events)</div>`;
@@ -1611,6 +1607,7 @@ async function renderDash(){
     const res=await gasGet('getDashboard');
     if(res.error){toast('대시보드 로드 실패');return;}
     dashData=res;
+    _serverPaidCount=res.paidCount||null; // left 포함 전체 납부자
 
     document.getElementById('d-total').textContent=res.totalMembers||'-';
     document.getElementById('d-att').textContent='-'; // B9: 세션 데이터 미사용
@@ -1779,7 +1776,8 @@ async function toggleFee(name, current) {
   if (res.ok) {
     const m = members.find(m => m.name === name);
     if (m) m.feePaid = newFee;
-    toast(`✅ ${name} 회비 ${newFee==='O'?'납부':'미납'} 처리`);
+    if (_serverPaidCount) _serverPaidCount += (newFee==='O' ? 1 : -1);
+    toast(`✅ ${name} ${newFee==='O'?'납부':'미납'} 처리`);
     renderMemberList(); renderList(); renderDashSummary();
   } else toast('❌ ' + (res.error || '실패'));
 }
@@ -1847,8 +1845,8 @@ async function loadFinances() {
 }
 
 function updateBalanceDisplay() {
-  // 회비 수입 = active 회원 중 납부자 수 × 20000
-  const paidCnt = members.filter(m => m.feePaid === 'O').length;
+  // ★ FIX: left 납부자 포함 — 서버 paidCount 우선
+  const paidCnt = _serverPaidCount || members.filter(m => m.feePaid === 'O').length;
   const feeIncome = paidCnt * 20000;
 
   const finSum  = finances.reduce((s,f) => s + f.amount, 0);
@@ -2390,73 +2388,119 @@ async function deleteCurrentMember() {
 // ══════════════════════════════════════════════════════
 //  현장 출석 체크 (로컬 전용, 서버 저장 안 함)
 // ══════════════════════════════════════════════════════
-let rollMap = {}; // name → true(도착) / false(미도착)
+let rollMap = {};      // name → true(도착) / false(미도착)
+let rollFilter = 'all'; // all / pending / here
 
+// ★ 핵심: 참석여부 탭에서 체크된 사람만 현장에 표시
 function initRoll() {
   rollMap = {};
-  const src = members.filter(m => m.status === 'active');
-  // 참석여부 탭에서 체크된 사람 초기값으로 반영
-  src.forEach(m => {
-    rollMap[m.name] = statusMap[m.name] === 'attend';
-  });
+  // statusMap에서 attend인 사람만 = 참석 예정자
+  const attendees = members.filter(m => statusMap[m.name] === 'attend');
+  attendees.forEach(m => { rollMap[m.name] = false; }); // 전원 미도착으로 시작
   renderRoll();
 }
 
 function renderRoll() {
   const q = (document.getElementById('roll-search')?.value || '').toLowerCase();
-  const src = members.filter(m => m.status === 'active'
-    && (!q || m.name.includes(q) || (m.dept||'').includes(q)));
+  const content = document.getElementById('roll-content');
 
-  const arrived = src.filter(m => rollMap[m.name]);
-  const pending = src.filter(m => !rollMap[m.name]);
+  // 참석 예정자만 (rollMap에 등록된 사람)
+  const rollNames = Object.keys(rollMap);
+  let target = members.filter(m => rollNames.includes(m.name));
 
-  document.getElementById('roll-cnt-here').textContent  = arrived.length;
-  document.getElementById('roll-cnt-left').textContent  = pending.length;
-  document.getElementById('roll-cnt-total').textContent = src.length;
-  document.getElementById('roll-arrived-cnt').textContent = arrived.length;
-  document.getElementById('roll-pending-cnt').textContent = pending.length;
+  // 검색
+  if (q) target = target.filter(m => m.name.includes(q) || (m.dept||'').includes(q));
 
-  document.getElementById('roll-arrived-section').style.display = arrived.length ? 'block' : 'none';
+  const arrived = target.filter(m => rollMap[m.name] === true);
+  const pending = target.filter(m => rollMap[m.name] !== true);
 
-  const chip = (m) => {
-    const here = rollMap[m.name];
-    const nm = m.name.replace(/'/g,"\'");
-    return `<div class="roll-chip ${here?'here':''}" onclick="toggleRoll('${nm}')" role="checkbox" aria-checked="${here}" aria-label="${m.name}">
-      <div class="rc-name">${m.name}</div>
-      <div class="rc-dept">${m.dept||''}</div>
-      <div class="rc-check">${here ? '✅' : ''}</div>
+  // 카운터 (검색 무관하게 전체 기준)
+  const allArrived = rollNames.filter(n => rollMap[n] === true).length;
+  const allPending = rollNames.filter(n => rollMap[n] !== true).length;
+  document.getElementById('roll-cnt-here').textContent = allArrived;
+  document.getElementById('roll-cnt-left').textContent = allPending;
+  document.getElementById('roll-cnt-total').textContent = rollNames.length;
+
+  // 참석 예정자 없으면 안내
+  if (!rollNames.length) {
+    content.innerHTML = `<div class="empty" style="padding:40px 20px">
+      <div style="font-size:36px;margin-bottom:8px">📋</div>
+      <div style="font-size:14px;font-weight:700;color:var(--navy);margin-bottom:6px">참석여부 탭에서 먼저 체크하세요</div>
+      <div style="font-size:12px;color:var(--muted);line-height:1.6">참석 체크된 인원만 여기에 표시됩니다</div>
     </div>`;
-  };
+    return;
+  }
 
-  document.getElementById('roll-grid-arrived').innerHTML = arrived.map(chip).join('');
-  document.getElementById('roll-grid-pending').innerHTML = pending.map(chip).join('');
+  // 필터 적용
+  let filtered;
+  if (rollFilter === 'here') filtered = arrived;
+  else if (rollFilter === 'pending') filtered = pending;
+  else filtered = target;
+
+  if (!filtered.length) {
+    const msg = rollFilter === 'here' ? '아직 도착자 없어요' : '모두 도착! 🎉';
+    content.innerHTML = `<div class="empty" style="padding:30px"><div style="font-size:28px;margin-bottom:6px">${rollFilter==='here'?'⏳':'🎉'}</div>${msg}</div>`;
+    return;
+  }
+
+  // 도착/미도착 섹션 분리
+  const arrivedF = filtered.filter(m => rollMap[m.name] === true);
+  const pendingF = filtered.filter(m => rollMap[m.name] !== true);
+
+  let h = '';
+  if (pendingF.length && rollFilter !== 'here') {
+    h += `<div class="roll-section-hdr">⏳ 미도착 <span class="roll-section-cnt">${pendingF.length}</span></div>`;
+    h += `<div class="roll-grid">${pendingF.map(rollChip).join('')}</div>`;
+  }
+  if (arrivedF.length && rollFilter !== 'pending') {
+    h += `<div class="roll-section-hdr">✅ 도착 <span class="roll-section-cnt green">${arrivedF.length}</span></div>`;
+    h += `<div class="roll-grid">${arrivedF.map(rollChip).join('')}</div>`;
+  }
+  content.innerHTML = h;
+}
+
+function rollChip(m) {
+  const here = rollMap[m.name] === true;
+  const nm = m.name.replace(/'/g, "\\'");
+  return `<div class="roll-chip ${here?'here':''}" onclick="toggleRoll('${nm}')">
+    <div class="rc-av">${here ? '✓' : m.name.charAt(0)}</div>
+    <div class="rc-nm">${m.name}</div>
+    <div class="rc-dp">${m.dept||''}</div>
+    ${m.avg ? `<div class="rc-ag">${m.avg}</div>` : ''}
+  </div>`;
 }
 
 function toggleRoll(name) {
-  rollMap[name] = !rollMap[name];
+  if (name in rollMap) rollMap[name] = !rollMap[name];
+  renderRoll();
+}
+
+function setRollFilter(f, el) {
+  rollFilter = f;
+  document.querySelectorAll('#sec-roll .fp').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
   renderRoll();
 }
 
 function rollReset() {
-  if (!confirm('현장 체크를 초기화할까요?')) return;
-  initRoll();
-  toast('🔄 초기화됨');
+  if (!confirm('도착 체크를 초기화할까요?')) return;
+  Object.keys(rollMap).forEach(k => { rollMap[k] = false; });
+  renderRoll();
+  toast('🔄 초기화');
 }
 
 function rollCheckAll() {
-  members.filter(m => m.status === 'active').forEach(m => { rollMap[m.name] = true; });
+  Object.keys(rollMap).forEach(k => { rollMap[k] = true; });
   renderRoll();
-  toast('✅ 전체 도착 체크');
+  toast('✅ 전체 도착');
 }
 
 function rollCopyMissing() {
-  const missing = members
-    .filter(m => m.status === 'active' && !rollMap[m.name])
-    .map(m => m.name);
+  const missing = Object.keys(rollMap).filter(n => !rollMap[n]);
   if (!missing.length) { toast('미도착자 없음 🎉'); return; }
   const text = `미도착 ${missing.length}명:\n` + missing.join(', ');
-  shareText(text, '팀퍼펙트 미도착 명단');
-  toast(`📋 미도착 ${missing.length}명 복사됨`);
+  shareText(text, '팀퍼펙트 미도착');
+  toast(`📋 ${missing.length}명 복사`);
 }
 
 // init
