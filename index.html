@@ -1675,6 +1675,44 @@ function saveCfg(){GAS_URL=document.getElementById('c-url').value.trim()||GAS_UR
 // ══════════════════════════════════════════════════════
 //  토스트
 // ══════════════════════════════════════════════════════
+// ── 대시보드 요약 ──
+function renderDashSummary() {
+  const active  = members.filter(m => m.status === 'active');
+  const paid    = members.filter(m => m.feePaid === 'O');
+  const unpaid  = active.filter(m => m.feePaid !== 'O');
+  const guest   = members.filter(m => m.status === 'guest');
+
+  const els = id => document.getElementById(id);
+  const set = (id, v) => { const e=els(id); if(e) e.textContent=v; };
+
+  set('d-total', active.length);
+  set('d-att', members.filter(m=>statusMap[m.name]==='attend').length || '-');
+  const rate = active.length ? Math.round(paid.length/active.length*100) : 0;
+  set('d-fee-rate',  rate + '%');
+  set('d-fee-rate2', rate + '%');
+  set('d-fee-sub',  paid.length + '/' + active.length + '명 납부');
+  set('d-fee-sub2', paid.length + '/' + active.length + '명 납부');
+  set('d-unpaid', unpaid.length);
+  set('d-guest',  guest.length);
+
+  const ul = els('unpaid-list');
+  const uc = els('unpaid-cnt');
+  if (ul) {
+    ul.innerHTML = unpaid.length
+      ? unpaid.map(m => `<div class="fin-item" style="padding:7px 10px">
+          <div class="fin-item-info">
+            <div class="fin-item-desc">${m.name}</div>
+            <div class="fin-item-sub">${m.dept||'-'} · ${m.grade||'-'}학번</div>
+          </div>
+          <button class="mgmt-btn green" style="font-size:10px;padding:4px 8px;border-radius:7px"
+            onclick="toggleFee('${m.name.replace(/'/g,"\'")}','X')">납부처리</button>
+        </div>`).join('')
+      : '<div class="empty">미납자 없음 🎉</div>';
+  }
+  if (uc) uc.textContent = unpaid.length + '명';
+  updateBalanceDisplay();
+}
+
 let _tt;
 function toast(msg){
   const t=document.getElementById('toast');
