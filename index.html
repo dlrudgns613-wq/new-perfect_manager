@@ -510,6 +510,15 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
         </div>
         <button class="btn btn-navy" style="width:100%;height:42px;font-size:13px;border-radius:10px" onclick="addNewMember()">✅ 추가</button>
       </div>
+
+      <!-- 게스트 관리 카드 -->
+      <div class="mgmt-card" id="guest-mgmt-card">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+          <div style="font-size:13px;font-weight:700;color:var(--navy)">👥 게스트 현황</div>
+          <span style="font-size:10px;color:var(--muted)">1학기 1회 제한 · 참가비 3,000원</span>
+        </div>
+        <div id="guest-list"></div>
+      </div>
     </div>
 
     <!-- 가계부 -->
@@ -570,10 +579,11 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
       <div class="mgmt-card">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
           <span style="font-size:13px;font-weight:700;color:var(--navy)">📋 내역</span>
-          <div style="display:flex;gap:4px">
-            <button onclick="setFinFilter('all',this)" id="ff-all" class="tab-pill active" style="padding:3px 8px;font-size:10px">전체</button>
+          <div style="display:flex;gap:4px;flex-wrap:wrap">
+            <button onclick="setFinFilter('all',this)" id="ff-all" class="tab-pill active" style="padding:3px 8px;font-size:10px">주요내역</button>
             <button onclick="setFinFilter('in',this)" id="ff-in" class="tab-pill" style="padding:3px 8px;font-size:10px">수입</button>
             <button onclick="setFinFilter('out',this)" id="ff-out" class="tab-pill" style="padding:3px 8px;font-size:10px">지출</button>
+            <button onclick="setFinFilter('all-full',this)" id="ff-full" class="tab-pill" style="padding:3px 8px;font-size:10px">전체</button>
           </div>
         </div>
         <div id="fin-list" style="padding:0 0 4px"><div class="loading"><div class="spin"></div>불러오는 중...</div></div>
@@ -959,12 +969,18 @@ function renderEvtChips() {
   if (!events.length) { wrap.style.display='none'; return; }
   wrap.style.display = 'block';
   const now = new Date(); now.setHours(0,0,0,0);
+  // 최근 과거 이벤트 먼저, 미래 이벤트 그 다음
   const sorted = [...events].sort((a,b) => {
     const da=a.date?new Date(a.date):null, db=b.date?new Date(b.date):null;
     if(!da&&!db)return 0;if(!da)return 1;if(!db)return-1;
     const fa=da>=now, fb=db>=now;
-    if(fa&&fb) return da-db; if(fa&&!fb) return -1; if(!fa&&fb) return 1;
-    return db-da;
+    // 둘 다 과거: 최신순 (가장 최근 과거가 맨 앞)
+    if(!fa&&!fb) return db-da;
+    // 둘 다 미래: 빠른 순
+    if(fa&&fb) return da-db;
+    // 과거 먼저
+    if(!fa&&fb) return -1; if(fa&&!fb) return 1;
+    return 0;
   });
   el.innerHTML = sorted.map(ev => {
     const fut = ev.date && new Date(ev.date) >= now;
@@ -1095,6 +1111,11 @@ async function saveAttendance() {
     toast(`✅ ${attendees.length}명 저장 완료!`);
     showOverlay('저장 완료!', `${attendees.length}명`, false);
     setTimeout(hideOverlay, 1200);
+    // ★ 게스트 참가비 자동 기록 제안
+    const guests = members.filter(m => m.status==='guest' && attendees.includes(m.name));
+    if (guests.length > 0) {
+      setTimeout(() => offerGuestFee(guests, currentEventTitle), 1400);
+    }
   } catch(e) {
     toast('❌ 저장 실패: '+e.message);
     hideOverlay();
@@ -1305,7 +1326,7 @@ function setMgmtTab(tab, el) {
   });
   if (tab==='finance') loadFinances();
   if (tab==='score') { const today=new Date().toISOString().slice(0,10); const el=document.getElementById('sc-date'); if(el)el.value=today; loadRecentScores(); }
-  if (tab==='member') renderMemberList();
+  if (tab==='member') { renderMemberList(); renderGuestList(); }
 }
 function setMemFilter(f,el) {
   memFilter=f;
@@ -1313,6 +1334,43 @@ function setMemFilter(f,el) {
   el.classList.add('active');
   renderMemberList();
 }
+
+function renderGuestList() {
+  const el = document.getElementById('guest-list');
+  if (!el) return;
+  const guests = members.filter(m => m.status === 'guest');
+  if (!guests.length) { el.innerHTML = '<div class="empty">게스트 없음</div>'; return; }
+  el.innerHTML = guests.map(m => {
+    const nm = m.name.replace(/'/g, "\'");
+    // 이번 학기 출석 수 계산 (statusMap 기반 간이 표시)
+    const attCount = Object.keys(statusMap).filter(k => k === m.name && statusMap[k] === 'attend').length;
+    return `<div class="mem-item">
+      <div class="mem-info">
+        <div class="mem-name" style="display:flex;align-items:center;gap:6px">
+          ${m.name}
+          <span style="font-size:10px;background:#fcd34d;color:#92400e;padding:2px 7px;border-radius:99px;font-weight:700">게스트</span>
+        </div>
+        <div class="mem-sub">${m.dept||'-'} · 참가비 3,000원</div>
+      </div>
+      <div style="display:flex;gap:4px;flex-shrink:0">
+        <button class="btn" style="font-size:10px;padding:5px 8px;border-radius:7px;background:var(--border);color:var(--text)" onclick="openEditModal('${nm}')">✏️</button>
+        <button class="btn btn-green" style="font-size:10px;padding:5px 8px;border-radius:7px" onclick="promoteGuest('${nm}')">✅ 가입</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+async function promoteGuest(name) {
+  if (!confirm(`"${name}"을 정식 회원으로 가입 처리할까요?\n\n회비 납부 여부는 이후 별도 처리하세요.`)) return;
+  const res = await api({ action:'updateMember', name, status:'active' });
+  if (res.ok) {
+    const m = members.find(m => m.name === name);
+    if (m) m.status = 'active';
+    toast(`✅ ${name} 정식 가입!`);
+    renderMemberList(); renderGuestList(); renderList();
+  } else toast('❌ ' + (res.error||''));
+}
+
 function renderMemberList() {
   const el = document.getElementById('m-list');
   if (!el) return;
@@ -1435,7 +1493,7 @@ function updateBalance() {
   const txt=document.getElementById('bank-txt');
   if(hero&&!isNaN(bankSaved)){
     const diff=bankSaved-balance;
-    if(Math.abs(diff)<=100){hero.style.background='#f0fdf4';if(icon)icon.textContent='✅';if(txt)txt.textContent='통장 일치!';}
+    if(Math.abs(diff)<=10){hero.style.background='#f0fdf4';if(icon)icon.textContent='✅';if(txt)txt.textContent='통장 일치!';}
     else{hero.style.background='#fef2f2';if(icon)icon.textContent='⚠️';if(txt)txt.textContent=(diff>0?'+':'')+fmt(diff)+'원 차이';}
   }
   // 대시보드 배너
@@ -1443,7 +1501,7 @@ function updateBalance() {
   if(dbd&&!isNaN(bankSaved)){
     const diff=bankSaved-balance;
     dbd.style.display='block';
-    if(Math.abs(diff)<=100){dbd.textContent='✅ 통장 일치';dbd.style.color='#34d399';}
+    if(Math.abs(diff)<=10){dbd.textContent='✅ 통장 일치';dbd.style.color='#34d399';}
     else{dbd.textContent=`⚠️ ${diff>0?'+':''}${fmt(diff)}원 차이`;dbd.style.color='#f87171';}
   }
 }
@@ -1467,7 +1525,7 @@ async function loadFinances(){
 
 function setFinFilter(f,el){
   _finFilter=f;
-  document.querySelectorAll('#msec-finance .tab-pill').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('#ff-all,#ff-in,#ff-out,#ff-full').forEach(b=>b.classList.remove('active'));
   el.classList.add('active');
   renderFinances();
 }
@@ -1479,8 +1537,11 @@ function renderFinances(){
   if(!el)return;
   if(!finances.length){el.innerHTML='<div class="empty">내역 없음</div>';return;}
   let filtered=[...finances];
-  if(_finFilter==='in')  filtered=filtered.filter(f=>f.amount>0);
+  // 반올림/이월은 요약카드에 이미 표시 → 목록에서 제외 (스크롤 압박 해소)
+  if(_finFilter==='all') filtered=filtered.filter(f=>f.category!=='반올림'&&f.category!=='이월');
+  if(_finFilter==='in')  filtered=filtered.filter(f=>f.amount>0&&f.category!=='반올림'&&f.category!=='이월');
   if(_finFilter==='out') filtered=filtered.filter(f=>f.amount<0);
+  // 'all-full': 반올림/이월 포함 전체
   filtered.sort((a,b)=>b.date.localeCompare(a.date));
   const sign=a=>a>=0?'+':'';
   el.innerHTML=filtered.map(f=>{
@@ -1639,6 +1700,40 @@ function applyAvg(){const v=parseInt(document.getElementById('avg-inp').value);i
 function openCfg(){document.getElementById('c-url').value=GAS_URL;document.getElementById('cfg-modal').classList.add('show');}
 function closeCfg(e){if(!e||e.target===document.getElementById('cfg-modal'))document.getElementById('cfg-modal').classList.remove('show');}
 function saveCfg(){GAS_URL=document.getElementById('c-url').value.trim()||GAS_URL;document.getElementById('cfg-modal').classList.remove('show');save();syncAll();}
+
+
+// ══════════════════════════════════════════════════════
+//  GUEST 기능
+// ══════════════════════════════════════════════════════
+const GUEST_FEE = 3000;
+
+// 저장 완료 후 게스트 참가비 기록 제안
+function offerGuestFee(guests, eventTitle) {
+  if (!guests.length) return;
+  const names = guests.map(g => g.name).join(', ');
+  const total = guests.length * GUEST_FEE;
+  if (confirm(`게스트 ${guests.length}명 참석\n${names}\n\n참가비 ${total.toLocaleString()}원을 가계부에 기록할까요?`)) {
+    const today = new Date().toISOString().slice(0,10);
+    const desc = `${eventTitle} 게스트 참가비 (${names})`;
+    api({ action:'addFinance', date:today, desc, amount:total, category:'수입', note:`게스트 ${guests.length}명 × ${GUEST_FEE}원` })
+      .then(res => { if(res.ok) toast(`✅ 게스트 참가비 ${total.toLocaleString()}원 기록됨`); });
+  }
+}
+
+// 게스트 1회 제한 체크 — 이미 출석한 적 있는 게스트인지
+async function checkGuestLimit(guestName) {
+  try {
+    // 모든 이벤트에서 해당 게스트 출석 이력 조회
+    let attendedCount = 0;
+    for (const ev of events) {
+      const res = await gasGet('getAttendance', { eventId: ev.eventId });
+      if (res.attendees && res.attendees.includes(guestName)) {
+        attendedCount++;
+      }
+    }
+    return attendedCount;
+  } catch(e) { return 0; }
+}
 
 // ═══════════════════════════════════════════════════════
 //  UTILS
