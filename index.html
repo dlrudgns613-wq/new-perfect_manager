@@ -1086,7 +1086,7 @@ function setEvtBadge(title) { document.getElementById('evt-badge-name').textCont
 //  TAB
 // ═══════════════════════════════════════════════════════
 function switchTab(tab) {
-  ['att','lane','dash','mgmt','roll'].forEach(t => {
+  ['att','lane','dash','mgmt','roll','score'].forEach(t => {
     document.getElementById(`sec-${t}`).classList.toggle('active', t===tab);
     document.getElementById(`tab-${t}`).classList.toggle('active', t===tab);
   });
