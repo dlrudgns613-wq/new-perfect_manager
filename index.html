@@ -293,14 +293,14 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
 <!-- ══ HEADER ══ -->
 <div class="hdr" id="hdr">
   <div class="hdr-top">
-    <div class="logo">🎳 팀<em>퍼펙트</em></div>
+    <div class="logo" onclick="_cfgTap()" style="cursor:default">🎳 팀<em>퍼펙트</em></div>
     <div class="hdr-right">
       <span id="last-saved" style="display:none;font-size:9px;color:rgba(255,255,255,.4);margin-right:4px"></span>
       <div class="sync-pill" onclick="syncAll()">
         <div class="dot" id="sdot"></div>
         <span id="stxt">대기중</span>
       </div>
-      <button class="iBtn" onclick="openCfg()">⚙️</button>
+      <button class="iBtn" onclick="openCfg()" style="opacity:0" oncontextmenu="event.preventDefault();openCfg()" onclick="openCfg()" id="cfg-btn">⚙️</button>
     </div>
   </div>
   <div class="evt-bar" id="evt-bar" style="display:none">
@@ -368,6 +368,13 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
     <button class="fp active" onclick="setFilter('all',this)">전체 <span id="cnt-all">0</span></button>
     <button class="fp ga"     onclick="setFilter('attend',this)">✅ 참석 <span id="cnt-att">0</span></button>
     <button class="fp"        onclick="setFilter('pending',this)">❓ 미정 <span id="cnt-pnd">0</span></button>
+  </div>
+  <!-- 게스트 토글 버튼 -->
+  <div id="guest-toggle-bar" style="display:none;padding:6px 12px;background:var(--card);border-bottom:1px solid var(--border)">
+    <button onclick="toggleGuestSection()" id="guest-toggle-btn"
+      style="width:100%;padding:7px;border:1.5px dashed #fcd34d;border-radius:9px;background:#fefce8;color:#92400e;font-size:12px;font-weight:700;font-family:'Noto Sans KR',sans-serif;cursor:pointer">
+      👥 게스트 체크 펼치기 ▼
+    </button>
   </div>
   <div id="mlist-wrap">
     <div id="guest-att-section" style="display:none;border-radius:var(--r);overflow:hidden;margin:4px 11px;box-shadow:var(--sh)"></div>
@@ -767,7 +774,7 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
 // ═══════════════════════════════════════════════════════
 //  STATE
 // ═══════════════════════════════════════════════════════
-let GAS_URL = '';
+let GAS_URL = 'https://script.google.com/macros/s/AKfycbxu6run01Cc9Y5LLgXKvLt35COSKNFL1KEyPQG74klxFlh6ZGUIbpcNqHNBr7GSbWEP/exec'; // 하드코딩됨
 let members = [], events = [], finances = [];
 let _allMembers = []; // 탈퇴 포함 전체 (관리탭용)
 let statusMap = {}, tempAvgMap = {};
@@ -802,7 +809,7 @@ function save() {
 }
 function load() {
   try {
-    GAS_URL = localStorage.getItem('pf_url') || '';
+    GAS_URL = localStorage.getItem('pf_url') || 'https://script.google.com/macros/s/AKfycbxu6run01Cc9Y5LLgXKvLt35COSKNFL1KEyPQG74klxFlh6ZGUIbpcNqHNBr7GSbWEP/exec';
     const s = localStorage.getItem('pf_st');  if (s) statusMap   = JSON.parse(s);
     const t = localStorage.getItem('pf_tmp'); if (t) tempAvgMap  = JSON.parse(t);
     const e = localStorage.getItem('pf_evt'); if (e) currentEventId = e;
@@ -888,6 +895,10 @@ async function syncAll() {
     setScrH(); renderList(); save();
     toast(`✅ ${members.length}명 동기화 완료`);
     renderDashSummary(); // 로컬 데이터로 즉시 표시
+    // 게스트 있으면 토글 바 표시
+    const hasGuests = (_allMembers.length?_allMembers:members).some(m=>m.status==='guest');
+    const gtBar = document.getElementById('guest-toggle-bar');
+    if (gtBar) gtBar.style.display = hasGuests ? 'block' : 'none';
 
     // 잔액용 paidCount (left 포함) — 백그라운드로
     gasGet('getDashboard').then(d => {
@@ -1038,7 +1049,17 @@ function switchTab(tab) {
 // ═══════════════════════════════════════════════════════
 //  MEMBER LIST
 // ═══════════════════════════════════════════════════════
-function isVisible(m) { return m.status==='active'||m.status==='guest'; }
+
+let _guestSectionOpen = false;
+function toggleGuestSection() {
+  _guestSectionOpen = !_guestSectionOpen;
+  const sec = document.getElementById('guest-att-section');
+  const btn = document.getElementById('guest-toggle-btn');
+  sec.style.display = _guestSectionOpen ? 'block' : 'none';
+  btn.textContent = _guestSectionOpen ? '👥 게스트 체크 접기 ▲' : '👥 게스트 체크 펼치기 ▼';
+}
+
+function isVisible(m) { return m.status==='active'; } // 게스트는 별도 토글
 
 function renderList() {
   const el = document.getElementById('mlist');
@@ -1975,6 +1996,16 @@ window.addEventListener('DOMContentLoaded', () => {
   initDatePickers();
   setScrH();
   window.addEventListener('resize', setScrH);
+
+// 설정 버튼 5번 탭하면 열림 (숨겨진 관리자 진입)
+let _cfgTapCnt = 0, _cfgTapTimer;
+function _cfgTap() {
+  _cfgTapCnt++;
+  clearTimeout(_cfgTapTimer);
+  if (_cfgTapCnt >= 5) { _cfgTapCnt = 0; openCfg(); }
+  _cfgTapTimer = setTimeout(() => { _cfgTapCnt = 0; }, 2000);
+}
+
   if (GAS_URL) syncAll();
   else { setSS('err','URL 없음'); document.getElementById('mlist').innerHTML='<div class="err-box">⚙️ 설정에서 GAS URL을 입력하세요.</div>'; }
 });
