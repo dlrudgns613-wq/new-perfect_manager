@@ -899,6 +899,14 @@ async function syncAll() {
     const hasGuests = (_allMembers.length?_allMembers:members).some(m=>m.status==='guest');
     const gtBar = document.getElementById('guest-toggle-bar');
     if (gtBar) gtBar.style.display = hasGuests ? 'block' : 'none';
+    // 카운터 업데이트
+    const guestCnt = (_allMembers.length?_allMembers:members).filter(m=>m.status==='guest').length;
+    const gBtn = document.getElementById('guest-toggle-btn');
+    if (gBtn && guestCnt > 0) {
+      const gAtt = (_allMembers.length?_allMembers:members).filter(m=>m.status==='guest'&&statusMap[m.name]==='attend').length;
+      const arrow = _guestSectionOpen ? '▲' : '▼';
+      gBtn.textContent = `👥 게스트 ${gAtt}/${guestCnt}명 체크 ${arrow}`;
+    }
 
     // 잔액용 paidCount (left 포함) — 백그라운드로
     gasGet('getDashboard').then(d => {
@@ -1065,22 +1073,32 @@ function renderList() {
   const el = document.getElementById('mlist');
   if (!members.length) return;
   const q = (document.getElementById('srch')?.value||'').trim();
-  let data = members.filter(m => isVisible(m));
+  // active만 메인 목록
+  let data = members.filter(m => m.status === 'active');
+  // 게스트는 _allMembers에서 따로 (members에 없을 수 있음)
+  const _guestSrc = (_allMembers.length ? _allMembers : members).filter(m => m.status === 'guest');
   if (q) data = data.filter(m => m.name.includes(q));
   if (filter==='attend') data = data.filter(m => statusMap[m.name]==='attend');
   if (filter==='pending') data = data.filter(m => (statusMap[m.name]||'pending')==='pending');
   data = applySort(data);
 
   const attCnt = members.filter(m => statusMap[m.name]==='attend').length;
-  const tot = members.filter(m => isVisible(m)).length;
+  const tot = members.filter(m => m.status==='active').length;
+  // 게스트 토글 바 카운터 갱신
+  const _gstTotal = (_allMembers.length?_allMembers:members).filter(m=>m.status==='guest').length;
+  const _gstAtt   = (_allMembers.length?_allMembers:members).filter(m=>m.status==='guest'&&statusMap[m.name]==='attend').length;
+  const _gBtn = document.getElementById('guest-toggle-btn');
+  if (_gBtn && _gstTotal > 0) {
+    const _arr = _guestSectionOpen ? '▲' : '▼';
+    _gBtn.textContent = `👥 게스트 ${_gstAtt}/${_gstTotal}명 체크 ${_arr}`;
+  }
   document.getElementById('cnt-all').textContent = tot;
   document.getElementById('cnt-att').textContent = attCnt;
   document.getElementById('cnt-pnd').textContent = tot - attCnt;
   document.getElementById('float-save').classList.toggle('show', attCnt > 0);
 
-  // 게스트는 별도 섹션 — 일반 목록에서 제외
-  const guests = data.filter(m => m.status === 'guest');
-  data = data.filter(m => m.status !== 'guest');
+  // 게스트는 별도 섹션 (_guestSrc에서)
+  const guests = q ? _guestSrc.filter(m => m.name.includes(q)) : _guestSrc;
 
   if (!data.length && !guests.length) {
     el.className='mlist'; el.innerHTML='<div class="empty">검색 결과 없음 🤔</div>'; return;
@@ -1122,7 +1140,8 @@ function renderList() {
   if (guestWrap) {
     if (guests.length) {
       const gAttCnt = guests.filter(m=>statusMap[m.name]==='attend').length;
-      guestWrap.style.display = 'block';
+      // display는 토글 버튼으로 제어, 내용만 업데이트
+      if (_guestSectionOpen) guestWrap.style.display = 'block';
       guestWrap.innerHTML = `
         <div style="padding:6px 12px;font-size:11px;font-weight:700;color:#92400e;background:#fef3c7;display:flex;justify-content:space-between">
           <span>👥 게스트 (참가비 3,000원)</span>
