@@ -522,7 +522,7 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
     <div class="tab-row">
       <button class="tab-pill active" id="mtab-member"  onclick="setMgmtTab('member',this)">👤 회원</button>
       <button class="tab-pill"        id="mtab-finance" onclick="setMgmtTab('finance',this)">💰 가계부</button>
-      <button class="tab-pill"        id="mtab-score"   onclick="setMgmtTab('score',this)">🎳 점수</button>
+      <button class="tab-pill"        id="mtab-score"   onclick="setMgmtTab('mscore',this)">🎳 점수</button>
     </div>
 
     <!-- 회원 -->
@@ -1488,11 +1488,11 @@ function rrect(ctx,x,y,w,h,r){if(h<=0)return;ctx.beginPath();ctx.moveTo(x+r,y);c
 function setMgmtTab(tab, el) {
   document.querySelectorAll('.tab-pill').forEach(b => b.classList.remove('active'));
   el.classList.add('active');
-  ['member','finance','score'].forEach(t => {
-    document.getElementById('msec-'+t).style.display = t===tab?'block':'none';
+  ['member','finance','mscore'].forEach(t => {
+    document.getElementById('msec-'+t.replace('mscore','score')).style.display = t===tab?'block':'none';
   });
   if (tab==='finance') loadFinances();
-  if (tab==='score') { const today=new Date().toISOString().slice(0,10); const el=document.getElementById('sc-date'); if(el)el.value=today; loadRecentScores(); }
+  if (tab==='mscore') { const today=new Date().toISOString().slice(0,10); const el=document.getElementById('sc-date'); if(el)el.value=today; loadRecentScores(); }
   if (tab==='member') { renderMemberList(); renderGuestList(); }
 }
 function setMemFilter(f,el) {
@@ -1966,13 +1966,18 @@ function renderScoreTab() {
     const trendStr = trend > 0 ? `<span style="color:var(--green);font-size:10px;font-weight:700">▲${trend}</span>`
                    : trend < 0 ? `<span style="color:var(--red);font-size:10px;font-weight:700">▼${Math.abs(trend)}</span>`
                    : `<span style="color:var(--muted);font-size:10px">─</span>`;
-    const rankColor = idx===0 ? '#f59e0b' : idx===1 ? '#94a3b8' : idx===2 ? '#b45309' : 'var(--border)';
+    const isAvgSort = _scoreSort === 'avg';
+    const rankColor = isAvgSort && idx===0 ? '#f59e0b'
+      : isAvgSort && idx===1 ? '#94a3b8'
+      : isAvgSort && idx===2 ? '#b45309'
+      : '#e2e8f0';
+    const rankTextColor = isAvgSort && idx < 3 ? '#fff' : 'var(--muted)';
     const nm = m.name.replace(/'/g,"\'");
 
     return `<div onclick="openAvgGraph('${nm}')"
       style="background:var(--card);border-radius:12px;padding:13px 14px;margin-bottom:7px;box-shadow:var(--sh);cursor:pointer;active:opacity:.8;transition:.12s;display:flex;align-items:center;gap:12px">
       <!-- 순위 -->
-      <div style="width:28px;height:28px;border-radius:8px;background:${rankColor};display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:900;color:${idx<3?'#fff':'var(--muted)'};flex-shrink:0">${idx+1}</div>
+      <div style="width:28px;height:28px;border-radius:8px;background:${rankColor};display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:900;color:${rankTextColor};flex-shrink:0">${idx+1}</div>
       <!-- 정보 -->
       <div style="flex:1;min-width:0">
         <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px">
