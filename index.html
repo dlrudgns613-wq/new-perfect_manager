@@ -519,6 +519,21 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
         </div>
         <div id="guest-list"></div>
       </div>
+
+      <!-- 학기 리셋 카드 -->
+      <div class="mgmt-card" style="border:2px solid #fee2e2">
+        <div style="font-size:13px;font-weight:700;color:var(--red);margin-bottom:6px">🔄 학기 리셋</div>
+        <div style="font-size:11px;color:var(--muted);line-height:1.7;margin-bottom:10px">
+          · 전체 회원 회비 납부 현황 초기화 (X로 변경)<br>
+          · 현재 잔액을 finances에 이월금으로 자동 기록<br>
+          · ⚠️ 되돌릴 수 없습니다
+        </div>
+        <label style="display:flex;align-items:center;gap:7px;margin-bottom:10px;font-size:12px;cursor:pointer">
+          <input type="checkbox" id="carry-over-chk" checked> 현재 잔액을 이월금으로 기록
+        </label>
+        <button class="btn btn-red" style="width:100%;height:40px" onclick="semesterReset()">🔄 학기 리셋 실행</button>
+      </div>
+
     </div>
 
     <!-- 가계부 -->
@@ -1093,6 +1108,22 @@ async function saveAttendance() {
   const attendees = members.filter(m => statusMap[m.name]==='attend').map(m => m.name);
   if (!attendees.length) { toast('참석자가 없습니다'); return; }
 
+  // ★ FIX2: 이미 저장된 출석 있으면 덮어쓰기 경고
+  const _existing = Object.keys(statusMap).filter(n => statusMap[n] === 'attend');
+  try {
+    const _serverAtt = await gasGet('getAttendance', { eventId: currentEventId });
+    if (_serverAtt.attendees && _serverAtt.attendees.length > 0) {
+      const _srvNames = _serverAtt.attendees.sort().join(',');
+      const _curNames = attendees.sort().join(',');
+      if (_srvNames !== _curNames) {
+        const _diff = _serverAtt.attendees.length;
+        if (!confirm(`⚠️ 서버에 이미 ${_diff}명 저장돼 있습니다.\n현재 ${attendees.length}명으로 덮어쓸까요?`)) {
+          return;
+        }
+      }
+    }
+  } catch(e) { /* 네트워크 오류시 그냥 진행 */ }
+
   _isSaving = true;
   showOverlay('시트에 저장 중...', `${attendees.length}명 · ${currentEventTitle}`, true);
   document.getElementById('float-save').disabled = true;
@@ -1360,6 +1391,19 @@ function renderGuestList() {
   }).join('');
 }
 
+
+async function semesterReset() {
+  const carryOver = document.getElementById('carry-over-chk')?.checked;
+  if (!confirm('⚠️ 학기 리셋을 실행합니다.\n\n모든 회원의 회비 납부 현황이 초기화됩니다.\n정말 진행할까요?')) return;
+  if (!confirm('마지막 확인: 되돌릴 수 없습니다.\n실행할까요?')) return;
+
+  const res = await api({ action:'semesterReset', confirm:'RESET_CONFIRMED', carryOver });
+  if (res.ok) {
+    toast(`✅ 리셋 완료! ${res.resetCount}명 초기화, 이월금 ${fmt(res.balance)}원`);
+    await syncAll();
+  } else toast('❌ ' + (res.error||''));
+}
+
 async function promoteGuest(name) {
   if (!confirm(`"${name}"을 정식 회원으로 가입 처리할까요?\n\n회비 납부 여부는 이후 별도 처리하세요.`)) return;
   const res = await api({ action:'updateMember', name, status:'active' });
@@ -1414,6 +1458,12 @@ async function addNewMember() {
   const grade=document.getElementById('new-grade').value.trim();
   const status=document.getElementById('new-status').value;
   if(!name){toast('이름을 입력하세요');return;}
+
+  // ★ FIX5: 동명이인 경고
+  const exact = members.find(m => m.name === name);
+  if (exact) {
+    if (!confirm(`⚠️ "${name}"이 이미 존재합니다 (${exact.status}).\n\n동명이인이면 계속하세요.\n같은 사람이면 취소하세요.`)) return;
+  }
   const res=await api({action:'addMember',name,dept,grade,avg:0,feePaid:'X',status});
   if(res.ok){members.push({name,dept,grade,avg:0,feePaid:'X',status});toast(`✅ ${name} 추가됨`);['new-name','new-dept','new-grade'].forEach(id=>document.getElementById(id).value='');renderMemberList();renderList();updateDeptDatalist();}
   else toast('❌ '+(res.message||res.error));
@@ -1601,13 +1651,58 @@ async function submitFinEdit(){
 // ═══════════════════════════════════════════════════════
 //  MANAGEMENT — SCORES
 // ═══════════════════════════════════════════════════════
+// ★ FIX3: 유사 이름 찾기 (레벤슈타인 거리 1~2)
+function similarName(input, candidates) {
+  const inp = input.replace(/\s/g,'');
+  for (const c of candidates) {
+    const cand = c.replace(/\s/g,'');
+    if (inp === cand) return null; // 정확 일치
+    // 한 글자 차이
+    if (Math.abs(inp.length - cand.length) <= 1) {
+      let diff = 0;
+      const shorter = inp.length < cand.length ? inp : cand;
+      const longer  = inp.length < cand.length ? cand : inp;
+      let i=0, j=0, skipped=false;
+      while (i < shorter.length && j < longer.length) {
+        if (shorter[i] !== longer[j]) {
+          diff++;
+          if (skipped || diff > 1) break;
+          skipped = true;
+          if (inp.length === cand.length) i++;
+        } else { i++; }
+        j++;
+      }
+      if (diff <= 1) return c;
+    }
+  }
+  return null;
+}
+
 function previewScores(){
   const text=document.getElementById('sc-paste').value;
   const el=document.getElementById('sc-preview');
   if(!text.trim()){el.innerHTML='';return;}
   const parsed=parseScoreText(text);
   if(!parsed.length){el.innerHTML='<div style="color:var(--red);font-size:12px">파싱 실패 — 형식 확인</div>';return;}
-  el.innerHTML=`<div style="background:var(--bg);border-radius:9px;padding:10px;font-size:12px"><div style="font-weight:700;margin-bottom:6px;color:var(--navy)">미리보기 (${parsed.length}명)</div>${parsed.map(r=>{const found=members.find(m=>m.name===r.name);return`<div style="display:flex;gap:8px;padding:3px 0;border-bottom:1px solid var(--border)"><span style="flex:1;font-weight:700">${r.name}${!found?' <span style="color:var(--red)">⚠️</span>':''}</span><span style="color:var(--muted)">${r.total}</span><span style="color:var(--muted)">${r.games}g</span><span style="font-weight:700;color:var(--navy)">${Math.round(r.total/r.games*10)/10}</span></div>`;}).join('')}</div>`;
+  const memNames = members.map(m=>m.name);
+  el.innerHTML=`<div style="background:var(--bg);border-radius:9px;padding:10px;font-size:12px">
+    <div style="font-weight:700;margin-bottom:6px;color:var(--navy)">미리보기 (${parsed.length}명)</div>
+    ${parsed.map(r=>{
+      const found = members.find(m=>m.name===r.name);
+      const similar = !found ? similarName(r.name, memNames) : null;
+      const warn = !found
+        ? (similar
+          ? `<span style="color:#f59e0b;font-size:10px"> ⚠️ "${similar}" 아닌가요?</span>`
+          : `<span style="color:var(--red);font-size:10px"> ❌ 미등록</span>`)
+        : '';
+      return `<div style="display:flex;gap:8px;padding:3px 0;border-bottom:1px solid var(--border)">
+        <span style="flex:1;font-weight:700">${r.name}${warn}</span>
+        <span style="color:var(--muted)">${r.total}</span>
+        <span style="color:var(--muted)">${r.games}g</span>
+        <span style="font-weight:700;color:var(--navy)">${Math.round(r.total/r.games*10)/10}</span>
+      </div>`;
+    }).join('')}
+  </div>`;
 }
 function parseScoreText(text){const lines=text.trim().split('\n').filter(l=>l.trim());const res=[];lines.forEach(line=>{const p=line.includes('\t')?line.split('\t').map(p=>p.trim()):line.split(',').map(p=>p.trim());if(p.length>=2){const name=p[0],total=parseFloat(p[1]),games=p[2]?parseInt(p[2]):3;if(name&&!isNaN(total)&&total>0)res.push({name,total,games:games||3});}});return res;}
 async function submitBulkScore(){
@@ -1721,6 +1816,23 @@ function offerGuestFee(guests, eventTitle) {
 }
 
 // 게스트 1회 제한 체크 — 이미 출석한 적 있는 게스트인지
+
+async function deleteEventConfirm(eventId, title) {
+  if (!confirm(`"${title}" 모임을 삭제할까요?\n\n⚠️ 해당 모임의 출석 기록도 함께 삭제됩니다.`)) return;
+  const res = await api({ action:'deleteEvent', eventId });
+  if (res.ok) {
+    events = events.filter(e => e.eventId !== eventId);
+    if (currentEventId === eventId) {
+      currentEventId = null; currentEventTitle = '';
+      setEvtBadge('모임 선택');
+      statusMap = {};
+      renderList();
+    }
+    renderEvtChips();
+    toast(`🗑 "${title}" 삭제됨`);
+  } else toast('❌ ' + (res.error||''));
+}
+
 async function checkGuestLimit(guestName) {
   try {
     // 모든 이벤트에서 해당 게스트 출석 이력 조회
