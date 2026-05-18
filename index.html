@@ -615,7 +615,11 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
     <!-- 점수 -->
     <div id="msec-score" style="display:none">
       <div class="mgmt-card">
-        <div style="font-size:13px;font-weight:700;color:var(--navy);margin-bottom:8px">🎳 점수 일괄 입력</div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;cursor:pointer" onclick="toggleScoreForm()">
+          <div style="font-size:13px;font-weight:700;color:var(--navy)">🎳 점수 일괄 입력</div>
+          <span id="score-form-arrow" style="font-size:12px;color:var(--muted)">▼ 펼치기</span>
+        </div>
+        <div id="score-form-body" style="display:none">
         <div style="font-size:11px;color:var(--muted);line-height:1.7;margin-bottom:10px;background:var(--bg);padding:9px;border-radius:8px">
           📋 <strong>붙여넣기 형식</strong><br>
           <code style="font-size:10px;background:#e2e8f0;padding:2px 5px;border-radius:4px">이름 탭 총점 탭 게임수</code> 또는 <code style="font-size:10px;background:#e2e8f0;padding:2px 5px;border-radius:4px">이름,총점,게임수</code>
@@ -626,6 +630,7 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
         <textarea id="sc-paste" class="inp" rows="7" placeholder="정승택&#9;613&#9;3&#10;배성준&#9;565&#9;3" style="resize:vertical;font-family:monospace;font-size:12px" oninput="previewScores()"></textarea>
         <div id="sc-preview" style="margin-top:8px"></div>
         <button class="btn btn-navy" style="width:100%;height:42px;font-size:13px;border-radius:10px;margin-top:10px" onclick="submitBulkScore()">✅ 일괄 저장</button>
+        </div><!-- /score-form-body -->
       </div>
       <div class="mgmt-card">
         <div style="font-size:13px;font-weight:700;color:var(--navy);margin-bottom:9px">📊 최근 점수</div>
@@ -1589,10 +1594,9 @@ function renderMemberList() {
     return `<div class="mem-item">
       <div class="mem-info">
         <div class="mem-name">${m.name} <span class="badge ${m.status==='active'?'bd-active':m.status==='guest'?'bd-guest':(m.status==='left'||m.status==='left-guest')?'bd-left':'bd-left'}">${sl}</span> <span class="badge ${m.feePaid==='O'?'bd-paid':'bd-unpaid'}">${fl}</span></div>
-        <div class="mem-sub">${m.dept||'-'} · ${m.grade||'-'}학번${m.avg?' · 에버 '+m.avg:''}</div>
+        <div class="mem-sub">${m.dept||'-'} · ${m.grade||'-'}학번${m.avg?` · <span onclick="event.stopPropagation();openAvgGraph('${nm}')" style="color:var(--navy);font-weight:700;text-decoration:underline;cursor:pointer">📈 ${m.avg}</span>`:''}</div>
       </div>
       <div style="display:flex;gap:4px;flex-shrink:0">
-        ${m.avg>0?`<button class="btn" style="font-size:10px;padding:5px 8px;border-radius:7px;background:#ecfdf5;color:#065f46;border:1px solid #a7f3d0" onclick="openAvgGraph('${nm}')">📈</button>`:''}
         <button class="btn" style="font-size:10px;padding:5px 8px;border-radius:7px;background:var(--border);color:var(--text)" onclick="openEditModal('${nm}')">✏️</button>
         ${m.status!=='guest'?`<button class="btn ${m.feePaid==='O'?'btn-amber':'btn-green'}" style="font-size:10px;padding:5px 8px;border-radius:7px" onclick="toggleFee('${nm}','${m.feePaid}')">${m.feePaid==='O'?'💸':'💰'}</button>`:''}
         ${m.status!=='left'?`<button class="btn btn-red" style="font-size:10px;padding:5px 8px;border-radius:7px" onclick="setLeft('${nm}')">탈퇴</button>`:`<button class="btn btn-green" style="font-size:10px;padding:5px 8px;border-radius:7px" onclick="setActive('${nm}')">복귀</button>`}
@@ -1859,6 +1863,16 @@ function similarName(input, candidates) {
   return null;
 }
 
+
+function toggleScoreForm() {
+  const body  = document.getElementById('score-form-body');
+  const arrow = document.getElementById('score-form-arrow');
+  if (!body) return;
+  const open = body.style.display !== 'none';
+  body.style.display  = open ? 'none' : 'block';
+  arrow.textContent   = open ? '▼ 펼치기' : '▲ 접기';
+}
+
 function previewScores(){
   const text=document.getElementById('sc-paste').value;
   const el=document.getElementById('sc-preview');
@@ -2007,7 +2021,7 @@ async function openAvgGraph(name) {
   const curAvg  = Math.round(avgs.reduce((s,v)=>s+v,0)/avgs.length);
   const maxAvg  = Math.max(...avgs);
   const firstAvg = avgs[0];
-  const trend   = curAvg - firstAvg;
+  const trend   = Math.round(curAvg - firstAvg);
 
   // 헤더 채우기
   document.getElementById('agm-name').textContent = name;
