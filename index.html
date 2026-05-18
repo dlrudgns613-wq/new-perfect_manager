@@ -345,6 +345,7 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
   <button class="tbt"        id="tab-roll" onclick="switchTab('roll')">📋 현장</button>
   <button class="tbt"        id="tab-lane" onclick="switchTab('lane')">🎳 레인</button>
   <button class="tbt"        id="tab-dash" onclick="switchTab('dash')">📊 현황</button>
+  <button class="tbt"        id="tab-score" onclick="switchTab('score')">📈 점수</button>
   <button class="tbt"        id="tab-mgmt" onclick="switchTab('mgmt')">⚙️ 관리</button>
 </div>
 
@@ -486,6 +487,33 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
       <div id="rank-att"></div>
     </div>
   </div>
+</div>
+
+<!-- ══ 점수 탭 ══ -->
+<div class="sec" id="sec-score">
+
+  <!-- 검색바 -->
+  <div style="padding:10px 12px;background:var(--navy);position:sticky;top:0;z-index:10">
+    <div style="font-size:14px;font-weight:900;color:var(--amber);margin-bottom:8px">📈 에버리지 랭킹</div>
+    <div style="position:relative">
+      <span style="position:absolute;left:10px;top:50%;transform:translateY(-50%);font-size:13px;pointer-events:none">🔍</span>
+      <input type="search" id="score-search" placeholder="이름 검색..." oninput="renderScoreTab()"
+        style="width:100%;background:rgba(255,255,255,.12);border:1.5px solid rgba(255,255,255,.2);border-radius:10px;padding:8px 12px 8px 34px;font-size:13px;color:#fff;font-family:'Noto Sans KR',sans-serif;outline:none">
+    </div>
+  </div>
+
+  <!-- 정렬 바 -->
+  <div style="display:flex;gap:5px;padding:7px 12px;background:var(--card);border-bottom:1px solid var(--border);overflow-x:auto;scrollbar-width:none">
+    <button class="sp active" id="ss-avg"  onclick="setScoreSort('avg',this)">에버↑</button>
+    <button class="sp"        id="ss-name" onclick="setScoreSort('name',this)">이름순</button>
+    <button class="sp"        id="ss-cnt"  onclick="setScoreSort('cnt',this)">기록수↑</button>
+  </div>
+
+  <!-- 멤버 카드 그리드 -->
+  <div id="score-grid" style="padding:8px 10px 100px">
+    <div class="loading"><div class="spin"></div>불러오는 중...</div>
+  </div>
+
 </div>
 
 <!-- ══ 관리 ══ -->
@@ -1064,6 +1092,7 @@ function switchTab(tab) {
   });
   document.getElementById('evt-bar').style.display = (tab==='att'&&members.length) ? 'block' : 'none';
   if (tab==='dash') renderDash();
+  if (tab==='score') initScoreTab();
   if (tab==='roll') initRoll();
   if (tab==='lane') { const att=getAttendees(); if(att.length) checkNoAvg(att); }
   setScrH();
@@ -1863,6 +1892,108 @@ function similarName(input, candidates) {
   return null;
 }
 
+
+
+// ══════════════════════════════════════════════════════
+//  점수 탭
+// ══════════════════════════════════════════════════════
+let _scoreData = {};   // name → {avgs, dates, totals}
+let _scoreSort = 'avg';
+let _scoreLoaded = false;
+
+async function initScoreTab() {
+  if (!_scoreLoaded) {
+    document.getElementById('score-grid').innerHTML =
+      '<div class="loading"><div class="spin"></div>점수 불러오는 중...</div>';
+    try {
+      const res = await gasGet('getScores');
+      if (Array.isArray(res)) {
+        _scoreData = {};
+        res.forEach(s => {
+          if (!s.avg || s.avg <= 0) return;
+          if (!_scoreData[s.name]) _scoreData[s.name] = { avgs:[], dates:[], totals:[] };
+          _scoreData[s.name].avgs.push(s.avg);
+          _scoreData[s.name].dates.push(s.date);
+          _scoreData[s.name].totals.push(s.totalScore);
+        });
+        _scoreLoaded = true;
+      }
+    } catch(e) {
+      document.getElementById('score-grid').innerHTML =
+        '<div class="err-box">점수 로드 실패: '+e.message+'</div>';
+      return;
+    }
+  }
+  renderScoreTab();
+}
+
+function setScoreSort(s, el) {
+  _scoreSort = s;
+  document.querySelectorAll('#ss-avg,#ss-name,#ss-cnt').forEach(b=>b.classList.remove('active'));
+  el.classList.add('active');
+  renderScoreTab();
+}
+
+function renderScoreTab() {
+  const q  = (document.getElementById('score-search')?.value||'').trim();
+  const el = document.getElementById('score-grid');
+  if (!el) return;
+
+  // members와 조인
+  let data = members
+    .filter(m => m.status === 'active' && m.avg > 0)
+    .filter(m => !q || m.name.includes(q));
+
+  // 정렬
+  if (_scoreSort==='avg')  data.sort((a,b) => b.avg - a.avg);
+  if (_scoreSort==='name') data.sort((a,b) => a.name.localeCompare(b.name,'ko'));
+  if (_scoreSort==='cnt')  data.sort((a,b) =>
+    ((_scoreData[b.name]?.avgs.length)||0) - ((_scoreData[a.name]?.avgs.length)||0));
+
+  if (!data.length) { el.innerHTML='<div class="empty">없음</div>'; return; }
+
+  // 최고 에버리지 (바 차트 기준)
+  const maxAvg = Math.max(...data.map(m=>m.avg));
+
+  el.innerHTML = data.map((m, idx) => {
+    const sd      = _scoreData[m.name];
+    const cnt     = sd ? sd.avgs.length : 0;
+    const high    = sd ? Math.max(...sd.avgs) : m.avg;
+    const low     = sd ? Math.min(...sd.avgs) : m.avg;
+    const trend   = sd && sd.avgs.length > 1
+      ? Math.round(sd.avgs[sd.avgs.length-1] - sd.avgs[0])
+      : 0;
+    const trendStr = trend > 0 ? `<span style="color:var(--green);font-size:10px;font-weight:700">▲${trend}</span>`
+                   : trend < 0 ? `<span style="color:var(--red);font-size:10px;font-weight:700">▼${Math.abs(trend)}</span>`
+                   : `<span style="color:var(--muted);font-size:10px">─</span>`;
+    const rankColor = idx===0 ? '#f59e0b' : idx===1 ? '#94a3b8' : idx===2 ? '#b45309' : 'var(--border)';
+    const nm = m.name.replace(/'/g,"\'");
+
+    return `<div onclick="openAvgGraph('${nm}')"
+      style="background:var(--card);border-radius:12px;padding:13px 14px;margin-bottom:7px;box-shadow:var(--sh);cursor:pointer;active:opacity:.8;transition:.12s;display:flex;align-items:center;gap:12px">
+      <!-- 순위 -->
+      <div style="width:28px;height:28px;border-radius:8px;background:${rankColor};display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:900;color:${idx<3?'#fff':'var(--muted)'};flex-shrink:0">${idx+1}</div>
+      <!-- 정보 -->
+      <div style="flex:1;min-width:0">
+        <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px">
+          <span style="font-size:14px;font-weight:900;color:var(--navy)">${m.name}</span>
+          ${trendStr}
+          ${cnt > 0 ? `<span style="font-size:9px;color:var(--muted);background:var(--bg);padding:1px 5px;border-radius:4px">${cnt}기록</span>` : ''}
+        </div>
+        <!-- 에버리지 바 -->
+        <div style="display:flex;align-items:center;gap:7px">
+          <div style="flex:1;background:var(--bg);border-radius:3px;height:6px;overflow:hidden">
+            <div style="width:${Math.round(m.avg/maxAvg*100)}%;height:100%;border-radius:3px;background:${idx===0?'#f59e0b':'var(--navy)'}"></div>
+          </div>
+          <span style="font-size:20px;font-weight:900;color:var(--navy);flex-shrink:0">${m.avg}</span>
+        </div>
+        <!-- 최고/최저 -->
+        ${cnt > 1 ? `<div style="font-size:10px;color:var(--muted);margin-top:3px">최고 <strong style="color:var(--green)">${high}</strong> · 최저 <strong style="color:var(--red)">${low}</strong> · ${m.dept||''}</div>` : `<div style="font-size:10px;color:var(--muted);margin-top:3px">${m.dept||''}</div>`}
+      </div>
+      <span style="font-size:16px;color:var(--muted)">›</span>
+    </div>`;
+  }).join('');
+}
 
 function toggleScoreForm() {
   const body  = document.getElementById('score-form-body');
