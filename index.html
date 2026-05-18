@@ -935,6 +935,7 @@ async function syncAll() {
     document.getElementById('sdot').className='dot ok';
     document.getElementById('stxt').textContent=`${_activeCnt}명`;
     toast(`✅ ${_activeCnt}명 동기화 완료`);
+    _log('동기화',`활성 ${_activeCnt}명`);
     renderDashSummary(); // 로컬 데이터로 즉시 표시
     // 게스트 있으면 토글 바 표시
     const hasGuests = (_allMembers.length?_allMembers:members).some(m=>m.status==='guest');
@@ -1272,6 +1273,7 @@ async function saveAttendance() {
     _lastSavedAt = new Date();
     updateLastSaved();
     toast(`✅ ${attendees.length}명 저장 완료!`);
+    _log('참석저장',currentEventTitle,attendees.length);
     showOverlay('저장 완료!', `${attendees.length}명`, false);
     setTimeout(hideOverlay, 1200);
     // ★ 게스트 참가비 자동 기록 제안
@@ -1831,7 +1833,7 @@ async function addFinanceEntry(){
   if(!desc){toast('내용을 입력하세요');return;}
   if(isNaN(amount)){toast('금액을 입력하세요');return;}
   const res=await api({action:'addFinance',date,desc,amount,category:cat,note:''});
-  if(res.ok){toast('✅ 추가됨');document.getElementById('fin-desc').value='';document.getElementById('fin-amount').value='';loadFinances();}
+  if(res.ok){toast('✅ 추가됨');_log('가계부추가',desc,amount);document.getElementById('fin-desc').value='';document.getElementById('fin-amount').value='';loadFinances();}
   else toast('❌ '+res.error);
 }
 async function deleteFinEntry(rowNum){if(!confirm('삭제할까요?'))return;const res=await api({action:'deleteFinance',rowNum});if(res.ok){toast('🗑 삭제됨');loadFinances();}else toast('❌ '+(res.error||''));}
@@ -2350,6 +2352,38 @@ async function checkGuestLimit(guestName) {
     }
     return attendedCount;
   } catch(e) { return 0; }
+}
+
+
+// ── 로그 전송 (fire-and-forget) ──
+function _log(act, detail, count) {
+  gasPost({ action:'addLog', act:act, detail:String(detail||''), count:String(count||'') }).catch(()=>{});
+}
+
+async function loadLogs() {
+  const el = document.getElementById('log-list');
+  el.innerHTML = '<div class="loading"><div class="spin"></div>불러오는 중...</div>';
+  try {
+    const res = await gasGet('getLogs', { limit:200 });
+    if (!Array.isArray(res)||!res.length){el.innerHTML='<div class="empty">로그 없음</div>';return;}
+    const C={'동기화':'#3b82f6','참석저장':'#10b981','레인배정':'#f59e0b','회원추가':'#8b5cf6',
+             '납부처리':'#10b981','납부취소':'#ef4444','탈퇴처리':'#ef4444','가계부추가':'#f59e0b','점수입력':'#0d1b35'};
+    el.innerHTML=res.map(r=>`<div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid #f8fafc;font-size:11px">
+      <span style="color:var(--muted);flex-shrink:0;min-width:105px">${r.ts.slice(5,16)}</span>
+      <span style="background:${C[r.action]||'#64748b'};color:#fff;padding:2px 7px;border-radius:99px;font-size:10px;font-weight:700;flex-shrink:0">${r.action}</span>
+      <span style="flex:1;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${r.detail}</span>
+      ${r.count?`<span style="color:var(--muted);flex-shrink:0">${r.count}건</span>`:''}
+    </div>`).join('');
+  } catch(e){el.innerHTML='<div class="empty">로드 실패: '+e.message+'</div>';}
+}
+
+function toggleLogViewer(){
+  const body=document.getElementById('log-viewer-body');
+  const arrow=document.getElementById('log-toggle-arrow');
+  if(!body)return;
+  const open=body.style.display!=='none';
+  body.style.display=open?'none':'block';
+  arrow.textContent=open?'▼ 펼치기':'▲ 접기';
 }
 
 // ═══════════════════════════════════════════════════════
