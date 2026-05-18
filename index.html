@@ -47,7 +47,7 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
 .evt-panel{background:rgba(0,0,0,.28);border-radius:12px;padding:10px;margin-top:6px;display:none}
 .evt-panel.open{display:block}
 .ep-lbl{font-size:10px;font-weight:700;color:rgba(255,255,255,.5);margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px}
-.evt-chips{display:flex;gap:5px;overflow-x:auto;scrollbar-width:none;padding-bottom:4px}
+.evt-chips{display:flex;gap:5px;flex-wrap:wrap;padding-bottom:4px;max-height:120px;overflow-y:auto;scrollbar-width:none}
 .evt-chips::-webkit-scrollbar{display:none}
 .ec{flex-shrink:0;padding:5px 11px;border-radius:99px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);color:rgba(255,255,255,.8);font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap;font-family:'Noto Sans KR',sans-serif}
 .ec.sel{background:var(--amber);border-color:var(--amber);color:var(--navy)}
@@ -505,9 +505,10 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
         <div class="mgmt-lbl">학과</div>
         <input class="inp" id="new-dept" type="text" placeholder="컴퓨터공학과" list="dept-list" style="margin-bottom:8px">
         <datalist id="dept-list"></datalist>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">
-          <div><div class="mgmt-lbl">학번(앞2자리)</div><input class="inp" id="new-grade" type="text" placeholder="26" maxlength="2"></div>
-          <div><div class="mgmt-lbl">게스트 여부</div><select class="sel" id="new-status"><option value="active">일반회원</option><option value="guest">게스트</option></select></div>
+        <div style="margin-bottom:10px">
+          <div class="mgmt-lbl">학번(앞2자리)</div>
+          <input class="inp" id="new-grade" type="text" placeholder="26" maxlength="2">
+          <input type="hidden" id="new-status" value="active">
         </div>
         <button class="btn btn-navy" style="width:100%;height:42px;font-size:13px;border-radius:10px" onclick="addNewMember()">✅ 추가</button>
       </div>
@@ -526,20 +527,6 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
           <button class="btn btn-amber" style="flex-shrink:0;color:var(--navy)" onclick="addGuest()">추가</button>
         </div>
         <div id="guest-list"></div>
-      </div>
-
-      <!-- 학기 리셋 카드 -->
-      <div class="mgmt-card" style="border:2px solid #fee2e2">
-        <div style="font-size:13px;font-weight:700;color:var(--red);margin-bottom:6px">🔄 학기 리셋</div>
-        <div style="font-size:11px;color:var(--muted);line-height:1.7;margin-bottom:10px">
-          · 전체 회원 회비 납부 현황 초기화 (X로 변경)<br>
-          · 현재 잔액을 finances에 이월금으로 자동 기록<br>
-          · ⚠️ 되돌릴 수 없습니다
-        </div>
-        <label style="display:flex;align-items:center;gap:7px;margin-bottom:10px;font-size:12px;cursor:pointer">
-          <input type="checkbox" id="carry-over-chk" checked> 현재 잔액을 이월금으로 기록
-        </label>
-        <button class="btn btn-red" style="width:100%;height:40px" onclick="semesterReset()">🔄 학기 리셋 실행</button>
       </div>
 
     </div>
@@ -1089,7 +1076,7 @@ function renderList() {
         ${m.avg?`<div class="gc-avg">${m.avg}</div>`:''}
         <div class="gc-dept">${m.dept||''}</div>
         ${att?`<div class="gc-chk">✓</div>`:''}
-        ${m.feePaid!=='O'?`<div class="gc-fee">미납</div>`:''}
+        ${m.status!=='guest'&&m.feePaid!=='O'?`<div class="gc-fee">미납</div>`:''}
       </div>`;
     }).join('');
   } else {
@@ -1100,7 +1087,7 @@ function renderList() {
       return `<div class="mc ${att?'attend':''}" onclick="toggleMember('${nm}')">
         <div class="mc-info">
           <div class="mc-name">${m.name}
-            ${m.feePaid!=='O'?' <span style="font-size:10px;color:var(--red);font-weight:700">미납</span>':''}
+            ${m.status!=='guest'&&m.feePaid!=='O'?' <span style="font-size:10px;color:var(--red);font-weight:700">미납</span>':''}
           </div>
           <div class="mc-sub">${m.avg?`<span class="avg-chip">${m.avg}</span>`:''}<span>${m.dept||''}</span></div>
         </div>
@@ -1549,7 +1536,7 @@ function renderMemberList() {
       </div>
       <div style="display:flex;gap:4px;flex-shrink:0">
         <button class="btn" style="font-size:10px;padding:5px 8px;border-radius:7px;background:var(--border);color:var(--text)" onclick="openEditModal('${nm}')">✏️</button>
-        <button class="btn ${m.feePaid==='O'?'btn-amber':'btn-green'}" style="font-size:10px;padding:5px 8px;border-radius:7px" onclick="toggleFee('${nm}','${m.feePaid}')">${m.feePaid==='O'?'💸':'💰'}</button>
+        ${m.status!=='guest'?`<button class="btn ${m.feePaid==='O'?'btn-amber':'btn-green'}" style="font-size:10px;padding:5px 8px;border-radius:7px" onclick="toggleFee('${nm}','${m.feePaid}')">${m.feePaid==='O'?'💸':'💰'}</button>`:''}
         ${m.status!=='left'?`<button class="btn btn-red" style="font-size:10px;padding:5px 8px;border-radius:7px" onclick="setLeft('${nm}')">탈퇴</button>`:`<button class="btn btn-green" style="font-size:10px;padding:5px 8px;border-radius:7px" onclick="setActive('${nm}')">복귀</button>`}
       </div>
     </div>`;
