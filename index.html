@@ -774,7 +774,7 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
 // ═══════════════════════════════════════════════════════
 //  STATE
 // ═══════════════════════════════════════════════════════
-let GAS_URL = 'https://script.google.com/macros/s/AKfycbxu6run01Cc9Y5LLgXKvLt35COSKNFL1KEyPQG74klxFlh6ZGUIbpcNqHNBr7GSbWEP/exec'; // 하드코딩됨
+let GAS_URL = 'https://script.google.com/macros/s/AKfycbz1wF_QiZrguNYKgOUrr0sIwWbJYsnPyb5z4XahNsucr5rXUTH9aRYC-O7ziula65sX/exec'; // 하드코딩됨
 let members = [], events = [], finances = [];
 let _allMembers = []; // 탈퇴 포함 전체 (관리탭용)
 let statusMap = {}, tempAvgMap = {};
@@ -809,7 +809,7 @@ function save() {
 }
 function load() {
   try {
-    GAS_URL = localStorage.getItem('pf_url') || 'https://script.google.com/macros/s/AKfycbxu6run01Cc9Y5LLgXKvLt35COSKNFL1KEyPQG74klxFlh6ZGUIbpcNqHNBr7GSbWEP/exec';
+    GAS_URL = localStorage.getItem('pf_url') || 'https://script.google.com/macros/s/AKfycbz1wF_QiZrguNYKgOUrr0sIwWbJYsnPyb5z4XahNsucr5rXUTH9aRYC-O7ziula65sX/exec';
     const s = localStorage.getItem('pf_st');  if (s) statusMap   = JSON.parse(s);
     const t = localStorage.getItem('pf_tmp'); if (t) tempAvgMap  = JSON.parse(t);
     const e = localStorage.getItem('pf_evt'); if (e) currentEventId = e;
