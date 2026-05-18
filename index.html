@@ -295,7 +295,7 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
   <div class="hdr-top">
     <div class="logo" onclick="_cfgTap()" style="cursor:default">🎳 팀<em>퍼펙트</em></div>
     <div class="hdr-right">
-      <span id="last-saved" style="display:none;font-size:9px;color:rgba(255,255,255,.4);margin-right:4px"></span>
+      <span id="last-saved" style="display:none;background:rgba(16,185,129,.25);border:1px solid rgba(16,185,129,.4);color:#6ee7b7;font-size:10px;font-weight:700;padding:3px 8px;border-radius:99px;margin-right:4px"></span>
       <div class="sync-pill" onclick="syncAll()">
         <div class="dot" id="sdot"></div>
         <span id="stxt">대기중</span>
@@ -342,10 +342,10 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
 <!-- ══ TABS ══ -->
 <div class="tabs" id="tabs">
   <button class="tbt active" id="tab-att"  onclick="switchTab('att')">☑️ 참석</button>
+  <button class="tbt"        id="tab-roll" onclick="switchTab('roll')">📋 현장</button>
   <button class="tbt"        id="tab-lane" onclick="switchTab('lane')">🎳 레인</button>
   <button class="tbt"        id="tab-dash" onclick="switchTab('dash')">📊 현황</button>
   <button class="tbt"        id="tab-mgmt" onclick="switchTab('mgmt')">⚙️ 관리</button>
-  <button class="tbt"        id="tab-roll" onclick="switchTab('roll')">📋 현장</button>
 </div>
 
 <div id="offline-bar">⚠️ 오프라인 — 저장 안 됩니다</div>
@@ -375,6 +375,11 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
       style="width:100%;padding:7px;border:1.5px dashed #fcd34d;border-radius:9px;background:#fefce8;color:#92400e;font-size:12px;font-weight:700;font-family:'Noto Sans KR',sans-serif;cursor:pointer">
       👥 게스트 체크 펼치기 ▼
     </button>
+  </div>
+  <!-- 모임 미선택 안내 -->
+  <div id="no-event-banner" style="display:none;margin:10px 12px;background:linear-gradient(135deg,#fef3c7,#fde68a);border-radius:12px;padding:14px 16px;border-left:4px solid var(--amber)">
+    <div style="font-size:13px;font-weight:900;color:#92400e;margin-bottom:3px">👆 모임을 먼저 선택하세요</div>
+    <div style="font-size:11px;color:#92400e;opacity:.8">상단 배지를 탭해서 오늘 모임을 선택해야<br>참석 체크 후 저장할 수 있어요</div>
   </div>
   <div id="mlist-wrap">
     <div id="guest-att-section" style="display:none;border-radius:var(--r);overflow:hidden;margin:4px 11px;box-shadow:var(--sh)"></div>
@@ -891,9 +896,12 @@ async function syncAll() {
       else autoSelectEvent();
     } else autoSelectEvent();
 
-    setSS('ok', `${members.length}명`);
+    setSS('ok', `${members.filter(m=>m.status==='active').length}명`);
     setScrH(); renderList(); save();
-    toast(`✅ ${members.length}명 동기화 완료`);
+    const _activeCnt = members.filter(m=>m.status==='active').length;
+    document.getElementById('sdot').className='dot ok';
+    document.getElementById('stxt').textContent=`${_activeCnt}명`;
+    toast(`✅ ${_activeCnt}명 동기화 완료`);
     renderDashSummary(); // 로컬 데이터로 즉시 표시
     // 게스트 있으면 토글 바 표시
     const hasGuests = (_allMembers.length?_allMembers:members).some(m=>m.status==='guest');
@@ -1033,6 +1041,8 @@ function renderEvtChips() {
   }).join('');
 }
 function selectEvent(id, title, load=true) {
+  const neb = document.getElementById('no-event-banner');
+  if (neb) neb.style.display = 'none';
   currentEventId = id; currentEventTitle = title;
   setEvtBadge(title); renderEvtChips(); closeEvtPanel(); save();
   if (load) { statusMap = {}; loadAttendance(id).then(() => renderList()); }
@@ -1100,6 +1110,9 @@ function renderList() {
   document.getElementById('cnt-att').textContent = attCnt;
   document.getElementById('cnt-pnd').textContent = tot - attCnt;
   document.getElementById('float-save').classList.toggle('show', attCnt > 0);
+  // 모임 미선택 배너
+  const neb = document.getElementById('no-event-banner');
+  if (neb) neb.style.display = (!currentEventId && members.length > 0) ? 'block' : 'none';
 
   // 게스트는 별도 섹션 (_guestSrc에서)
   const guests = q ? _guestSrc.filter(m => m.name.includes(q)) : _guestSrc;
@@ -1250,7 +1263,7 @@ function hideOverlay() { document.getElementById('save-overlay').classList.remov
 function updateLastSaved() {
   const el = document.getElementById('last-saved');
   if (!el || !_lastSavedAt) return;
-  el.textContent = `저장 ${String(_lastSavedAt.getHours()).padStart(2,'0')}:${String(_lastSavedAt.getMinutes()).padStart(2,'0')}`;
+  el.textContent = `✓ ${String(_lastSavedAt.getHours()).padStart(2,'0')}:${String(_lastSavedAt.getMinutes()).padStart(2,'0')} 저장됨`;
   el.style.display = 'inline';
 }
 
@@ -1579,6 +1592,7 @@ function renderMemberList() {
         <div class="mem-sub">${m.dept||'-'} · ${m.grade||'-'}학번${m.avg?' · 에버 '+m.avg:''}</div>
       </div>
       <div style="display:flex;gap:4px;flex-shrink:0">
+        ${m.avg>0?`<button class="btn" style="font-size:10px;padding:5px 8px;border-radius:7px;background:#ecfdf5;color:#065f46;border:1px solid #a7f3d0" onclick="openAvgGraph('${nm}')">📈</button>`:''}
         <button class="btn" style="font-size:10px;padding:5px 8px;border-radius:7px;background:var(--border);color:var(--text)" onclick="openEditModal('${nm}')">✏️</button>
         ${m.status!=='guest'?`<button class="btn ${m.feePaid==='O'?'btn-amber':'btn-green'}" style="font-size:10px;padding:5px 8px;border-radius:7px" onclick="toggleFee('${nm}','${m.feePaid}')">${m.feePaid==='O'?'💸':'💰'}</button>`:''}
         ${m.status!=='left'?`<button class="btn btn-red" style="font-size:10px;padding:5px 8px;border-radius:7px" onclick="setLeft('${nm}')">탈퇴</button>`:`<button class="btn btn-green" style="font-size:10px;padding:5px 8px;border-radius:7px" onclick="setActive('${nm}')">복귀</button>`}
@@ -1890,13 +1904,36 @@ async function submitBulkScore(){
 }
 async function loadRecentScores(){
   const el=document.getElementById('recent-scores');if(!el)return;
-  try{const res=await gasGet('getScores');if(res.error)throw new Error(res.error);const recent=[...res].sort((a,b)=>b.date.localeCompare(a.date)).slice(0,20);el.innerHTML=recent.map(s=>`<div class="fin-row"><div class="fin-info"><div class="fin-desc">${s.name}</div><div class="fin-meta">${s.date} · ${s.games}게임</div></div><div class="fin-amt plus">avg ${s.avg}</div></div>`).join('')||'<div class="empty">없음</div>';}
+  try{const res=await gasGet('getScores');if(res.error)throw new Error(res.error);const recent=[...res].sort((a,b)=>b.date.localeCompare(a.date)).slice(0,20);el.innerHTML=recent.map(s=>{const nm=s.name.replace(/'/g,"\'");return`<div class="fin-row" onclick="openAvgGraph('${nm}')" style="cursor:pointer"><div class="fin-info"><div class="fin-desc">${s.name}</div><div class="fin-meta">${s.date} · ${s.games}게임</div></div><div class="fin-amt plus">avg ${s.avg}</div><span style="font-size:10px;color:var(--muted)">📈</span></div>`;}).join('')||'<div class="empty">없음</div>';}
   catch(e){el.innerHTML='<div class="empty">로드 실패</div>';}
 }
 
 // ═══════════════════════════════════════════════════════
 //  ROLL CALL
 // ═══════════════════════════════════════════════════════
+
+// ── 현장 출석 임시저장 ──
+function saveRollTemp() {
+  try {
+    const key = 'pf_roll_' + (currentEventId||'noevt');
+    localStorage.setItem(key, JSON.stringify(rollMap));
+    localStorage.setItem('pf_roll_evt', currentEventId||'');
+  } catch(e) {}
+}
+function loadRollTemp() {
+  try {
+    const savedEvt = localStorage.getItem('pf_roll_evt');
+    if (savedEvt && savedEvt === currentEventId) {
+      const saved = localStorage.getItem('pf_roll_' + currentEventId);
+      if (saved) return JSON.parse(saved);
+    }
+  } catch(e) {}
+  return null;
+}
+function clearRollTemp() {
+  try { localStorage.removeItem('pf_roll_' + (currentEventId||'noevt')); } catch(e) {}
+}
+
 function initRoll(){
   rollMap={};
   members.filter(m=>statusMap[m.name]==='attend').forEach(m=>{rollMap[m.name]=false;});
@@ -1952,6 +1989,157 @@ function rollCopyMissing(){const missing=Object.keys(rollMap).filter(n=>!rollMap
 //  AVG POPUP
 // ═══════════════════════════════════════════════════════
 function openAvgPopup(name){avgPopupTarget=name;document.getElementById('avg-popup-name').textContent=name+' 에버리지';document.getElementById('avg-inp').value=tempAvgMap[name]||'';document.getElementById('avg-popup').classList.add('show');}
+
+// ══════════════════════════════════════════════════════
+//  개인 에버리지 그래프
+// ══════════════════════════════════════════════════════
+async function openAvgGraph(name) {
+  // 서버에서 점수 로드
+  let scores = [];
+  try {
+    const res = await gasGet('getScores', { name });
+    if (Array.isArray(res)) scores = res.filter(s => s.avg > 0).sort((a,b)=>a.date.localeCompare(b.date));
+  } catch(e) {}
+
+  if (!scores.length) { toast(`${name}의 점수 기록이 없습니다`); return; }
+
+  const avgs    = scores.map(s => s.avg);
+  const curAvg  = Math.round(avgs.reduce((s,v)=>s+v,0)/avgs.length);
+  const maxAvg  = Math.max(...avgs);
+  const firstAvg = avgs[0];
+  const trend   = curAvg - firstAvg;
+
+  // 헤더 채우기
+  document.getElementById('agm-name').textContent = name;
+  document.getElementById('agm-sub').textContent = `${scores.length}게임 기록`;
+  document.getElementById('agm-cur').textContent = curAvg;
+  document.getElementById('agm-max').textContent = maxAvg;
+  const trendEl = document.getElementById('agm-trend');
+  trendEl.textContent = (trend >= 0 ? '+' : '') + trend;
+  trendEl.style.color = trend > 0 ? 'var(--green)' : trend < 0 ? 'var(--red)' : 'var(--muted)';
+
+  // 점수 목록
+  document.getElementById('agm-list').innerHTML = [...scores].reverse().slice(0,10).map(s =>
+    `<div style="display:flex;justify-content:space-between;padding:6px 16px;border-bottom:1px solid #f8fafc;font-size:12px">
+      <span style="color:var(--muted)">${s.date}</span>
+      <span style="font-weight:700">총점 ${Math.round(s.totalScore)}</span>
+      <span style="font-weight:900;color:var(--navy)">avg ${s.avg}</span>
+    </div>`
+  ).join('');
+
+  document.getElementById('avg-graph-modal').classList.add('show');
+
+  // 그래프 그리기 (requestAnimationFrame으로 모달 렌더 후 실행)
+  requestAnimationFrame(() => drawAvgGraph(scores));
+}
+
+function drawAvgGraph(scores) {
+  const cv  = document.getElementById('avg-graph-canvas');
+  if (!cv) return;
+  const dpr = window.devicePixelRatio || 1;
+  const W   = cv.offsetWidth || 360;
+  const H   = 140;
+  cv.width  = W * dpr;
+  cv.height = H * dpr;
+  cv.style.width  = W + 'px';
+  cv.style.height = H + 'px';
+  const ctx = cv.getContext('2d');
+  ctx.scale(dpr, dpr);
+
+  const avgs = scores.map(s => s.avg);
+  const mn   = Math.max(0, Math.min(...avgs) - 15);
+  const mx   = Math.max(...avgs) + 15;
+  const pad  = { t:16, r:16, b:28, l:36 };
+  const gW   = W - pad.l - pad.r;
+  const gH   = H - pad.t - pad.b;
+  const n    = avgs.length;
+
+  const px = i => pad.l + (n===1 ? gW/2 : (i/(n-1)) * gW);
+  const py = v => pad.t + gH - ((v - mn)/(mx - mn)) * gH;
+
+  // 배경 그리드
+  ctx.strokeStyle = '#e2e8f0';
+  ctx.lineWidth = 1;
+  [0,.25,.5,.75,1].forEach(t => {
+    const y = pad.t + gH * t;
+    ctx.beginPath(); ctx.moveTo(pad.l, y); ctx.lineTo(pad.l+gW, y); ctx.stroke();
+    ctx.fillStyle = '#94a3b8';
+    ctx.font = '9px sans-serif';
+    ctx.textAlign = 'right';
+    ctx.fillText(Math.round(mx - t*(mx-mn)), pad.l - 5, y + 3);
+  });
+
+  // 그라디언트 채우기
+  const grad = ctx.createLinearGradient(0, pad.t, 0, pad.t + gH);
+  grad.addColorStop(0, 'rgba(16,185,129,.25)');
+  grad.addColorStop(1, 'rgba(16,185,129,.02)');
+  ctx.beginPath();
+  ctx.moveTo(px(0), py(avgs[0]));
+  for (let i=1; i<n; i++) {
+    // 베지어 커브로 부드러운 선
+    const cx1 = (px(i-1)+px(i))/2, cy1=py(avgs[i-1]);
+    const cx2 = (px(i-1)+px(i))/2, cy2=py(avgs[i]);
+    ctx.bezierCurveTo(cx1,cy1,cx2,cy2,px(i),py(avgs[i]));
+  }
+  ctx.lineTo(px(n-1), pad.t+gH);
+  ctx.lineTo(px(0), pad.t+gH);
+  ctx.closePath();
+  ctx.fillStyle = grad;
+  ctx.fill();
+
+  // 선
+  ctx.beginPath();
+  ctx.strokeStyle = '#10b981';
+  ctx.lineWidth = 2.5;
+  ctx.lineJoin = 'round';
+  ctx.moveTo(px(0), py(avgs[0]));
+  for (let i=1; i<n; i++) {
+    const cx1=(px(i-1)+px(i))/2, cy1=py(avgs[i-1]);
+    const cx2=(px(i-1)+px(i))/2, cy2=py(avgs[i]);
+    ctx.bezierCurveTo(cx1,cy1,cx2,cy2,px(i),py(avgs[i]));
+  }
+  ctx.stroke();
+
+  // 최고점 강조
+  const maxIdx = avgs.indexOf(Math.max(...avgs));
+  ctx.beginPath();
+  ctx.arc(px(maxIdx), py(avgs[maxIdx]), 6, 0, Math.PI*2);
+  ctx.fillStyle = '#f59e0b';
+  ctx.fill();
+  ctx.strokeStyle = '#fff';
+  ctx.lineWidth = 2;
+  ctx.stroke();
+
+  // 점들
+  avgs.forEach((v,i) => {
+    if (i === maxIdx) return;
+    ctx.beginPath();
+    ctx.arc(px(i), py(v), 3.5, 0, Math.PI*2);
+    ctx.fillStyle = '#10b981';
+    ctx.fill();
+    ctx.strokeStyle = '#fff';
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+  });
+
+  // 첫/마지막 날짜
+  ctx.fillStyle = '#94a3b8';
+  ctx.font = '9px sans-serif';
+  ctx.textAlign = 'center';
+  if (n > 0) ctx.fillText(scores[0].date.slice(5), px(0), H - 6);
+  if (n > 1) ctx.fillText(scores[n-1].date.slice(5), px(n-1), H - 6);
+
+  // 최고점 레이블
+  ctx.fillStyle = '#d97706';
+  ctx.font = 'bold 10px sans-serif';
+  ctx.textAlign = 'center';
+  ctx.fillText('★' + avgs[maxIdx], px(maxIdx), py(avgs[maxIdx]) - 10);
+}
+
+function closeAvgGraph() {
+  document.getElementById('avg-graph-modal').classList.remove('show');
+}
+
 function closeAvgPopup(){document.getElementById('avg-popup').classList.remove('show');avgPopupTarget=null;}
 function setAvgGuide(v){document.getElementById('avg-inp').value=v;}
 function applyAvg(){const v=parseInt(document.getElementById('avg-inp').value);if(!v||v<50||v>300){toast('50~300 입력');return;}if(avgPopupTarget){tempAvgMap[avgPopupTarget]=v;save();}closeAvgPopup();renderList();toast(`✅ ${avgPopupTarget} ${v} 적용`);}
@@ -2056,5 +2244,43 @@ function _cfgTap() {
   else { setSS('err','URL 없음'); document.getElementById('mlist').innerHTML='<div class="err-box">⚙️ 설정에서 GAS URL을 입력하세요.</div>'; }
 });
 </script>
+
+<!-- ══ 에버리지 그래프 모달 ══ -->
+<div class="modal-bg" id="avg-graph-modal">
+  <div class="modal" style="max-width:420px;padding:0;overflow:hidden">
+    <!-- 헤더 -->
+    <div style="background:var(--navy);padding:16px 18px;display:flex;justify-content:space-between;align-items:center">
+      <div>
+        <div style="font-size:15px;font-weight:900;color:#fff" id="agm-name">이름</div>
+        <div style="font-size:11px;color:rgba(255,255,255,.5);margin-top:2px" id="agm-sub">에버리지 변동</div>
+      </div>
+      <button onclick="closeAvgGraph()" style="background:rgba(255,255,255,.12);border:none;color:#fff;width:32px;height:32px;border-radius:8px;font-size:16px;cursor:pointer">✕</button>
+    </div>
+    <!-- 스탯 바 -->
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;background:#f8fafc;border-bottom:1px solid var(--border)">
+      <div style="padding:10px;text-align:center;border-right:1px solid var(--border)">
+        <div style="font-size:9px;color:var(--muted);font-weight:700;text-transform:uppercase">현재</div>
+        <div style="font-size:20px;font-weight:900;color:var(--navy)" id="agm-cur">-</div>
+      </div>
+      <div style="padding:10px;text-align:center;border-right:1px solid var(--border)">
+        <div style="font-size:9px;color:var(--muted);font-weight:700;text-transform:uppercase">최고</div>
+        <div style="font-size:20px;font-weight:900;color:var(--green)" id="agm-max">-</div>
+      </div>
+      <div style="padding:10px;text-align:center">
+        <div style="font-size:9px;color:var(--muted);font-weight:700;text-transform:uppercase">변동</div>
+        <div style="font-size:20px;font-weight:900" id="agm-trend">-</div>
+      </div>
+    </div>
+    <!-- 캔버스 그래프 -->
+    <div style="padding:16px 16px 8px;background:#fff">
+      <canvas id="avg-graph-canvas" style="width:100%;display:block" height="140"></canvas>
+    </div>
+    <!-- 점수 목록 -->
+    <div style="max-height:180px;overflow-y:auto;border-top:1px solid var(--border)">
+      <div id="agm-list" style="padding:8px 0"></div>
+    </div>
+  </div>
+</div>
+
 </body>
 </html>
