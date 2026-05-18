@@ -879,7 +879,7 @@ async function syncAll() {
       seen.add(m.name); return true;
     });
     _allMembers = _raw; // 전체 보관
-    members = _raw.filter(m => m.status !== 'left'); // 참석/레인용
+    members = _raw.filter(m => m.status !== 'left' && m.status !== 'left-guest'); // 참석/레인용
     events = Array.isArray(eRes) ? eRes : [];
 
     document.getElementById('evt-bar').style.display = 'block';
@@ -1066,6 +1066,10 @@ function toggleGuestSection() {
   sec.style.display = _guestSectionOpen ? 'block' : 'none';
   btn.textContent = _guestSectionOpen ? '👥 게스트 체크 접기 ▲' : '👥 게스트 체크 펼치기 ▼';
 }
+
+
+function isLeft(m) { return m.status === 'left' || m.status === 'left-guest'; }
+function isGuest(m) { return m.status === 'guest' || m.status === 'left-guest'; }
 
 function isVisible(m) { return m.status==='active'; } // 게스트는 별도 토글
 
@@ -1563,15 +1567,15 @@ function renderMemberList() {
   if (q) data = data.filter(m=>m.name.includes(q));
   if (memFilter==='active') data=data.filter(m=>m.status==='active');
   if (memFilter==='unpaid') data=data.filter(m=>m.feePaid!=='O'&&m.status==='active');
-  if (memFilter==='left')   data=data.filter(m=>m.status==='left');
+  if (memFilter==='left')   data=data.filter(m=>m.status==='left'||m.status==='left-guest');
   if (!data.length){el.innerHTML='<div class="empty">없음</div>';return;}
   el.innerHTML=data.map(m=>{
     const nm=m.name.replace(/'/g,"\\'");
-    const sl=m.status==='active'?'활성':m.status==='guest'?'게스트':'탈퇴';
+    const sl=m.status==='active'?'활성':m.status==='guest'?'게스트':m.status==='left-guest'?'게스트탈퇴':'탈퇴';
     const fl=m.feePaid==='O'?'납부':'미납';
     return `<div class="mem-item">
       <div class="mem-info">
-        <div class="mem-name">${m.name} <span class="badge ${m.status==='active'?'bd-active':m.status==='guest'?'bd-guest':'bd-left'}">${sl}</span> <span class="badge ${m.feePaid==='O'?'bd-paid':'bd-unpaid'}">${fl}</span></div>
+        <div class="mem-name">${m.name} <span class="badge ${m.status==='active'?'bd-active':m.status==='guest'?'bd-guest':(m.status==='left'||m.status==='left-guest')?'bd-left':'bd-left'}">${sl}</span> <span class="badge ${m.feePaid==='O'?'bd-paid':'bd-unpaid'}">${fl}</span></div>
         <div class="mem-sub">${m.dept||'-'} · ${m.grade||'-'}학번${m.avg?' · 에버 '+m.avg:''}</div>
       </div>
       <div style="display:flex;gap:4px;flex-shrink:0">
@@ -1590,8 +1594,31 @@ async function toggleFee(name,current) {
   if(res.ok){const m=members.find(m=>m.name===name);if(m)m.feePaid=newFee;if(_serverPaidCount)_serverPaidCount+=(newFee==='O'?1:-1);toast(`✅ ${name} ${newFee==='O'?'납부':'미납'}`);renderMemberList();renderList();renderDashSummary();}
   else toast('❌ '+(res.error||'실패'));
 }
-async function setLeft(name) { if(!confirm(`"${name}" 탈퇴 처리?`)) return; const res=await api({action:'updateMember',name,status:'left'}); if(res.ok){const m=members.find(m=>m.name===name);if(m)m.status='left';toast(`✅ ${name} 탈퇴`);renderMemberList();renderList();}else toast('❌ '+(res.error||'실패')); }
-async function setActive(name) { const res=await api({action:'updateMember',name,status:'active'}); if(res.ok){const m=members.find(m=>m.name===name);if(m)m.status='active';toast(`✅ ${name} 복귀`);renderMemberList();renderList();}else toast('❌ '+(res.error||'실패')); }
+async function setLeft(name) {
+  if (!confirm(`"${name}" 탈퇴 처리?`)) return;
+  const src = (_allMembers.length ? _allMembers : members);
+  const m = src.find(m => m.name === name);
+  const newStatus = (m && m.status === 'guest') ? 'left-guest' : 'left';
+  const res = await api({ action:'updateMember', name, status: newStatus });
+  if (res.ok) {
+    [members, _allMembers].forEach(arr => { const mm=arr.find(m=>m.name===name); if(mm) mm.status=newStatus; });
+    toast(`✅ ${name} 탈퇴${newStatus==='left-guest'?' (게스트)':''}`);
+    renderMemberList(); renderGuestList(); renderList();
+  } else toast('❌ '+(res.error||'실패'));
+}
+
+async function setActive(name) {
+  const src = (_allMembers.length ? _allMembers : members);
+  const m = src.find(m => m.name === name);
+  const restoreStatus = (m && m.status === 'left-guest') ? 'guest' : 'active';
+  const res = await api({ action:'updateMember', name, status: restoreStatus });
+  if (res.ok) {
+    [members, _allMembers].forEach(arr => { const mm=arr.find(m=>m.name===name); if(mm) mm.status=restoreStatus; });
+    toast(`✅ ${name} 복귀${restoreStatus==='guest'?' (게스트)':''}`);
+    renderMemberList(); renderGuestList(); renderList();
+  } else toast('❌ '+(res.error||'실패'));
+}
+
 async function addNewMember() {
   const name=document.getElementById('new-name').value.trim();
   const dept=document.getElementById('new-dept').value.trim();
