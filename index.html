@@ -664,6 +664,18 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
         <div style="font-size:13px;font-weight:700;color:var(--navy);margin-bottom:9px">📊 최근 점수</div>
         <div id="recent-scores"></div>
       </div>
+
+      <div class="mgmt-card">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;cursor:pointer" onclick="toggleLogViewer()">
+          <div style="font-size:13px;font-weight:700;color:var(--navy)">📜 사용 로그</div>
+          <span id="log-toggle-arrow" style="font-size:12px;color:var(--muted)">▼ 펼치기</span>
+        </div>
+        <div id="log-viewer-body" style="display:none">
+          <div style="font-size:11px;color:var(--muted);margin-bottom:8px">최근 200건 · 시각+행위만 기록됩니다</div>
+          <button class="btn btn-navy" style="width:100%;height:36px;font-size:12px;border-radius:8px;margin-bottom:8px" onclick="loadLogs()">🔄 로그 불러오기</button>
+          <div id="log-list"><div class="empty">버튼을 눌러 불러오세요</div></div>
+        </div>
+      </div>
     </div>
   </div>
 </div>
