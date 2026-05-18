@@ -370,6 +370,7 @@ body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text
     <button class="fp"        onclick="setFilter('pending',this)">❓ 미정 <span id="cnt-pnd">0</span></button>
   </div>
   <div id="mlist-wrap">
+    <div id="guest-att-section" style="display:none;border-radius:var(--r);overflow:hidden;margin:4px 11px;box-shadow:var(--sh)"></div>
     <div class="mlist" id="mlist"><div class="loading"><div class="spin"></div>불러오는 중...</div></div>
   </div>
 </div>
@@ -783,6 +784,7 @@ let manualLanes = {}, manualUnassigned = [], manualSelChip = null;
 let swapMode = false, swapSel = null, avgPopupTarget = null;
 let _isSaving = false, _selectedType = '';
 let _serverPaidCount = null;
+let _serverActivePaidCount = null;
 let _lastSavedAt = null;
 let _editingMember = null, _editingFin = null;
 let _finFilter = 'all', memFilter = 'all';
@@ -887,12 +889,17 @@ async function syncAll() {
     setSS('ok', `${members.length}명`);
     setScrH(); renderList(); save();
     toast(`✅ ${members.length}명 동기화 완료`);
+    renderDashSummary(); // 로컬 데이터로 즉시 표시
 
-    // 잔액용 paidCount (left 포함)
-    try {
-      const d = await gasGet('getDashboard');
-      if (d.paidCount) { _serverPaidCount = d.paidCount; renderDashSummary(); }
-    } catch(e) {}
+    // 잔액용 paidCount (left 포함) — 백그라운드로
+    gasGet('getDashboard').then(d => {
+      if (d.paidCount) {
+        _serverPaidCount = d.paidCount;
+        if (d.activePaidCount) _serverActivePaidCount = d.activePaidCount;
+        renderDashSummary();
+        updateBalance();
+      }
+    }).catch(()=>{});
     updateDeptDatalist();
   } catch(e) {
     setSS('err', '오류');
@@ -1000,7 +1007,12 @@ function renderEvtChips() {
   el.innerHTML = sorted.map(ev => {
     const fut = ev.date && new Date(ev.date) >= now;
     const sel = ev.eventId === currentEventId;
-    return `<div class="ec ${sel?'sel':''} ${fut&&!sel?'fut':''}" onclick="selectEvent('${ev.eventId}','${ev.title.replace(/'/g,"\\'")}',true)">${fut&&!sel?'🔜 ':''}${ev.title}</div>`;
+    const eid = ev.eventId;
+    const ttl = ev.title.replace(/'/g,"\\'");
+    return `<div class="ec ${sel?'sel':''} ${fut&&!sel?'fut':''}"
+      onclick="selectEvent('${eid}','${ttl}',true)"
+      oncontextmenu="event.preventDefault();deleteEventConfirm('${eid}','${ttl}')"
+      title="길게 누르면 삭제">${fut&&!sel?'🔜 ':''}${ev.title}</div>`;
   }).join('');
 }
 function selectEvent(id, title, load=true) {
@@ -1047,7 +1059,13 @@ function renderList() {
   document.getElementById('cnt-pnd').textContent = tot - attCnt;
   document.getElementById('float-save').classList.toggle('show', attCnt > 0);
 
-  if (!data.length) { el.className='mlist'; el.innerHTML='<div class="empty">검색 결과 없음 🤔</div>'; return; }
+  // 게스트는 별도 섹션 — 일반 목록에서 제외
+  const guests = data.filter(m => m.status === 'guest');
+  data = data.filter(m => m.status !== 'guest');
+
+  if (!data.length && !guests.length) {
+    el.className='mlist'; el.innerHTML='<div class="empty">검색 결과 없음 🤔</div>'; return;
+  }
 
   if (viewMode==='grid') {
     el.className = 'grid-view';
@@ -1067,12 +1085,10 @@ function renderList() {
     el.className = 'mlist';
     el.innerHTML = data.map(m => {
       const att = statusMap[m.name]==='attend';
-      const g   = m.status==='guest';
       const nm  = m.name.replace(/'/g,"\\'");
-      return `<div class="mc ${att?'attend':''} ${g?'mc-guest':''}" onclick="toggleMember('${nm}')">
+      return `<div class="mc ${att?'attend':''}" onclick="toggleMember('${nm}')">
         <div class="mc-info">
           <div class="mc-name">${m.name}
-            ${g?'<span style="font-size:10px;background:#fcd34d;color:#92400e;padding:1px 5px;border-radius:4px;font-weight:700;margin-left:4px">게스트</span>':''}
             ${m.feePaid!=='O'?' <span style="font-size:10px;color:var(--red);font-weight:700">미납</span>':''}
           </div>
           <div class="mc-sub">${m.avg?`<span class="avg-chip">${m.avg}</span>`:''}<span>${m.dept||''}</span></div>
@@ -1080,6 +1096,33 @@ function renderList() {
         <div class="chk">${att?'✓':''}</div>
       </div>`;
     }).join('');
+  }
+
+  // ★ 게스트 섹션 (하단 분리)
+  const guestWrap = document.getElementById('guest-att-section');
+  if (guestWrap) {
+    if (guests.length) {
+      const gAttCnt = guests.filter(m=>statusMap[m.name]==='attend').length;
+      guestWrap.style.display = 'block';
+      guestWrap.innerHTML = `
+        <div style="padding:6px 12px;font-size:11px;font-weight:700;color:#92400e;background:#fef3c7;display:flex;justify-content:space-between">
+          <span>👥 게스트 (참가비 3,000원)</span>
+          <span>${gAttCnt}/${guests.length}명 참석</span>
+        </div>
+        ${guests.map(m=>{
+          const att=statusMap[m.name]==='attend';
+          const nm=m.name.replace(/'/g,"\\'");
+          return `<div class="mc ${att?'attend':''} mc-guest" onclick="toggleMember('${nm}')" style="border-radius:0;border-bottom:1px solid var(--border);margin:0">
+            <div class="mc-info">
+              <div class="mc-name">${m.name} <span style="font-size:9px;background:#fcd34d;color:#92400e;padding:1px 5px;border-radius:4px;font-weight:700">G</span></div>
+              <div class="mc-sub">${m.dept||''}</div>
+            </div>
+            <div class="chk">${att?'✓':''}</div>
+          </div>`;
+        }).join('')}`;
+    } else {
+      guestWrap.style.display = 'none';
+    }
   }
 }
 
@@ -1299,9 +1342,11 @@ function renderDashSummary() {
 
   set('d-total',   active.length);
   set('d-att',     members.filter(m=>statusMap[m.name]==='attend').length||'-');
-  const rate = active.length ? Math.round(paid.length/active.length*100) : 0;
+  const activePaid = members.filter(m=>m.feePaid==='O'&&m.status==='active');
+  const leftPaid   = members.filter(m=>m.feePaid==='O'&&m.status==='left');
+  const rate = active.length ? Math.round(activePaid.length/active.length*100) : 0;
   set('d-fee-rate', rate+'%');
-  set('d-fee-sub',  `${paid.length}/${active.length}명 납부`);
+  set('d-fee-sub',  `${activePaid.length}/${active.length}명 납부${leftPaid.length>0?' (탈퇴 '+leftPaid.length+'명)':''}`)  ;
   set('d-unpaid',   unpaid.length);
 
   const ul = document.getElementById('unpaid-list');
@@ -1322,7 +1367,9 @@ async function renderDash() {
     if (res.paidCount) _serverPaidCount = res.paidCount;
     document.getElementById('d-total').textContent = res.totalMembers||'-';
     document.getElementById('d-fee-rate').textContent = (res.feeRate||0)+'%';
-    document.getElementById('d-fee-sub').textContent  = `${res.paidCount||0}/${res.totalMembers||0}명 납부`;
+    const actP = res.activePaidCount||0, leftP = res.leftPaidCount||0, tot = res.totalMembers||0;
+    document.getElementById('d-fee-sub').textContent  =
+      `${actP}/${tot}명 납부${leftP>0?' (탈퇴납부 '+leftP+'명 별도)':''}`;
     document.getElementById('d-unpaid').textContent   = res.unpaidCount||'0';
     const trend = document.getElementById('evt-trend');
     if (res.events?.length) trend.innerHTML = [...res.events].sort((a,b)=>(a.date||'').localeCompare(b.date||'')).map(ev=>`<div class="trend-item"><div class="trend-cnt">${ev.attendeeCount}</div><div class="trend-name">${ev.title.replace(/\[|\]/g,'').trim()}</div></div>`).join('');
