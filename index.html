@@ -1054,6 +1054,7 @@ async function confirmNewEvent() {
     statusMap = {};
     selectEvent(res.eventId, title, true);
     toast(`✅ "${title}" 생성됨`);
+    _log('모임생성', title);
   } catch(e) { toast('❌ '+e.message); }
 }
 function renderEvtChips() {
@@ -1089,6 +1090,7 @@ function renderEvtChips() {
 function selectEvent(id, title, load=true) {
   const neb = document.getElementById('no-event-banner');
   if (neb) neb.style.display = 'none';
+  _log('모임선택', title);
   currentEventId = id; currentEventTitle = title;
   setEvtBadge(title); renderEvtChips(); closeEvtPanel(); save();
   if (load) { statusMap = {}; loadAttendance(id).then(() => renderList()); }
@@ -1098,6 +1100,7 @@ function setEvtBadge(title) { document.getElementById('evt-badge-name').textCont
 // ═══════════════════════════════════════════════════════
 //  TAB
 // ═══════════════════════════════════════════════════════
+const TAB_NAME = {att:'참석여부',roll:'현장출석',lane:'레인배정',dash:'현황',score:'점수',mgmt:'관리'};
 function switchTab(tab) {
   ['att','lane','dash','mgmt','roll','score'].forEach(t => {
     document.getElementById(`sec-${t}`).classList.toggle('active', t===tab);
@@ -1109,6 +1112,7 @@ function switchTab(tab) {
   if (tab==='roll') initRoll();
   if (tab==='lane') { const att=getAttendees(); if(att.length) checkNoAvg(att); }
   setScrH();
+  _log((TAB_NAME[tab]||tab)+' 열람', currentEventTitle||'');
 }
 
 // ═══════════════════════════════════════════════════════
@@ -1413,6 +1417,7 @@ function copyKakao(){
   let txt=`🎳 레인배정 결과\n📅 ${currentEventTitle||'미정'}\n👥 참석 ${total}명 · 편차 ${spread}점\n${'━'.repeat(20)}\n\n`;
   laneGroups.forEach(t=>{const avg=t.members.length?Math.round(t.total/t.members.length):0;txt+=`🏆 팀${t.teamNum} (${t.laneAN}·${t.laneBN}번레인)\n   합계 ${Math.round(t.total)} / 평균 ${avg}\n   ${t.laneAN}번 🎳 ${t.laneA.map(m=>m.avg?m.name+'('+m.avg+')':m.name).join(' · ')}\n`;if(t.laneB.length)txt+=`   ${t.laneBN}번 🎳 ${t.laneB.map(m=>m.avg?m.name+'('+m.avg+')':m.name).join(' · ')}\n`;txt+='\n';});
   txt+=`${'━'.repeat(20)}\n🎉 모두 즐거운 게임!`;
+  _log('레인공유', currentEventTitle||'', laneGroups.reduce((s,t)=>s+t.members.length,0));
   if(navigator.share){navigator.share({title:'팀퍼펙트 레인배정',text:txt.trim()}).catch(()=>{});}
   else{navigator.clipboard?.writeText(txt.trim()).then(()=>toast('📤 복사!'));}
 }
@@ -1580,6 +1585,7 @@ async function addGuest() {
     document.getElementById('guest-dept').value = '';
     renderGuestList(); renderList();
     toast(`✅ 게스트 "${name}" 추가됨`);
+    _log('게스트추가', name);
   } else toast('❌ ' + (res.message||res.error||''));
 }
 
@@ -1590,7 +1596,7 @@ async function recordGuestFee(name) {
   const evTitle = currentEventTitle || today;
   const desc    = `${evTitle} 게스트 참가비 (${name})`;
   const res = await api({ action:'addFinance', date:today, desc, amount:3000, category:'수입', note:`게스트 ${name}` });
-  if (res.ok) toast(`✅ ${name} 참가비 3,000원 기록됨`);
+  if (res.ok) { toast(`✅ ${name} 참가비 3,000원 기록됨`); _log('게스트참가비', name, 3000); }
   else toast('❌ ' + (res.error||''));
 }
 
@@ -1615,6 +1621,7 @@ async function promoteGuest(name) {
       if (m) m.status = 'active';
     });
     toast(`✅ ${name} 정식 가입!`);
+    _log('게스트정식가입', name);
     renderMemberList(); renderGuestList(); renderList();
   } else toast('❌ ' + (res.error||''));
 }
@@ -1848,7 +1855,7 @@ async function addFinanceEntry(){
   if(res.ok){toast('✅ 추가됨');_log('가계부추가',desc,amount);document.getElementById('fin-desc').value='';document.getElementById('fin-amount').value='';loadFinances();}
   else toast('❌ '+res.error);
 }
-async function deleteFinEntry(rowNum){if(!confirm('삭제할까요?'))return;const res=await api({action:'deleteFinance',rowNum});if(res.ok){toast('🗑 삭제됨');loadFinances();}else toast('❌ '+(res.error||''));}
+async function deleteFinEntry(rowNum){if(!confirm('삭제할까요?'))return;const f=finances.find(f=>f.rowNum===rowNum);const res=await api({action:'deleteFinance',rowNum,desc:f?.desc,amount:f?.amount});if(res.ok){toast('🗑 삭제됨');_log('가계부삭제',f?.desc||'',f?.amount||'');loadFinances();}else toast('❌ '+(res.error||''));}
 
 function openFinEdit(f){
   if(typeof f==='string')f=JSON.parse(f.replace(/&quot;/g,'"'));
@@ -2341,6 +2348,7 @@ async function deleteEventConfirm(eventId, title) {
   const res = await api({ action:'deleteEvent', eventId });
   if (res.ok) {
     events = events.filter(e => e.eventId !== eventId);
+    _log('모임삭제', title);
     if (currentEventId === eventId) {
       currentEventId = null; currentEventTitle = '';
       setEvtBadge('모임 선택');
@@ -2378,8 +2386,18 @@ async function loadLogs() {
   try {
     const res = await gasGet('getLogs', { limit:200 });
     if (!Array.isArray(res)||!res.length){el.innerHTML='<div class="empty">로그 없음</div>';return;}
-    const C={'동기화':'#3b82f6','참석저장':'#10b981','레인배정':'#f59e0b','회원추가':'#8b5cf6',
-             '납부처리':'#10b981','납부취소':'#ef4444','탈퇴처리':'#ef4444','가계부추가':'#f59e0b','점수입력':'#0d1b35'};
+    const C={
+      '동기화':'#94a3b8',
+      '참석여부 열람':'#cbd5e1','현장출석 열람':'#cbd5e1','레인배정 열람':'#cbd5e1','현황 열람':'#cbd5e1','점수 열람':'#cbd5e1','관리 열람':'#cbd5e1',
+      '모임선택':'#3b82f6','모임생성':'#6366f1','모임삭제':'#ef4444',
+      '참석저장':'#10b981',
+      '레인배정':'#f59e0b','레인공유':'#d97706',
+      '회원추가':'#8b5cf6','회원수정':'#7c3aed','회원삭제':'#ef4444',
+      '탈퇴처리':'#ef4444','납부처리':'#10b981','납부취소':'#f87171',
+      '게스트추가':'#fbbf24','게스트참가비':'#f59e0b','게스트정식가입':'#10b981',
+      '가계부추가':'#0d9488','가계부수정':'#0f766e','가계부삭제':'#ef4444',
+      '점수입력':'#0d1b35',
+    };
     el.innerHTML=res.map(r=>`<div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid #f8fafc;font-size:11px">
       <span style="color:var(--muted);flex-shrink:0;min-width:105px">${r.ts.slice(5,16)}</span>
       <span style="background:${C[r.action]||'#64748b'};color:#fff;padding:2px 7px;border-radius:99px;font-size:10px;font-weight:700;flex-shrink:0">${r.action}</span>
