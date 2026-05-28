@@ -1325,7 +1325,11 @@ function updateLastSaved() {
 const TC = ['#162447','#065f46','#7c2d12','#4c1d95','#1e3a5f','#1f2937'];
 
 function getAttendees() {
-  return members.filter(m => statusMap[m.name]==='attend' && isVisible(m)).map(m => ({ name:m.name, avg:getEff(m) }));
+  // active + 게스트 모두 포함 (게스트는 _allMembers에만 있을 수 있음)
+  const src = _allMembers.length ? _allMembers : members;
+  return src
+    .filter(m => statusMap[m.name]==='attend' && (m.status==='active' || m.status==='guest'))
+    .map(m => ({ name:m.name, avg:getEff(m), isGuest: m.status==='guest' }));
 }
 function setLaneMode(mode) {
   laneMode = mode;
@@ -1351,7 +1355,7 @@ function checkNoAvg(att) {
   list.innerHTML = noAvg.map(m => {
     const id = m.name.replace(/[^가-힣a-zA-Z0-9]/g,'_');
     return `<div style="display:flex;align-items:center;gap:7px;margin-bottom:7px">
-      <span style="flex:1;font-size:13px;font-weight:700">${m.name}</span>
+      <span style="flex:1;font-size:13px;font-weight:700">${m.name}${m.isGuest?' <span style="font-size:9px;background:#fcd34d;color:#92400e;padding:1px 5px;border-radius:4px">G</span>':''}</span>
       <button onclick="setNG('${m.name.replace(/'/g,"\\'")}',100)" style="padding:4px 8px;border:1.5px solid var(--border);border-radius:7px;background:var(--bg);font-size:11px;font-weight:700;cursor:pointer;font-family:'Noto Sans KR',sans-serif">남100</button>
       <button onclick="setNG('${m.name.replace(/'/g,"\\'")}',80)"  style="padding:4px 8px;border:1.5px solid var(--border);border-radius:7px;background:var(--bg);font-size:11px;font-weight:700;cursor:pointer;font-family:'Noto Sans KR',sans-serif">여80</button>
       <input type="number" id="ng-${id}" value="${tempAvgMap[m.name]||''}" placeholder="직접" min="50" max="300" style="width:65px;border:1.5px solid var(--border);border-radius:7px;padding:4px 6px;font-size:13px;font-weight:700;font-family:'Noto Sans KR',sans-serif;outline:none;text-align:center;color:var(--navy)" oninput="applyNG('${m.name.replace(/'/g,"\\'")}',this.value)">
